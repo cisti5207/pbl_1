@@ -16,13 +16,6 @@ void printCenter (const char *mess)
     printf ("%*s%s", space, "", mess);
 }
 
-void printData(const char *data_truyen)
-{
-    printf ("%*s%s", 4, "", "║ ");
-    for (int i = 1; i != 7; i++) printf ("")
-
-}
-
 /*
 ╔════════╦═══════════════════════════════════════════════════════════════════╦═════╦═══════╦═════╦═══════╗
 ║ XXXXXX ║ Ten truyen                                                        ║ XXX ║ State ║ Fav ║ price ║ 
