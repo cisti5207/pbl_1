@@ -7,50 +7,145 @@
 #define FALSE 0
 #define NOT_FOUND -1
 
+// == Khóa khung console ==
+void FixAndLockConsole();
+
+// == Cấu trúc của một danh sách truyên ==
 struct ElementType 
 {
-    char ID[7];
+    char ID[8];
     char Name[200];
     char normName[200];
-    char Quantity[4];
+    char Quantity[5];
     char State[10];
-    char Fav[4];
-    char Price_day[7];
+    char Price_day[10];
+    int lenName;
 };
 struct ListInfo 
 {
     struct ElementType *dataTruyen;
     int count;
     int capacity;
-    double stake;
 };
 
 typedef struct ElementType Element;
 typedef struct ListInfo *List;
 typedef int Position;
 
+// == Tạo danh sách truyên ==
 List createList (FILE *f);
 int getdataTruyen(List L, FILE *f);
+
+// == Lọc khoảng trắng ==
 int trim(char *c);
 
+// == Đếm độ dài thực tế của tên truyện ==
+int lenName(const char *Name);
+
+// == chuyển dấu thành không dấu ==
 int normalize(const char *word, char *normalword);
 int normalize_vi(const char *word, char *result, Position *pos, Position *pos_result);
 
+// == show List ==
+void showList(List L, Position page);
+
+// == show Title ==
+void Title();
+
+// == show chức năng quản lí ==
+void showFunc();
+
+// =============== MAIN ===================
 int main()
 {
-    FILE *f = fopen ("..\\build\\dataTruyen.txt", "r+");
+    SetConsoleOutputCP(65001);
+    SetConsoleCP(65001);
+
+    FixAndLockConsole();
+
+    FILE *f = fopen ("data\\dataTruyen.txt", "r+");
 
     List TRUYEN88 = createList(f);
     if (getdataTruyen(TRUYEN88, f) == FALSE)
     {
-        printf ("Khong the lay du lieu truyen!!");
+        printf ("Errol!!!");
+        getchar();
         return FALSE;
     }
 
+    Title();
+
+    Position page = 1;
+
+    while (1)
+    {
+        while (1)
+        {
+            showList(TRUYEN88, page);
+            break;
+        }
+        break;
+    }
+    getchar();
+    return TRUE;
     
+}
+
+// == show chức năng quản lí ==
+void showFunc()
+{
 
 }
 
+// == show Title ==
+void Title()
+{
+    int x = 236;
+    int y = x - 74;
+    printf("╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s████████╗██████╗ ██╗   ██╗██╗   ██╗███████╗███╗   ██╗   █████╗   █████╗ %*s║\n", y/2, "", y/2, "");
+    printf("║%*s╚══██╔══╝██╔══██╗██║   ██║╚██╗ ██╔╝██╔════╝████╗  ██║  ██╔══██╗ ██╔══██╗%*s║\n", y/2, "", y/2, "");
+    printf("║%*s   ██║   ██████╔╝██║   ██║ ╚████╔╝ █████╗  ██╔██╗ ██║  ╚█████╔╝ ╚█████╔ %*s║\n", y/2, "", y/2, "");
+    printf("║%*s   ██║   ██╔══██╗██║   ██║  ╚██╔╝  ██╔══╝  ██║╚██╗██║  ██╔══██╗ ██╔══██╗%*s║\n", y/2, "", y/2, "");
+    printf("║%*s   ██║   ██║  ██║╚██████╔╝   ██║   ███████╗██║ ╚████║  ╚█████╔╝ ╚█████╔╝%*s║\n", y/2, "", y/2, "");
+    printf("║%*s   ╚═╝   ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═══╝   ╚════╝   ╚════╝ %*s║\n", y/2, "", y/2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("╠═════════════════════════════════════╦══════════════╦════════════════════════════════════════════════════════════════════════════════════════════════════════════╦══════════╦════════════╦══════════╦═════════════════════════════════════╣\n");
+    printf("║                                     ║   Mã Truyện  ║                                                 Tên Truyện                                                 ║ Số lượng ║ Trạng thái ║ Giá/ngày ║                                     ║\n");
+}
+
+// == show List ==
+void showList(List L, Position page)
+{
+    int x = 236;
+    int y = x - 74;
+    int count = 1;
+    Element e;
+    
+    while (count <= 20)
+    {
+        e = L -> dataTruyen[(page - 1) * 10 + count];
+        int len = e.lenName;
+        printf("║                                     ╠══════════════╬════════════════════════════════════════════════════════════════════════════════════════════════════════════╬══════════╬════════════╬══════════╣                                     ║\n");
+        printf("║                                     ║%*s %s %*s║ %s %*s║%*s %s %*s║%*s %s %*s║%*s %s %*s║                                     ║\n", 
+                                                3, "", e.ID         , 3                 , "",
+                                                       e.Name       , 108 - (len + 2)   , "",                                                
+                                                2, "", e.Quantity   , 3                 , "",
+                                                3, "", e.State      , 4                 , "",
+                                                1, "", e.Price_day  , 1                 , "");
+        count++;
+    }
+    printf("╠═════════════════════════════════════╩══════════════╩════════════════════════════════════════════════════════════════════════════════════════════════════════════╩══════════╩════════════╩══════════╩═════════════════════════════════════╣\n");
+}
+
+// == Tạo danh sách truyện để quản lí ==
 List createList (FILE *f)
 {
     List L = malloc (sizeof(struct ListInfo));
@@ -59,7 +154,6 @@ List createList (FILE *f)
         return NULL;
     
     int count, capacity;
-    double stake;
 
     /*
         fscanf (f, " %*[^0-9]%d", &count);
@@ -67,11 +161,9 @@ List createList (FILE *f)
     */
     fscanf (f, " Count: %d", &count);
     fscanf (f, " Capacity: %d", &capacity);
-    fscanf (f, " Stake: %lf", &stake);
     
     L -> count = count;
     L -> capacity = capacity;
-    L -> stake = stake;
     L -> dataTruyen = malloc (sizeof(struct ElementType) * (capacity + 1));
 
     if (L -> dataTruyen == NULL)
@@ -85,16 +177,18 @@ int getdataTruyen(List L, FILE *f)
     Element e;
     while (1) 
     {
-        if (fscanf (f," %[^|] | %[^|] | %[^|] | %[^|] | %[^|] | %[^|] | %[^|] | ",
-            e.ID, e.Name, e.normName, e.Quantity, e.State, e.Fav, e.Price_day) != 7)
+        if (fscanf (f," %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %[^\n] ",
+            e.ID, e.Name, e.normName, e.Quantity, e.State, e.Price_day) != 6)
             return FALSE;
 
         trim(e.ID);
+        trim(e.Name);
         trim(e.normName);
         trim(e.Quantity);
         trim(e.State);
-        trim(e.Fav);
         trim(e.Price_day);
+
+        e.lenName = lenName(e.Name);
 
         L -> dataTruyen[cur] = e;
 
@@ -103,16 +197,50 @@ int getdataTruyen(List L, FILE *f)
     }
     return TRUE;
 }
+
+// == Đếm độ dài thực tế của tên truyện ==
+int lenName(const char *Name)
+{
+    int i = 0, len = 0;
+    while (Name[i] != '\0')
+    {
+        if ((Name[i] & 0x80) == 0) 
+            i++;
+        else if ((Name[i] & 0xE0) == 0xC0) 
+            i += 2;
+        else if ((Name[i] & 0xF0) == 0xE0) 
+            i += 3;
+        else if ((Name[i] & 0xF8) == 0xF0) 
+            i += 4;
+        
+        len++;
+    }
+    return len;
+}
+
+// === Lọc khoảng trắn ===
 int trim(char *c)
 {
-    int i = strlen (c);
-    while ((i >= 0) && (c[i] == ' ' || c[i] == '\t'))
+    int len_c = strlen(c);
+    int i = len_c - 1;
+    while ((i >= 0) && (c[i] == ' ' || c[i] == '\t' || c[i] == '\n'))
     {
         c[i] = 0;
         i--;
     }
+    if (i == 0) return TRUE;
+    
+    len_c = strlen(c);
+    i = 0;
+    while (c[i] == ' ' || c[i] == '\t') i++;
+
+    for (int j = 0; j + i <= len_c; j++)
+        c[j] = c[j + i];
+
     return TRUE;
 }
+
+// === Tim Truyen =====
 int findTruyen(FILE *f, List L)
 {
     char name_find[200];
@@ -121,6 +249,7 @@ int findTruyen(FILE *f, List L)
 
 }
 
+// === Viet Hoa =====
 int normalize(const char *word, char *normalword)
 {
     int i = 0, j = 0;
@@ -278,4 +407,47 @@ int normalize_vi(const char *word, char *result, Position *pos, Position *pos_re
     }
     *pos_result = *pos;
     return TRUE;
+}
+
+// == Khóa khung console ==
+void FixAndLockConsole() 
+{
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    HWND hwnd = GetConsoleWindow();
+
+    // 1. Phóng to cửa sổ trước
+    ShowWindow(hwnd, SW_MAXIMIZE);
+    
+    // Đợi 1 chút để Windows ổn định kích thước cửa sổ mới
+    Sleep(200); 
+
+    // 2. Lấy thông tin chính xác của cửa sổ sau khi đã phóng to
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hOut, &csbi);
+
+    // Tính toán kích thước hiện tại của cửa sổ (tính bằng số ký tự)
+    short winWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    short winHeight = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+    // 3. ÉP Buffer phải bằng khít với Window
+    // Điều này sẽ triệt tiêu hoàn toàn thanh cuộn
+    COORD newSize;
+    newSize.X = winWidth;
+    newSize.Y = winHeight;
+    
+    // Thực hiện ép kích thước bộ đệm
+    if (!SetConsoleScreenBufferSize(hOut, newSize)) {
+        // Nếu lỗi, có thể do winHeight quá lớn so với giới hạn font
+        // Ta thử lại với giá trị an toàn hơn từ csbi
+        SetConsoleScreenBufferSize(hOut, newSize);
+    }
+
+    // 4. Khóa cứng viền không cho kéo giãn
+    LONG style = GetWindowLong(hwnd, GWL_STYLE);
+    style &= ~WS_THICKFRAME; // Chặn kéo viền
+    style &= ~WS_MAXIMIZEBOX; // Chặn nút phóng to (vì đã max rồi)
+    SetWindowLong(hwnd, GWL_STYLE, style);
+
+    // Cập nhật thay đổi
+    SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }

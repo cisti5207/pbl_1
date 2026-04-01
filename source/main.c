@@ -2,13 +2,15 @@
 #include <string.h>
 #include <windows.h>
 #include <stdlib.h>
+
 // ================= MENU =============================
 void Menu();
 
+// Khóa console mặc định và scroll
 void FixAndLockConsole();
+
+// Chuyển vị trí con trỏ
 void gotoxy(int x, int y);
-
-
 
 int main() {
     SetConsoleOutputCP(65001);
@@ -23,8 +25,9 @@ int main() {
     scanf ("%c", &choose);
     switch(choose)
     {
-        case '1':   
-            system("start ....exe");
+        case '1':
+            system("cls");
+            system("build\\dataTruyen_menu.exe");
             return 0;
         case '2':
         case '3':
