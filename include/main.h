@@ -1,1 +1,0 @@
-void printCenter(const char *mess);

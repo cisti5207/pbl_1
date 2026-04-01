@@ -1,20 +1,23 @@
-000001 | Thế giới hoàn mỹ | 010 | Còn | 000 | 10.000
-000002 | Hoa Sơn tái khởi | 010 | Còn | 000 | 15.000
-000003 | Kiếm Lai | 010 | Còn | 000 | 10.000
-000004 | Truyền Kiều | 010 | Còn | 000 | 18.000
-000005 | Thám tử lừng danh Conan | 010 | Còn | 000 | 05.000
-000006 | Thánh khư | 010 | Còn | 000 | 07.000
-000007 | Tây Du Kí | 010 | Còn | 000 | 18.000
-000008 | Linh khư | 010 | Còn | 000 | 06.000
-000009 | Nhất niệm vĩnh hằng | 010 | Còn | 000 | 07.000
-000010 | Tiên nghịch | 010 | Còn | 000 | 10.000
-000011 | Doraemon | 010 | Còn | 000 | 04.000
-000012 | Toàn trí độc giả | 010 | Còn | 000 | 10.000
-000013 | Quái lực loạn thần | 010 | Còn | 000 | 07.000
-000014 | Tử thần phiêu nguyệt | 010 | Còn | 000 | 05.000
-000015 | Cậu bé rồng | 010 | Còn | 000 | 02.000
-000016 | 7 viên ngọc rồng | 010 | Còn | 000 | 03.000
-000017 | Đấu phá thương khung | 010 | Còn | 000 | 05.000
-000018 | Già thiên | 010 | Còn | 000 | 10.000
-000019 | Trạng quỳnh | 010 | Còn | 000 | 02.000
-000020 | Phàm nhân tu tiên | 010 | Còn | 000 | 07.000
+Count: 20
+Capacity: 100
+Stake: 0.5
+000001 | Thế giới hoàn mỹ               | the gioi hoan my            | 010 | Còn | 000 | 10.000
+000002 | Hoa Sơn tái khởi               | hoa son tai khoi            | 010 | Còn | 000 | 15.000
+000003 | Kiếm Lai                       | kiem lai                    | 010 | Còn | 000 | 10.000
+000004 | Truyền Kiều                    | truyen kieu                 | 010 | Còn | 000 | 18.000
+000005 | Thám tử lừng danh Conan        | tham tu lung danh conan     | 010 | Còn | 000 | 05.000
+000006 | Thánh khư                      | thanh khu                   | 010 | Còn | 000 | 07.000
+000007 | Tây Du Kí                      | tay du ki                   | 010 | Còn | 000 | 18.000
+000008 | Linh khư                       | linh khu                    | 010 | Còn | 000 | 06.000
+000009 | Nhất niệm vĩnh hằng            | nhat niem vinh hang         | 010 | Còn | 000 | 07.000
+000010 | Tiên nghịch                    | tien nghich                 | 010 | Còn | 000 | 10.000
+000011 | Doraemon                       | doraemon                    | 010 | Còn | 000 | 04.000
+000012 | Toàn trí độc giả               | toan tri doc gia            | 010 | Còn | 000 | 10.000
+000013 | Quái lực loạn thần             | quai luc loan than          | 010 | Còn | 000 | 07.000
+000014 | Tử thần phiêu nguyệt           | tu than phieu nguyet        | 010 | Còn | 000 | 05.000
+000015 | Cậu bé rồng                    | cau be rong                 | 010 | Còn | 000 | 02.000
+000016 | 7 viên ngọc rồng               | 7 vien ngoc rong            | 010 | Còn | 000 | 03.000
+000017 | Đấu phá thương khung           | dau pha thuong khung        | 010 | Còn | 000 | 05.000
+000018 | Già thiên                      | gia thien                   | 010 | Còn | 000 | 10.000
+000019 | Trạng quỳnh                    | trang quynh                 | 010 | Còn | 000 | 02.000
+000020 | Phàm nhân tu tiên              | pham nhan tu tien           | 010 | Còn | 000 | 07.000
