@@ -7,8 +7,15 @@
 #define FALSE 0
 #define NOT_FOUND -1
 
+//=======================================================================
+// Quản lí console
 // == Khóa khung console ==
 void FixAndLockConsole();
+
+// == Điều chỉnh con trỏ console ==
+void gotoxy(int x, int y);
+
+//=========================================================================
 
 // == Cấu trúc của một danh sách truyên ==
 struct ElementType 
@@ -55,6 +62,9 @@ void Title();
 // == show chức năng quản lí ==
 void showFunc();
 
+// == show block để sử dụng function ==
+void commandBlock();
+
 // =============== MAIN ===================
 int main()
 {
@@ -82,6 +92,9 @@ int main()
         while (1)
         {
             showList(TRUYEN88, page);
+            showFunc();
+            commandBlock();
+            gotoxy(13, 70);
             break;
         }
         break;
@@ -91,14 +104,10 @@ int main()
     
 }
 
-// == show chức năng quản lí ==
-void showFunc()
-{
 
-}
 
 // == show Title ==
-void Title()
+void Title() // Tổng 17 line
 {
     int x = 236;
     int y = x - 74;
@@ -122,14 +131,14 @@ void Title()
 }
 
 // == show List ==
-void showList(List L, Position page)
+void showList(List L, Position page) // Tổng 31 line
 {
     int x = 236;
     int y = x - 74;
     int count = 1;
     Element e;
     
-    while (count <= 20)
+    while (count <= 15)
     {
         e = L -> dataTruyen[(page - 1) * 10 + count];
         int len = e.lenName;
@@ -143,6 +152,43 @@ void showList(List L, Position page)
         count++;
     }
     printf("╠═════════════════════════════════════╩══════════════╩════════════════════════════════════════════════════════════════════════════════════════════════════════════╩══════════╩════════════╩══════════╩═════════════════════════════════════╣\n");
+}
+
+// == show chức năng quản lí ==
+void showFunc() // Tổng 19 line
+{
+    int x = 236;
+    int z = x - 48;
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s╔════════════════════════════════════════════╗%*s║\n", z/2, "", z/2, "");
+    printf("║%*s║   HỆ THỐNG QUẢN LÝ CHO THUÊ TRUYỆN TRANH   ║%*s║\n", z/2, "", z/2, "");
+    printf("║%*s╚════════════════════════════════════════════╝%*s║\n", z/2, "", z/2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║                           [1] ➕ Thêm truyện                            [3] ⏫ Lưu dữ liệu                                          [5] ◀️ Trang trước                                        [7] ⏮️ Trang đầu                           ║\n");
+    printf("║%*s║\n", x - 2, "");
+    printf("║                           [2] ➖ Xóa truyện                             [4] 🔄️ Làm mới dữ liệu                                     [6] ▶️ Trang tiếp theo                                    [8] ⏭️ Trang cuối                          ║\n");
+    printf("║%*s║\n", x - 2, "");
+    printf("╠══════════════════════════════════════════════════════════╦════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╦══════════════════════════════════════════════════════════╣\n");
+    printf("║                                                          ║                                                [9] 🔎 Tìm kiếm truyện                                              ║                                                          ║\n");
+    printf("║                                                          ╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣                                                          ║\n");
+    printf("║                                                          ║                                                [10] ❌ Exit                                                        ║                                                          ║\n");
+    printf("╠══════════════════════════════════════════════════════════╩════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╩══════════════════════════════════════════════════════════╣\n");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+    printf("║%*s║\n", x - 2, "");
+}
+
+// == show block để sử dụng function ==
+void commandBlock() // Tổng 6 line
+{
+    int x = 236;
+    printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+    printf("║%*s║\n", x - 2, "");
+    printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+    printf("║ 🟩 Choose: %*s║\n", x - 14, "");
+    printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
 }
 
 // == Tạo danh sách truyện để quản lí ==
@@ -450,4 +496,13 @@ void FixAndLockConsole()
 
     // Cập nhật thay đổi
     SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+}
+
+// == Điều chỉnh con trỏ của console ==
+void gotoxy(int x, int y) 
+{
+    COORD coord;
+    coord.X = x; 
+    coord.Y = y; 
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
