@@ -21,13 +21,14 @@ int main() {
     Menu();
     gotoxy(13, 70);
 
-    char choose;
+    char choose; int run;
     scanf ("%c", &choose);
     switch(choose)
     {
         case '1':
-            system("cls");
-            system("build\\dataTruyen_menu.exe");
+            run = system("build\\dataTruyen_menu.exe");
+            if (run != 0)
+                system ("dataTruyen_menu.exe");
             return 0;
         case '2':
         case '3':

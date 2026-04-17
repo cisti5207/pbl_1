@@ -355,7 +355,7 @@ void inDanhSachChuaTra(User *head) {
 
 
 int main() {
-User *head = NULL;
-SetConsoleOutputCP(65001);
+    User *head = NULL;
+    SetConsoleOutputCP(65001);
     SetConsoleCP(65001); 
 }
