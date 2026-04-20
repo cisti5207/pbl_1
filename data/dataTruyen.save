@@ -1,0 +1,102 @@
+Count: 100
+Capacity: 1000
+000001 | Thế giới hoàn mỹ               | the gioi hoan my               | 010 | Còn | 10.000
+000002 | Hoa Sơn tái khởi               | hoa son tai khoi               | 010 | Còn | 15.000
+000003 | Kiếm Lai                       | kiem lai                       | 010 | Còn | 10.000
+000004 | Truyền Kiều                    | truyen kieu                    | 010 | Còn | 18.000
+000005 | Thám tử lừng danh Conan        | tham tu lung danh conan        | 010 | Còn | 05.000
+000006 | Thánh khư                      | thanh khu                      | 010 | Còn | 07.000
+000007 | Tây Du Kí                      | tay du ki                      | 010 | Còn | 18.000
+000008 | Linh khư                       | linh khu                       | 010 | Còn | 06.000
+000009 | Nhất niệm vĩnh hằng            | nhat niem vinh hang            | 010 | Còn | 07.000
+000010 | Tiên nghịch                    | tien nghich                    | 010 | Còn | 10.000
+000011 | Doraemon                       | doraemon                       | 010 | Còn | 04.000
+000012 | Toàn trí độc giả               | toan tri doc gia               | 010 | Còn | 10.000
+000013 | Quái lực loạn thần             | quai luc loan than             | 010 | Còn | 07.000
+000014 | Tử thần phiêu nguyệt           | tu than phieu nguyet           | 010 | Còn | 05.000
+000015 | Cậu bé rồng                    | cau be rong                    | 010 | Còn | 02.000
+000016 | 7 viên ngọc rồng               | 7 vien ngoc rong               | 010 | Còn | 03.000
+000017 | Đấu phá thương khung           | dau pha thuong khung           | 010 | Còn | 05.000
+000018 | Già thiên                      | gia thien                      | 010 | Còn | 10.000
+000019 | Trạng quỳnh                    | trang quynh                    | 010 | Còn | 02.000
+000020 | Phàm nhân tu tiên              | pham nhan tu tien              | 010 | Còn | 07.000
+000021 | Tru tiên                       | tru tien                       | 010 | Còn | 08.000
+000022 | Võ động càn khôn               | vo dong can khon               | 010 | Còn | 07.000
+000023 | Đại chúa tể                    | dai chua te                    | 010 | Còn | 07.000
+000024 | Đế bá                          | de ba                          | 010 | Còn | 09.000
+000025 | Thần mộ                        | than mo                        | 010 | Còn | 08.000
+000026 | Tinh thần biến                 | tinh than bien                 | 010 | Còn | 07.000
+000027 | Thôn phệ tinh không            | thon phe tinh khong            | 010 | Còn | 09.000
+000028 | Mục thần ký                    | muc than ky                    | 010 | Còn | 08.000
+000029 | Tuyết trung hãn đao hành       | tuyet trung han dao hanh       | 010 | Còn | 09.000
+000030 | Kiếm hiệp tình duyên           | kiem hiep tinh duyen           | 010 | Còn | 06.000
+000031 | Bàn long                       | ban long                       | 010 | Còn | 07.000
+000032 | Huyền giới chi môn             | huyen gioi chi mon             | 010 | Còn | 07.000
+000033 | Vạn cổ chí tôn                 | van co chi ton                 | 010 | Còn | 08.000
+000034 | Thần đạo đan tôn               | than dao dan ton               | 010 | Còn | 08.000
+000035 | Vĩnh hằng chí tôn              | vinh hang chi ton              | 010 | Còn | 09.000
+000036 | Long phù                       | long phu                       | 010 | Còn | 07.000
+000037 | Tu la võ thần                  | tu la vo than                  | 010 | Còn | 09.000
+000038 | Vạn tộc chi kiếp               | van toc chi kiep               | 010 | Còn | 09.000
+000039 | Ma thiên ký                    | ma thien ky                    | 010 | Còn | 07.000
+000040 | Kiếm động cửu thiên            | kiem dong cuu thien            | 010 | Còn | 07.000
+000041 | Vạn cổ thần đế                 | van co than de                 | 010 | Còn | 09.000
+000042 | Võ luyện đỉnh phong            | vo luyen dinh phong            | 010 | Còn | 10.000
+000043 | Tuyệt thế võ thần              | tuyet the vo than              | 010 | Còn | 08.000
+000044 | Linh vực                       | linh vuc                       | 010 | Còn | 07.000
+000045 | Đại đạo triều thiên            | dai dao trieu thien            | 010 | Còn | 08.000
+000046 | Kiếm vương triều               | kiem vuong trieu               | 010 | Còn | 08.000
+000047 | Tinh môn                       | tinh mon                       | 010 | Còn | 07.000
+000048 | Thần lan kỳ vực                | than lan ky vuc                | 010 | Còn | 07.000
+000049 | Thần võ thiên tôn              | than vo thien ton              | 010 | Còn | 09.000
+000050 | Hỗn độn kiếm thần              | hon don kiem than              | 010 | Còn | 09.000
+000051 | Phá thiên lục                  | pha thien luc                  | 010 | Còn | 07.000
+000052 | Cổ chân nhân                   | co chan nhan                   | 010 | Còn | 08.000
+000053 | Nhân đạo chí tôn               | nhan dao chi ton               | 010 | Còn | 07.000
+000054 | Linh kiếm tôn                  | linh kiem ton                  | 010 | Còn | 08.000
+000055 | Thiên đạo đồ thư quán          | thien dao do thu quan          | 010 | Còn | 08.000
+000056 | Thần y đích nữ                 | than y dich nu                 | 010 | Còn | 06.000
+000057 | Phượng nghịch thiên hạ         | phuong nghich thien ha         | 010 | Còn | 07.000
+000058 | Ma đạo tổ sư                   | ma dao to su                   | 010 | Còn | 09.000
+000059 | Thiên quan tứ phúc             | thien quan tu phuc             | 010 | Còn | 09.000
+000060 | Hệ thống tối cường             | he thong toi cuong             | 010 | Còn | 08.000
+000061 | Đấu la đại lục                 | dau la dai luc                 | 010 | Còn | 10.000
+000062 | Tuyệt thế đường môn            | tuyet the duong mon            | 010 | Còn | 08.000
+000063 | Long vương truyền thuyết       | long vuong truyen thuyet       | 010 | Còn | 08.000
+000064 | Cửu tinh bá thể quyết          | cuu tinh ba the quyet          | 010 | Còn | 09.000
+000065 | Vạn cổ kiếm thần               | van co kiem than               | 010 | Còn | 08.000
+000066 | Thái cổ thần vương             | thai co than vuong             | 010 | Còn | 09.000
+000067 | Kiếm phá cửu thiên             | kiem pha cuu thien             | 010 | Còn | 08.000
+000068 | Dị thế tà quân                 | di the ta quan                 | 010 | Còn | 07.000
+000069 | Sát thần                       | sat than                       | 010 | Còn | 07.000
+000070 | Ngạo thế cửu trọng thiên       | ngao the cuu trong thien       | 010 | Còn | 09.000
+000071 | Đại mộng chủ                   | dai mong chu                   | 010 | Còn | 08.000
+000072 | Cổ kiếm kỳ đàm                 | co kiem ky dam                 | 010 | Còn | 07.000
+000073 | Tiên kiếm kỳ hiệp              | tien kiem ky hiep              | 010 | Còn | 07.000
+000074 | Phong thần diễn nghĩa          | phong than dien nghia          | 010 | Còn | 08.000
+000075 | Tam quốc diễn nghĩa            | tam quoc dien nghia            | 010 | Còn | 10.000
+000076 | Thủy hử                        | thuy hu                        | 010 | Còn | 09.000
+000077 | Hồng lâu mộng                  | hong lau mong                  | 010 | Còn | 09.000
+000078 | Sử ký Tư Mã Thiên              | su ky tu ma thien              | 010 | Còn | 08.000
+000079 | Bình ngô đại cáo               | binh ngo dai cao               | 010 | Còn | 06.000
+000080 | Chinh phụ ngâm                 | chinh phu ngam                 | 010 | Còn | 06.000
+000081 | Lục Vân Tiên                   | luc van tien                   | 010 | Còn | 07.000
+000082 | Dế mèn phiêu lưu ký            | de men phieu luu ky            | 010 | Còn | 05.000
+000083 | Tuổi thơ dữ dội                | tuoi tho du doi                | 010 | Còn | 06.000
+000084 | Đất rừng phương nam            | dat rung phuong nam            | 010 | Còn | 06.000
+000085 | Kính vạn hoa                   | kinh van hoa                   | 010 | Còn | 05.000
+000086 | Cho tôi xin một vé đi tuổi thơ | cho toi xin mot ve di tuoi tho | 010 | Còn | 06.000
+000087 | Tôi thấy hoa vàng trên cỏ xanh | toi thay hoa vang tren co xanh | 010 | Còn | 07.000
+000088 | Mắt biếc                       | mat biec                       | 010 | Còn | 07.000
+000089 | Ngồi khóc trên cây             | ngoi khoc tren cay             | 010 | Còn | 06.000
+000090 | Cô gái đến từ hôm qua          | co gai den tu hom qua          | 010 | Còn | 06.000
+000091 | Búp sen xanh                   | bup sen xanh                   | 010 | Còn | 06.000
+000092 | Sống mòn                       | song mon                       | 010 | Còn | 07.000
+000093 | Chí phèo                       | chi pheo                       | 010 | Còn | 05.000
+000094 | Lão hạc                        | lao hac                        | 010 | Còn | 05.000
+000095 | Tắt đèn                        | tat den                        | 010 | Còn | 06.000
+000096 | Bỉ vỏ                          | bi vo                          | 010 | Còn | 06.000
+000097 | Số đỏ                          | so do                          | 010 | Còn | 07.000
+000098 | Giông tố                       | giong to                       | 010 | Còn | 07.000
+000099 | Vỡ đê                          | vo de                          | 010 | Còn | 06.000
+000100 | Nỗi buồn chiến tranh           | noi buon chien tranh           | 010 | Còn | 08.000
