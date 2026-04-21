@@ -26,9 +26,10 @@ int main() {
     switch(choose)
     {
         case '1':
-            run = system("build\\dataTruyen_menu.exe");
+            system("cls");
+            run = system("build\\dataTruyen_menu.exe 2>nul");
             if (run != 0)
-                system ("dataTruyen_menu.exe");
+                system ("dataTruyen_menu.exe 2>nul");
             return 0;
         case '2':
         case '3':

@@ -65,13 +65,22 @@ void showList(List L, Position page);
 
 // == show chức năng quản lí ==
 void showFunc();
+
 void show_addData();
-void addData(List );
+int addData(List );
+void show_returnaddData(int _returnaddData);
+
 void show_eraseData();
 void eraseData(List, Position );
+void show_returneraseData(int );
+
+void show_saveData();
 void saveData(List L, FILE *);
-void show_findTruyen(List );
-Position findTruyen(List, const char *, Position, Position);
+
+void show_findTruyen();
+void show_choosefindTruyen(int choose);
+Position findTruyen(List, char *, Position, Position);
+void show_find(List L, Position p);
 
 // == show block để sử dụng function ==
 void commandBlock();
@@ -114,10 +123,8 @@ int main()
         showFunc();
         commandBlock(); 
         gotoxy(13, 70);
-
         scanf (" %d", &choose);
         gotoxy(13, 70);
-
         printf ("         ");
 
         switch (choose)
@@ -126,7 +133,9 @@ int main()
             {
                 gotoxy (0, 48);
                 show_addData();
-                addData(TRUYEN88);
+                int _returnaddData = addData(TRUYEN88);
+                show_returnaddData(_returnaddData);
+                Sleep(5000);
                 gotoxy (0, 48);
                 break;
             }
@@ -135,19 +144,68 @@ int main()
                 gotoxy (0, 48);
                 show_eraseData();
             
-                gotoxy(83, 56);
+                gotoxy(83, 57);
 
                 char ID[20];
                 scanf (" %s", ID);
 
                 Position p = findTruyen(TRUYEN88, ID, 1, 0);
+                int _returneraseDate = (p == NOT_FOUND || p == FALSE)? FALSE : TRUE;
+                
+                if (_returneraseDate == TRUE)
+                    eraseData(TRUYEN88, p);
 
-                eraseData(TRUYEN88, p);
+                show_returneraseData(_returneraseDate);
+                Sleep(2000);
+
                 gotoxy (0, 48);
                 break;
             }
             case 3:
+                fseek(f, 0, SEEK_SET);
+                saveData(TRUYEN88, f);
+                
+                gotoxy (0, 48);
+                show_saveData();
+
+                gotoxy(67, 57);
+
+                for (int i = 1; i <= 107; i++)
+                {
+                    if (i <= 20) Sleep(200);
+                    else if (i <= 70) Sleep(500);
+                    else Sleep(100);
+                    printf ("█");
+                }
+                fflush(f);
+                gotoxy (0, 48);
+                break;
             case 4:
+                int choose_findTruyen;
+                gotoxy (0, 48);
+                show_findTruyen();
+                while (1) 
+                {
+                    gotoxy(78, 58);
+                    
+                    scanf (" %d", &choose_findTruyen);
+                    if (choose_findTruyen == 3) break;
+
+                    show_choosefindTruyen(choose_findTruyen);
+                    char mess[200];
+                    scanf (" %[^\n]", mess);
+
+                    gotoxy(67, 58);
+                    printf ("🟩 Choose:                                                                                                ");
+                    gotoxy(78, 58);
+
+                    Position p = findTruyen(TRUYEN88, mess, choose_findTruyen % 2, choose_findTruyen % 2);
+
+                    show_find(TRUYEN88, p);
+                    
+                }
+                gotoxy (0, 48);
+                break;
             case 5:
                 if (page != 1) page--;
                 gotoxy (0, 17);
@@ -169,6 +227,12 @@ int main()
                 showList(TRUYEN88, page); 
                 break;
             default:
+                system("cls");
+                if (system("build\\main.exe 2>nul") != 0)
+                {
+                    system("cls");
+                    system("main.exe 2>nul");
+                }
                 return 0;
         }
     }
@@ -204,8 +268,8 @@ void showFunc() // Tổng 16 line
     printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════╦════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╦══════════════════════════════════════════════════════════╣\n");
     printf("║                                                          ║                                                                                                                    ║                                                          ║\n");
-    printf("║                                                          ╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣                                                          ║\n");
     printf("║                                                          ║                                                [Another key] ❌ Exit                                               ║                                                          ║\n");
+    printf("║                                                          ║                                                                                                                    ║                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════╩════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╩══════════════════════════════════════════════════════════╣\n");
 }
 
@@ -226,10 +290,15 @@ void show_addData() // Thêm dữ liệu // 16 line
     printf("║                                                                                                                                                                                                                                          ║\n");
     printf("║                                                                                                                                                                                                                                          ║\n");
     printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
 }
-void addData(List L) // Thêm dữ liệu
+int addData(List L) // Thêm dữ liệu
 {
+    if (L -> count == L -> capacity) return FALSE;
     L -> count++;
     Element e;
     
@@ -242,10 +311,13 @@ void addData(List L) // Thêm dữ liệu
 
     normalize(e.Name, e.normName);
     
-    sprintf(e.ID, "%06d", L->count);
+    int ID;
+    if (L -> count == 1) ID = 1;
+    else ID = atoi (L -> dataTruyen[L -> count - 1].ID) + 1; 
+    sprintf(e.ID, "%06d", ID);
 
-    strcpy(e.State, "Còn");
-
+    if (e.Quantity > 0) strcpy(e.State, "Còn");
+    else strcpy(e.State, "Hết");
     
     e.lenName = lenName(e.Name);
 
@@ -256,6 +328,25 @@ void addData(List L) // Thêm dữ liệu
 
     L -> dataTruyen[L -> count] = e;
     L -> last_page = (L -> count / 15 == 0)? L -> count / 15 : L -> count / 15 + 1;
+    return TRUE;
+}
+void show_returnaddData(int _returnaddData)
+{
+    gotoxy(0, 59);
+    if (_returnaddData == FALSE)
+    {
+        printf("║                                     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                     ║\n");
+        printf("║                                     ║ Số lượng đã đạt giới hạn, không thể thêm !!!!                                                                                                                ║                                     ║\n");
+        printf("║                                     ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                     ║\n");
+        gotoxy(85, 60);
+    }
+    else
+    {
+        printf("║                                     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                     ║\n");
+        printf("║                                     ║ Đã thêm thành công truyện                                                                                                                                    ║                                     ║\n");
+        printf("║                                     ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                     ║\n");
+        gotoxy(65, 60);
+    }
 }
 
 void show_eraseData() // Xóa dữ liệu // 16 line
@@ -277,20 +368,61 @@ void show_eraseData() // Xóa dữ liệu // 16 line
     printf("║                                                                                                                                                                                                                                          ║\n");
     printf("║                                                                                                                                                                                                                                          ║\n");
     printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
 }
 void eraseData(List L, Position p) // Xóa dữ liệu
 {
-    
-
     for (int i = p; i < L -> count; i++)
-        L -> dataTruyen[p] = L -> dataTruyen[p + 1];
+        L -> dataTruyen[i] = L -> dataTruyen[i + 1];
 
     L -> count--;
 }
-
-void saveData(List L, FILE *f) // Save dữ liệu
+void show_returneraseData(int _returneraseData)
 {
-    FILE *tmp = fopen("tmp.txt", "w");
+    gotoxy(0, 60);
+    if (_returneraseData == FALSE)
+    {
+        printf("║                                     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                     ║\n");
+        printf("║                                     ║ Xóa truyện không thực hiện thành công !!!!                                                                                                                   ║                                     ║\n");
+        printf("║                                     ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                     ║\n");
+        gotoxy(82, 61);
+    }
+    else
+    {
+        printf("║                                     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                     ║\n");
+        printf("║                                     ║ Đã xóa thành công truyện                                                                                                                                     ║                                     ║\n");
+        printf("║                                     ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                     ║\n");
+        gotoxy(64, 61);
+    }
+}
+
+void show_saveData()
+{
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                            Lưu dữ liệu truyện                                                                                                            ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                                             ║\n");
+    printf("║                                                                ║                                                                                                           ║                                                             ║\n");
+    printf("║                                                                ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                                             ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+}
+void saveData(List L, FILE *tmp) // Save dữ liệu
+{
 
     fprintf (tmp, "Count: %d\n", L -> count);
     fprintf (tmp, "Capacity: %d\n", L -> capacity);
@@ -301,33 +433,85 @@ void saveData(List L, FILE *f) // Save dữ liệu
         e = L -> dataTruyen[i];
         fprintf(tmp, "%s | ", e.ID);
         fprintf(tmp, "%*s | ", -((strlen(e.Name) - e.lenName) + 30), e.Name);
-        fprintf(tmp, "%*s | ", 30, e.normName);
+        fprintf(tmp, "%*s | ", -30, e.normName);
         fprintf(tmp, "%03d | ", e.Quantity);
         fprintf(tmp, "%*s | ", -((strlen(e.State) - lenName(e.State)) + 3), e.State);
         fprintf(tmp, "%6.3lf\n", e.Price_day);
     }
-
-    remove("dataTruyen_menu.txt");
-    rename("tmp.txt", "dataTruyen_menu.txt");
 }
 
-
-void show_findTruyen(List L)
+void show_findTruyen()
 {
     printf("║                                                                                                                                                                                                                                          ║\n");
-    printf("║                                                                                           [1]. Tìm truyện theo mã                                                                                                                        ║\n");
-    printf("║                                                                                           [2]. Tìm truyền theo tên                                                                                                                       ║\n");
-    printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+    printf("║                                                                                                             Tìm Truyện                                                                                                                   ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                                             ║\n");
+    printf("║                                                                ║                                         [1] Tìm truyện theo mã truyện                                     ║                                                             ║\n");
+    printf("║                                                                ╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════╣                                                             ║\n");
+    printf("║                                                                ║                                         [2] Tìm truyện theo tên truyện                                    ║                                                             ║\n");
+    printf("║                                                                ╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════╣                                                             ║\n");
+    printf("║                                                                ║                                         [3] Quay lại                                                      ║                                                             ║\n");
+    printf("║                                                                ╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════╣                                                             ║\n");
+    printf("║                                                                ║ 🟩 Choose:                                                                                                ║                                                             ║\n");
+    printf("║                                                                ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                                             ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║ 🟩 Choose:                                                                                                                                                                                                                               ║\n");
-    printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
 }
-Position findTruyen(List L, const char *Name, Position _ID, Position _Name)
+void show_choosefindTruyen(int choose)
 {
-
+    gotoxy(68, 58);
+    if (choose == 1) printf ("Mã truyện   [🏷️]: ");
+    else printf ("Tên truyện   [🏷️]: ");
+    
 }
+Position findTruyen(List L, char *mess, Position _ID, Position _Name)
+{
+    if (L -> count == 0) return FALSE;
+    Position cur = 1;
+    if (_ID == 1)
+    {
+        for (cur; cur <= L -> count; cur++)
+            if (strcmp(L -> dataTruyen[cur].ID, mess) == 0) return cur;
+        return cur = NOT_FOUND;
+    }
+    else 
+    {
+        trim(mess);
+        char normmess[200];
 
+        normalize(mess, normmess);
+        for (cur; cur <= L -> count; cur++)
+            if (strcmp(L -> dataTruyen[cur].normName, normmess) == 0) return cur;
+        return cur = NOT_FOUND;
+    }
+}
+void show_find(List L, Position p)
+{
+    gotoxy(0, 61);
+    if (p == NOT_FOUND)
+    {
+        printf("║                                     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                     ║\n");
+        printf("║                                     ║ Giá trị trên không phù hợp !!!                                                                                                                               ║                                     ║\n");
+        printf("║                                     ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                     ║\n");
+        return;
+    }
+    Element e = L -> dataTruyen[p];
+    int len = e.lenName;
+    printf("║                                     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗                                     ║\n");
+    printf("║                                     ║%*s %s %*s║ %s %*s║%*s %03d %*s║%*s %s %*s║%*s %06.3lf %*s║                                     ║\n", 
+                                                3, "", e.ID         , 3                 , "",
+                                                       e.Name       , 108 - (len + 2)   , "",                                                
+                                                2, "", e.Quantity   , 3                 , "",
+                                                3, "", e.State      , 4                 , "",
+                                                1, "", e.Price_day  , 1                 , "");
+    printf("║                                     ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝                                     ║\n");
+}
 
 
 // == show List ==
