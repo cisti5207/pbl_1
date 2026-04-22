@@ -21,13 +21,15 @@ int main() {
     Menu();
     gotoxy(13, 70);
 
-    char choose;
+    char choose; int run;
     scanf ("%c", &choose);
     switch(choose)
     {
         case '1':
             system("cls");
-            system("build\\dataTruyen_menu.exe");
+            run = system("build\\dataTruyen_menu.exe 2>nul");
+            if (run != 0)
+                system ("dataTruyen_menu.exe 2>nul");
             return 0;
         case '2':
         case '3':
@@ -84,14 +86,14 @@ void Menu()
     printf("║%*s║\n", x - 2, "");
     printf("║%*s║\n", x - 2, "");
     printf("║%*s║\n", x - 2, "");
-    printf("║%*s╔════════════════════════════════════════════╗%*s║\n", z/2, "", z/2);
-    printf("║%*s║   HỆ THỐNG QUẢN LÝ CHO THUÊ TRUYỆN TRANH   ║%*s║\n", z/2, "", z/2);
-    printf("║%*s╠════════════════════════════════════════════╣%*s║\n", z/2, "", z/2);
-    printf("║%*s║ [1] 📚 Dữ liệu truyện                      ║%*s║\n", z/2, "", z/2);
-    printf("║%*s║ [2] 👤 Dữ liệu người thuê truyện           ║%*s║\n", z/2, "", z/2);
-    printf("║%*s║ [3] 📊 Thống kê                            ║%*s║\n", z/2, "", z/2);
-    printf("║%*s║ [4] ❌ Exit                                ║%*s║\n", z/2, "", z/2);
-    printf("║%*s╚════════════════════════════════════════════╝%*s║\n", z/2, "", z/2);
+    printf("║%*s╔════════════════════════════════════════════╗%*s║\n", z/2, "", z/2, "");
+    printf("║%*s║   HỆ THỐNG QUẢN LÝ CHO THUÊ TRUYỆN TRANH   ║%*s║\n", z/2, "", z/2, "");
+    printf("║%*s╠════════════════════════════════════════════╣%*s║\n", z/2, "", z/2, "");
+    printf("║%*s║ [1] 📚 Dữ liệu truyện                      ║%*s║\n", z/2, "", z/2, "");
+    printf("║%*s║ [2] 👤 Dữ liệu người thuê truyện           ║%*s║\n", z/2, "", z/2, "");
+    printf("║%*s║ [3] 📊 Thống kê                            ║%*s║\n", z/2, "", z/2, "");
+    printf("║%*s║ [4] ❌ Exit                                ║%*s║\n", z/2, "", z/2, "");
+    printf("║%*s╚════════════════════════════════════════════╝%*s║\n", z/2, "", z/2, "");
     printf("║%*s║\n", x - 2, "");
     printf("║%*s║\n", x - 2, "");
     printf("║%*s║\n", x - 2, "");
