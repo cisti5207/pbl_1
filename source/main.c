@@ -27,14 +27,20 @@ int main() {
     {
         case '1':
             system("cls");
-            run = system("build\\dataTruyen_menu.exe 2>nul");
+            run = system("build\\dataTruyen.exe 2>nul");
             if (run != 0)
-                system ("dataTruyen_menu.exe 2>nul");
+                system ("dataTruyen.exe 2>nul");
             return 0;
         case '2':
+            system("cls");
+            run = system("build\\dataUser.exe 2>nul");
+            if (run != 0)
+                system ("dataUserexe 2>nul");
+            return 0;
         case '3':
         case '4':
-        default: break;
+        default: 
+            break;
     }
     return 0;
 }
