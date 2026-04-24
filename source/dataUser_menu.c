@@ -55,9 +55,8 @@ int whereY();
 void gotoxy(int x, int y);
 void indanhsachnguoichuatra(User *head);
 
-
-
-int main() {
+int main() 
+{
     User *head = NULL;
 
     setupConsole();
@@ -113,10 +112,8 @@ int main() {
     return 0;
 }
 
-
 void setupConsole() 
 {
-
     SetConsoleOutputCP(65001);
     SetConsoleCP(65001);
     
@@ -469,7 +466,7 @@ void xulytrasach(User *head)
 
 int layGiaTuFile(char *maCanTim) 
 {
-    FILE *f = fopen("data/dataTruyen.txt", "r"); 
+    FILE *f = fopen("data/dataTruyen.txt", "r");
     if (f == NULL) return 3000; 
 
     char line[500];

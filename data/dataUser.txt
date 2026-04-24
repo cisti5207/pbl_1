@@ -1,1 +1,1 @@
-MaUser | Name                       |Ma truyen | Ten Truyen  |So luong | Ngay thue |Ngay tra  | So ngay thue | Tien coc| Trang thai 
+MaUser | Name                       |Ma truyen | Ten Truyen  | So luong | Ngay thue | Ngay tra | So ngay thue | Tien coc| Trang thai 

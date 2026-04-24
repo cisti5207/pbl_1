@@ -2,9 +2,41 @@
 #include <string.h>
 #include <windows.h>
 #include <stdlib.h>
+#include <conio.h>
+
+#define FALSE 0
+#define TRUE 1
+
+struct Account
+{
+    char nameAccount[200];
+    char passAccount[200];
+};
+
+typedef struct Account Account;
 
 // ================= MENU =============================
-void Menu();
+void Khung();
+
+// == UI bảng func ===
+void show_choice();
+
+// == Lấy tài khoản ==
+void getAccount(FILE *_readAccount, Account *_Admin, int _quantityAccount);
+
+// == Show UI của login ==
+void show_loginAccount(int y);
+void show_loginFALSE();
+
+// == Login ==
+int login(Account *_Admin, int _quantityAccount);
+void inputPassword(char *pass);
+
+// == Xóa space thừa ==
+void trim(char *_string);
+
+// chuyen mau text va back
+void setColorUI(int Text, int Background);
 
 // Khóa console mặc định và scroll
 void FixAndLockConsole();
@@ -12,120 +44,347 @@ void FixAndLockConsole();
 // Chuyển vị trí con trỏ
 void gotoxy(int x, int y);
 
-int main() {
+// == State mode password ==
+int mode_pass(int read, int on, int off);
+
+int main() 
+{
     SetConsoleOutputCP(65001);
     SetConsoleCP(65001);    
 
     FixAndLockConsole();
-    
-    Menu();
-    gotoxy(13, 70);
+    Khung();
 
-    char choose; int run;
-    scanf ("%c", &choose);
+    if (mode_pass(1, 0, 0) == 0)
+    {
+        FILE *_readAccount = fopen ("data\\account.txt", "r");
+        int _quantityAccount;
+        if (fscanf (_readAccount ,"Quantity: %d", &_quantityAccount) != 1)
+            printf ("read FAIL!!!");
+        
+        Account _Admin[_quantityAccount];
+        getAccount(_readAccount, _Admin, _quantityAccount);
+
+        fclose(_readAccount);
+        
+        setColorUI(0, 15);
+        show_loginAccount(40);
+
+        while(login(_Admin, _quantityAccount) == FALSE)
+        {
+            setColorUI(7, 0);
+
+            gotoxy(0, 51);
+            show_loginFALSE();
+            
+            setColorUI(0, 15);
+            show_loginAccount(40);
+        }
+        setColorUI(7, 0);
+        printf("\n");
+        Khung();
+        mode_pass(0, 1, 0);
+    }
+
+    gotoxy(0, 40);
+    show_choice();
+
+    gotoxy(3, 71); printf ("🟩 Choose: ");
+
+    
+    char choose;
+    scanf (" %c", &choose);
     switch(choose)
     {
         case '1':
             system("cls");
-            run = system("build\\dataTruyen.exe 2>nul");
-            if (run != 0)
-                system ("dataTruyen.exe 2>nul");
+            system("build\\dataTruyen.exe 2>nul");
             return 0;
         case '2':
             system("cls");
-            run = system("build\\dataUser.exe 2>nul");
-            if (run != 0)
-                system ("dataUserexe 2>nul");
+            system("build\\dataUser.exe 2>nul");
             return 0;
         case '3':
+            system("cls");
+            system("build\\statistics.exe 2>nul");
+            return 0;
         case '4':
-        default: 
+        default:
+            mode_pass(0, 0, 1);
             break;
     }
     return 0;
 }
 
-//================== Menu =========================
-void Menu()
+// == State mode password ==
+int mode_pass(int read, int on, int off)
 {
-    int x = 236;
-    int y = x - 74;
-    int z = x - 48; 
+    FILE *f;
+
+    if (read == 1)
+    {
+        int c;
+        f = fopen ("build\\mode_pass.txt", "r");
+        
+        fscanf (f, "%d", &c);
+        free(f);
+
+        if (c == 1) return 1;
+        return 0;
+    }
+    else if (on == 1)
+    {
+        f = fopen ("build\\mode_pass.txt", "w");
+        fprintf (f, "1");
+        fflush(f);
+        free(f);
+
+        return 1;
+    }
+    else
+    {
+        f = fopen ("build\\mode_pass.txt", "w");
+        fprintf (f, "0");
+        fflush(f);
+        free(f);
+        
+        return 0;
+    }
+}
+
+//================== Khung =========================
+void Khung()
+{
     printf("╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s████████╗██████╗ ██╗   ██╗██╗   ██╗███████╗███╗   ██╗   █████╗   █████╗ %*s║\n", y/2, "", y/2, "");
-    printf("║%*s╚══██╔══╝██╔══██╗██║   ██║╚██╗ ██╔╝██╔════╝████╗  ██║  ██╔══██╗ ██╔══██╗%*s║\n", y/2, "", y/2, "");
-    printf("║%*s   ██║   ██████╔╝██║   ██║ ╚████╔╝ █████╗  ██╔██╗ ██║  ╚█████╔╝ ╚█████╔ %*s║\n", y/2, "", y/2, "");
-    printf("║%*s   ██║   ██╔══██╗██║   ██║  ╚██╔╝  ██╔══╝  ██║╚██╗██║  ██╔══██╗ ██╔══██╗%*s║\n", y/2, "", y/2, "");
-    printf("║%*s   ██║   ██║  ██║╚██████╔╝   ██║   ███████╗██║ ╚████║  ╚█████╔╝ ╚█████╔╝%*s║\n", y/2, "", y/2, "");
-    printf("║%*s   ╚═╝   ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═══╝   ╚════╝   ╚════╝ %*s║\n", y/2, "", y/2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                  ████████╗██████╗ ██╗   ██╗██╗   ██╗███████╗███╗   ██╗   █████╗   █████╗                                                                                 ║\n");
+    printf("║                                                                                  ╚══██╔══╝██╔══██╗██║   ██║╚██╗ ██╔╝██╔════╝████╗  ██║  ██╔══██╗ ██╔══██╗                                                                                ║\n");
+    printf("║                                                                                     ██║   ██████╔╝██║   ██║ ╚████╔╝ █████╗  ██╔██╗ ██║  ╚█████╔╝ ╚█████╔                                                                                 ║\n");
+    printf("║                                                                                     ██║   ██╔══██╗██║   ██║  ╚██╔╝  ██╔══╝  ██║╚██╗██║  ██╔══██╗ ██╔══██╗                                                                                ║\n");
+    printf("║                                                                                     ██║   ██║  ██║╚██████╔╝   ██║   ███████╗██║ ╚████║  ╚█████╔╝ ╚█████╔╝                                                                                ║\n");
+    printf("║                                                                                     ╚═╝   ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═══╝   ╚════╝   ╚════╝                                                                                 ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║%*s║\n", x - 2, "");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║%*s║\n", x - 2, "");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║%*s║\n", x - 2, "");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║%*s║\n", x - 2, "");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s╔════════════════════════════════════════════╗%*s║\n", z/2, "", z/2, "");
-    printf("║%*s║   HỆ THỐNG QUẢN LÝ CHO THUÊ TRUYỆN TRANH   ║%*s║\n", z/2, "", z/2, "");
-    printf("║%*s╠════════════════════════════════════════════╣%*s║\n", z/2, "", z/2, "");
-    printf("║%*s║ [1] 📚 Dữ liệu truyện                      ║%*s║\n", z/2, "", z/2, "");
-    printf("║%*s║ [2] 👤 Dữ liệu người thuê truyện           ║%*s║\n", z/2, "", z/2, "");
-    printf("║%*s║ [3] 📊 Thống kê                            ║%*s║\n", z/2, "", z/2, "");
-    printf("║%*s║ [4] ❌ Exit                                ║%*s║\n", z/2, "", z/2, "");
-    printf("║%*s╚════════════════════════════════════════════╝%*s║\n", z/2, "", z/2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
-    printf("║%*s║\n", x - 2, "");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║%*s║\n", x - 2, "");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║ 🟩 Choose: %*s║\n", x - 14, "");
-    printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
+    printf("║                                                                                                                                                                                                                                          ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
 }
 
 
+// == UI bảng func ===
+void show_choice()
+{
+    printf("║                                                                                              ╔════════════════════════════════════════════╗                                                                                              ║\n");
+    printf("║                                                                                              ║   HỆ THỐNG QUẢN LÝ CHO THUÊ TRUYỆN TRANH   ║                                                                                              ║\n");
+    printf("║                                                                                              ╠════════════════════════════════════════════╣                                                                                              ║\n");
+    printf("║                                                                                              ║ [1] 📚 Dữ liệu truyện                      ║                                                                                              ║\n");
+    printf("║                                                                                              ║ [2] 👤 Dữ liệu người thuê truyện           ║                                                                                              ║\n");
+    printf("║                                                                                              ║ [3] 📊 Thống kê                            ║                                                                                              ║\n");
+    printf("║                                                                                              ║ [4] ❌ Exit                                ║                                                                                              ║\n");
+    printf("║                                                                                              ╚════════════════════════════════════════════╝                                                                                              ║\n");
+}
+
+// == Lấy tài khoản ==
+void getAccount(FILE *_readAccount, Account *_Admin, int _quantityAccount)
+{
+    for (int i = 0; i < _quantityAccount; i++)
+    {
+        Account x;
+        fscanf (_readAccount, " %[^|]", x.nameAccount);
+        fscanf (_readAccount, "| %[^\n]", x.passAccount);
+        
+        trim(x.nameAccount);
+        trim(x.passAccount);
+
+        _Admin[i] = x;
+    }
+}
+
+// == Show UI của login ==
+void show_loginAccount(int y)
+{
+    int i = 0;
+    gotoxy(88, y + i++); printf ("╔════════════════════════════════════════════════════════════╗");
+    gotoxy(88, y + i++); printf ("║                                                            ║");
+    gotoxy(88, y + i++); printf ("║                          👤 Login                          ║");
+    gotoxy(88, y + i++); printf ("║                                                            ║");
+    gotoxy(88, y + i++); printf ("╠════════════════════════════════════════════════════════════╣");
+    gotoxy(88, y + i++); printf ("║ Tên account:                                               ║");
+    gotoxy(88, y + i++); printf ("╠════════════════════════════════════════════════════════════╣");
+    gotoxy(88, y + i++); printf ("║ Mật khẩu   :                                               ║");
+    gotoxy(88, y + i++); printf ("╚════════════════════════════════════════════════════════════╝");
+}
+void show_loginFALSE()
+{
+    printf("║                                                                    ╔══════════════════════════════════════════════════════════════════════════════════════════════════╗                                                                  ║\n");
+    printf("║                                                                    ║ Tên tài khoản hoặc mật khẩu không đúng !!!!!                                                     ║                                                                  ║\n");
+    printf("║                                                                    ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝                                                                  ║\n");
+}
+
+// == Login ==
+int login(Account *_Admin, int _quantityAccount)
+{
+    gotoxy(104, 45);
+    
+    char nameAccount[200];
+    scanf (" %[^\n]", nameAccount);
+    trim(nameAccount);
+
+    gotoxy(104, 47);
+    char passAccount[200];
+    inputPassword(passAccount);
+
+    int flag = 0;
+    for (int i = 0; i < _quantityAccount; i++)
+    {
+        if (strcmp(_Admin[i].nameAccount, nameAccount) == 0) 
+        {
+            if (strcmp(_Admin[i].passAccount, passAccount) == 0)
+            {
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}
+void inputPassword(char *pass) 
+{
+    int i = 0;
+    char c;
+
+    while (1) {
+        c = _getch();
+
+        if (c == '\r') {
+            break;
+        }
+
+        else if (c == 8) {
+            if (i > 0) {
+                i--;
+                printf("\b \b");
+            }
+        }
+
+        else if (i < 200 - 1) {
+            pass[i++] = c;
+            printf("*");
+        }
+    }
+
+    pass[i] = '\0';
+}
+
+// == Xóa space thừa ==
+void trim(char *_string)
+{
+    int i = strlen(_string) - 1;
+
+    while (i >= 0 && (_string[i] == ' ' || _string[i] == '\n' || _string[i] == '\t'))
+    {
+        _string[i] = 0;
+        i--;
+    }
+
+    if (i == 0) return;
+
+    i = 0;
+    while (_string[i] == ' ' || _string[i] == '\t') i++;
+
+    for (int j = 0; j + i <= strlen(_string); j++)
+        _string[j] = _string[i + j];
+}
+
+
+/* == Set color ==
+| Giá trị | Tên màu (EN)       | Mô tả           |
+| ------- | ------------------ | --------------- |
+| 0       | Black              | Đen             |
+| 1       | Blue               | Xanh dương đậm  |
+| 2       | Green              | Xanh lá đậm     |
+| 3       | Aqua (Cyan)        | Xanh cyan       |
+| 4       | Red                | Đỏ đậm          |
+| 5       | Purple (Magenta)   | Tím             |
+| 6       | Yellow (Brown)     | Vàng đậm        |
+| 7       | White (Light Gray) | Trắng xám       |
+| 8       | Gray               | Xám             |
+| 9       | Light Blue         | Xanh dương sáng |
+| 10      | Light Green        | Xanh lá sáng    |
+| 11      | Light Aqua         | Cyan sáng       |
+| 12      | Light Red          | Đỏ sáng         |
+| 13      | Light Purple       | Tím sáng        |
+| 14      | Light Yellow       | Vàng sáng       |
+| 15      | Bright White       | Trắng sáng      |
+*/
+void setColorUI(int Text, int Background)
+{
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    SetConsoleTextAttribute(h, Text | (Background << 4));
+}
+
+// ==Control con trỏ ==
 void gotoxy(int x, int y) 
 {
     COORD coord;
@@ -134,6 +393,7 @@ void gotoxy(int x, int y)
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+// == Khóa khung console ==
 void FixAndLockConsole() 
 {
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
