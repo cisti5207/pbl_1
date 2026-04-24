@@ -76,4 +76,28 @@ Capacity: 1000
 000077 | Hồng lâu mộng                  | hong lau mong                  | 010 | 000 | Còn |  9.000
 000078 | Sử ký Tư Mã Thiên              | su ky tu ma thien              | 010 | 000 | Còn |  8.000
 000079 | Bình ngô đại cáo               | binh ngo dai cao               | 010 | 000 | Còn |  6.000
-000080 | Chinh phụ ngâm                 | chinh phu ngam                 | 010 | 000 | Còn 
+000080 | Chinh phụ ngâm                 | chinh phu ngam                 | 010 | 000 | Còn |  6.000
+000081 | Lục Vân Tiên                   | luc van tien                   | 010 | 000 | Còn |  7.000
+000082 | Dế mèn phiêu lưu ký            | de men phieu luu ky            | 010 | 000 | Còn |  5.000
+000083 | Tuổi thơ dữ dội                | tuoi tho du doi                | 010 | 000 | Còn |  6.000
+000084 | Đất rừng phương nam            | dat rung phuong nam            | 010 | 000 | Còn |  6.000
+000085 | Kính vạn hoa                   | kinh van hoa                   | 010 | 000 | Còn |  5.000
+000086 | Cho tôi xin một vé đi tuổi thơ | cho toi xin mot ve di tuoi tho | 010 | 000 | Còn |  6.000
+000087 | Tôi thấy hoa vàng trên cỏ xanh | toi thay hoa vang tren co xanh | 010 | 000 | Còn |  7.000
+000088 | Mắt biếc                       | mat biec                       | 010 | 000 | Còn |  7.000
+000089 | Ngồi khóc trên cây             | ngoi khoc tren cay             | 010 | 000 | Còn |  6.000
+000090 | Cô gái đến từ hôm qua          | co gai den tu hom qua          | 010 | 000 | Còn |  6.000
+000091 | Búp sen xanh                   | bup sen xanh                   | 010 | 000 | Còn |  6.000
+000092 | Sống mòn                       | song mon                       | 010 | 000 | Còn |  7.000
+000093 | Chí phèo                       | chi pheo                       | 010 | 000 | Còn |  5.000
+000094 | Lão hạc                        | lao hac                        | 010 | 000 | Còn |  5.000
+000095 | Tắt đèn                        | tat den                        | 010 | 000 | Còn |  6.000
+000096 | Bỉ vỏ                          | bi vo                          | 010 | 000 | Còn |  6.000
+000097 | Số đỏ                          | so do                          | 010 | 000 | Còn |  7.000
+000098 | Giông tố                       | giong to                       | 010 | 000 | Còn |  7.000
+000099 | Vỡ đê                          | vo de                          | 010 | 000 | Còn |  6.000
+000100 | Nỗi buồn chiến tranh           | noi buon chien tranh           | 010 | 000 | Còn |  8.000
+000101 | Cửu hầu chân kinh              | cuu hau chan kinh              | 020 | 000 | Còn | 10.250
+000102 | Lê Hữu Hoàng siêu cấp đẹp jay  | le huu hoang sieu cap dep jay  | 000 | 000 | Hết | 10.250
+000103 | 1                              | 1                              | 001 | 000 | Còn |  1.000
+000104 | 1                              | 1                              | 000 | 000 | Hết |  1.000
