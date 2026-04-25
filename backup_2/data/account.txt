@@ -1,0 +1,6 @@
+| Tên tài khoản                 | Mật khẩu                                          | Tên người đăng kí                 | Ngày tháng năm sinh           | CCCD                  | Quyền
+| 102250016                     | 1                                                 | Lê Hữu Hoàng                      | 26/10/2007                    | 049107000125          | Administrator
+| 102250017                     | 123456                                            | Nguyễn Văn Minh                   | 15/03/2006                    | 049107000126          | Staff
+| 102250018                     | abc@123                                           | Trần Thị Lan                      | 08/07/2005                    | 049107000127          | Staff
+| 102250019                     | 987654321                                         | Phạm Quốc Huy                     | 21/12/2007                    | 049107000128          | Staff
+| 102250020                     | 456789                                            | Nguyễn Đăng Hoàn                  | 12/09/2006                    | 049107000129          | Administrator

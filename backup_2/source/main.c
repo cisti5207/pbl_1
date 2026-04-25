@@ -1,22 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
-#include <string.h>
 #include "../include/main.h"
 
 void main()
 {
     SetConsole();
-
-    User *_User;
-
     Title(46, 20);
     Loading(70, 35);
     showUI_Login(70, 35, Nhappass);
     getchar();
 }
-
-// ================================Hàm chính==============================================
 
 void showUI_Login(int x, int y, int state)
 {
@@ -42,75 +36,6 @@ void showUI_Login(int x, int y, int state)
 
     }
     else printf ("Eror!!!!");
-}
-
-int changePassword(User *_User, int Soluong)
-{
-    
-}
-
-int saveAccount(User *_User, int Soluong)
-{
-    FILE *writeAccount = fopen("data\\account.txt", "w");
-    if (*writeAccount == NULL) 
-    {
-        fclose (writeAccount);
-        return FALSE;
-    }
-
-    fprintf (writeAccount, "Số lượng: %d\n", Soluong);
-    fprintf (writeAccount, "| Tên tài khoản%*s| Mật khẩu%*s| Tên người đăng kí%*s| Ngày tháng năm sinh%*s| CCCD%*s| Quyền%*s|", 17, "", 42, "", 17, "", 11, "", 18, "", 9, "");
-
-    for (int i = 1; i <= Soluong; i++)
-    {
-        fprintf ("| %*s| %*s| %*s| %*s| %*s| %*s|", 
-            _User[i]._Name, 30 + (strlen(_User[i]._Name) - lenString[_User[i]._Name]),
-            _User[i]._Password, 50 + (strlen(_User[i]._Password) - lenString[_User[i]._Password]),
-            _User[i]._realName, 34 + (strlen(_User[i]._realName) - lenString[_User[i]._realName]),
-            _User[i]._Datebirth, 30 + (strlen(_User[i]._Datebirth) - lenString[_User[i]._Datebirth]),
-            _User[i]._CCCD, 22 + (strlen(_User[i]._CCCD) - lenString[_User[i]._CCCD]),
-            _User[i]._Role, 14 + (strlen(_User[i]._Role) - lenString[_User[i]._Role]));
-    }
-
-    fclose (readAccount);
-    return TRUE;
-}
-
-int getAccount(User *_User, int *Soluong)
-{
-    FILE *readAccount = fopen("data\\account.txt", "r");
-    if (*readAccount == NULL) 
-    {
-        fclose (readAccount);
-        return FALSE;
-    }
-
-    fscanf (readAccount, "Số lượng: %d\n", Soluong);
-
-    _User = malloc (sizeof (User) * (*Soluong + 1));
-
-    char clear[300];
-    fscanf (readAccount, " %[\n]\n", clear);
-
-    for (int i = 1; i <= *Soluong; i++)
-    {
-        if (fscanf (readAccount, "| %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %[^|]\n", 
-            _User[i]._Name, _User[i]._Password, _User[i]._realName, _User[i]._Datebirth, _User[i]._CCCD, _User[i]._Role) != 6) 
-            {
-                fclose (readAccount);
-                return FALSE;
-            }
-
-        trim(_User[i]._Name);
-        trim(_User[i]._Password);
-        trim(_User[i]._realName);
-        trim(_User[i]._Datebirth);
-        trim(_User[i]._CCCD);
-        trim(_User[i]._Role);
-    }
-
-    fclose (readAccount);
-    return TRUE;
 }
 
 void Loading(int x, int y)
@@ -146,49 +71,6 @@ void Title(int x, int y)
     gotoxy(x, y + 5);   printf ("   ╚═╝   ╚═╝  ╚═╝ ╚═════╝        ╚═══╝  ╚═╝╚══════╝╚═╝  ╚═══╝     ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ");
 }
 
-// ====================Hàm chung==========================
-void trim(char *_String)
-{
-    int i = strlen(_String) - 1;
-
-    while (i >= 0 && (_String[i] == ' ' || _String[i] == '\n' || _String[i] == '\t'))
-    {
-        _String[i] = 0;
-        i--;
-    }
-
-    if (i == 0) return;
-
-    i = 0;
-    while (_String[i] == ' ' || _String[i] == '\t') i++;
-
-    for (int j = 0; j + i <= strlen(_String); j++)
-        _String[j] = _String[i + j];
-}
-
-int lenString(const char *_String)
-{
-    int i = 0, len = 0;
-    while (_String[i] != '\0')
-    {
-        if ((_String[i] & 0x80) == 0) 
-            i++;
-        else if ((_String[i] & 0xE0) == 0xC0) 
-            i += 2;
-        else if ((_String[i] & 0xF0) == 0xE0) 
-            i += 3;
-        else if ((_String[i] & 0xF8) == 0xF0) 
-            i += 4;
-        
-        len++;
-    }
-    return len;
-}
-
-
-
-
-// =====================Console=============================
 void gotoxy(int x, int y) 
 {
     COORD coord;
@@ -196,6 +78,7 @@ void gotoxy(int x, int y)
     coord.Y = y; 
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
+
 
 void SetConsole() 
 {
