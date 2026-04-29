@@ -1,3 +1,0 @@
-Quantity: 1
-102250016 | 1 | CCCD | tên | ngày tháng năm sinh
-100000000000000 | 2

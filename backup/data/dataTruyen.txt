@@ -1,5 +1,0 @@
-Count: 100
-Capacity: 1000
-Tổng 992 quyển truyện
-
-MaTruyen | TenTruyen | The loai | NXB | Năm xuất bản | Số lượng tồn kho | Số lượng nhập hàng | Số lượt mượn | Giá ngày
