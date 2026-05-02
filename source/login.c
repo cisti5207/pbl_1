@@ -8,7 +8,7 @@ int main() {
     InitWindow(1200, 800, "Login");
     SetTargetFPS(60);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
-    SetWindowMinSize(1200, 800);
+    SetWindowMinSize(1000, 600);
 
     font[0] = SetFontUTF8("font/arial/arial.ttf", 30);
     font[1] = SetFontUTF8("font/cooper/COOPBL.ttf", 100);
