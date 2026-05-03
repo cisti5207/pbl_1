@@ -7,6 +7,7 @@
 #define COOLGREEN    (Color){46, 204, 113, 255}
 #define LIGHTBROWN   (Color){205, 133, 63, 255}
 
+int InitLogin();
 
 #define WelcomeText "Welcome to Library!"
 #define AboutWelcomeText "xxx"
