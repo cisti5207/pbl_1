@@ -107,10 +107,6 @@ void GetAccountData(const char *filename, Account **accounts, int *accountCount)
 void SaveAccountData(const char *filename, Account *accounts, int accountCount);
 void trim(char *str);
 
-
-
-
-
 void DeleteLastChar(InputBox *input);
 void UpdateInputBox(InputBox *input);
 

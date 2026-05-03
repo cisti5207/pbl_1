@@ -19,9 +19,6 @@ int InitLogin() {
     GetAccountData("data\\accounts.txt", &_accounts, &_accountCount);
     printf("Total accounts loaded: %d\n", _accountCount);
 
-    for (int i = 0; i < _accountCount; i++) {
-        printf("Account %d: Username: %s, Password: %s\n", i + 1, _accounts[i].username, _accounts[i].password);
-    }
 
     font[0] = SetFontUTF8("font/arial/arial.ttf", 24);
     font[1] = SetFontUTF8("font/cooper/COOPBL.ttf", 100);
