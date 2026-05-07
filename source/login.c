@@ -6,7 +6,7 @@
 #include <ctype.h>
 
 Vector2 mousePosition;
-Font font[6];
+extern Font font[6];
 
 LoginState LOGIN_STATE = LOGIN;
 LoginResult LOGIN_RESULT = LOGIN_EMPTY;
