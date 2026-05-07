@@ -13,20 +13,12 @@ LoginResult LOGIN_RESULT = LOGIN_EMPTY;
 ForgotPasswordResult FORGOT_PASSWORD_RESULT = FORGOT_PASSWORD_EMPTY;
 
 
-int main() {
+int InitLogin() {
     Account *_accounts = NULL;
     int _accountCount = 0;
     GetAccountData("data\\accounts.txt", &_accounts, &_accountCount);
     printf("Total accounts loaded: %d\n", _accountCount);
 
-    for (int i = 0; i < _accountCount; i++) {
-        printf("Account %d: Username: %s, Password: %s\n", i + 1, _accounts[i].username, _accounts[i].password);
-    }
-
-    InitWindow(1200, 800, "Login");
-    SetTargetFPS(60);
-    SetWindowState(FLAG_WINDOW_RESIZABLE);
-    SetWindowMinSize(1000, 600);
 
     font[0] = SetFontUTF8("font/arial/arial.ttf", 24);
     font[1] = SetFontUTF8("font/cooper/COOPBL.ttf", 100);
@@ -44,10 +36,13 @@ int main() {
     int _MonitorWidth = GetMonitorWidth(0);
     int _MonitorHeight = GetMonitorHeight(0);
 
-    if (font[0].texture.id == 0 || font[1].texture.id == 0) {
-        printf("Failed to load font!\n");
-        return -1;
+    for (int i = 0; i < 6; i++) {
+        if (font[i].texture.id == 0) {
+            printf("Failed to load font!\n");
+            return -1;
+        }
     }
+
     ShowCursor();
 
     InputBox LoginBox = { 0 };
@@ -69,13 +64,19 @@ int main() {
 
         DrawFPS(10, 10);
         EndDrawing();
+
+        if (LOGIN_RESULT == LOGIN_SUCCESS) {
+            break; // Thoát vòng lặp nếu đăng nhập thành công
+        }
     }
 
     for (int i = 0; i < 6; i++) {
         UnloadFont(font[i]);
     }
-    CloseWindow();
-    return 0;
+
+    ClearBackground(BLACK);
+
+    return LOGIN_RESULT;
 }
 
 Font SetFontUTF8(char *_font, int _fontSize)
@@ -155,8 +156,6 @@ void _DrawLoginForm(Texture2D img, int _ScreenWidth, int _ScreenHeight, InputBox
     DrawLoginRegisterButtonText         (_FormX, _FormY, _FormWidth, _FormHeight, _FormHeight * 0.02f);
     DrawLoginForgotPasswordButtonText   (_FormX, _FormY, _FormWidth, _FormHeight, _FormHeight * 0.02f);
     DrawLoginButtonText                 (_FormX, _FormY, _FormWidth, _FormHeight, _FormHeight * 0.04f, *LoginBox, *PasswordBox, accounts, accountCount);
-
-
 }
 
 void DrawNameLibText(int _FormX, int _FormY, int _FormWidth, int _FormHeight, int _FontSize) {
@@ -343,6 +342,7 @@ void DrawLoginButtonText(int _FormX, int _FormY, int _FormWidth, int _FormHeight
         DrawRectangleRounded(buttonRect, 0.2f, 10, COOLGREEN);
         DrawTextEx(font[1], LoginButtonText, _Text, _FontSize, 2, BLACK);
     }
+    LOGIN_RESULT = LOGIN_ERROR;
     return;
 }
 

@@ -5,10 +5,14 @@
 
 int main()
 {
-    InitWindow(1200, 800, "Login");\
+    InitWindow(1200, 800, "Login");
     SetTargetFPS(60);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowMinSize(1000, 600);
 
-    
+    InitLogin();
+
+    printf("Exiting login screen...\n");
+
+    return 0;
 }
