@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "ManageBooks.h"
 #include "raylib.h"
 #include "login.h"
 #include "main.h"
@@ -19,9 +20,11 @@ int main()
         return 1;
     }
 
-    
+    InitManageBooks();
 
     printf("Exiting login screen...\n");
 
     return 0;
 }
+
+

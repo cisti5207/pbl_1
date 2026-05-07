@@ -2,6 +2,7 @@
 #define LOGIN_H
 
 #include "raylib.h"
+#include "libmanage.h"
 
 #define MAX_USERNAME_LENGTH 256
 #define MAX_PASSWORD_LENGTH 256
@@ -17,7 +18,7 @@
 #define LEN_SHOW_DOB 21
 #define LEN_SHOW_ROLE 13
 
-#define MAX_INPUT 256
+
 
 #define QUANTITY_FONT 100
 #define FONT_SIZE 18
@@ -72,14 +73,6 @@ typedef struct Node {
 typedef struct Node *AccountList;
 typedef struct Node *AccountPosition;
 
-typedef struct {
-    Rectangle box;
-    char text[MAX_INPUT];
-    int length;
-    bool isFocused;
-} InputBox;
-
-
 typedef enum {
     LOGIN,
     REGISTER,
@@ -109,26 +102,18 @@ typedef enum{
     FAILED
 } CheckResult;
 
-void GetSize();
 
 void DrawBackground();
 void DrawForm();
 void DrawLoginForm(InputBox *loginBox, InputBox *passwordBox, AccountList accounts, int accountCount, Texture2D IconUsername, Texture2D IconPassword, Texture2D ShowPasswordIcon);
 void DrawLoginUsername(InputBox *LoginBox, Texture2D IconUsername);
 void DrawLoginPassword(InputBox *PasswordBox, Texture2D IconPassword, Texture2D ShowPasswordIcon);
-void DrawIcon(Rectangle box, Texture2D icon);
 
 LoginResult CheckLogin(AccountList accounts, const char *username, const char *password);
-
 
 int InsertAccount(AccountList pL, Account *e, AccountPosition p);
 AccountList CreateHeaderNode();
 int GetAccountData(const char *filename, AccountList accounts, int *accountCount);
 int SaveAccountData(const char *filename, AccountList accounts, int accountCount);
-int lenStringUTF8(const char *str);
-void trim(char *str);
-Font SetFontUTF8(const char *fontPath, int fontSize);
-void DeleteLastChar(InputBox *input);
-void UpdateInputBox(InputBox *input);
-void DrawIcon(Rectangle box, Texture2D icon);
+
 #endif // LOGIN

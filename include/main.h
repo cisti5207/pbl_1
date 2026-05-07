@@ -2,7 +2,6 @@
 #define MAIN_H
 
 #include "raylib.h"
-#include "login.h"
 
 typedef enum{
     LOGINAPP,
@@ -12,5 +11,6 @@ typedef enum{
     MANAGE_BORROWING,
     MANAGE_RETURNING,
 } AppState;
+
 
 #endif // MAIN_H
