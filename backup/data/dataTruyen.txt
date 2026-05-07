@@ -1,7 +1,7 @@
 Count: 50
 Capacity: 1000
-Số lượng hiện tại: 6815
-Số lượng gốc: 6815
+Tổng 50 quyển truyện
+
 MaTruyen | TenTruyen                                   | TheLoai             | NXB        | NamXB | TonKho | Nhap  | LuotMuon | GiaNgay
 -----------------------------------------------------------------------------------------------------------------------------------------
 T001     | Doraemon                                    | Truyện tranh        | Kim Đồng   | 2010  | 150    | 150   | 0        | 2000
