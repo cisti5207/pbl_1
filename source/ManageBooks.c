@@ -14,12 +14,12 @@ void InitManageBooks()
 {
     SetWindowTitle("Manage Books");
 
-    Vector2 MANAGEBOOKS_SCREEN = {
+    MANAGEBOOKS_SCREEN = (Vector2) {
         GetScreenWidth(),
         GetScreenHeight()
     };
 
-    Vector2 MONITOR_SIZE = {
+    MONITOR_SIZE = (Vector2) {
         GetMonitorWidth(0),
         GetMonitorHeight(0)
     };
