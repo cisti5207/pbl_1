@@ -1,56 +1,55 @@
-Count: 50
-Capacity: 1000
-Số lượng hiện tại: 6815
-Số lượng gốc: 6815
-MaTruyen | TenTruyen                                   | TheLoai             | NXB        | NamXB | TonKho | Nhap  | LuotMuon | GiaNgay
------------------------------------------------------------------------------------------------------------------------------------------
-T001     | Doraemon                                    | Truyện tranh        | Kim Đồng   | 2010  | 150    | 150   | 0        | 2000
-T002     | Thám tử lừng danh Conan                     | Trinh thám          | Kim Đồng   | 2012  | 140    | 140   | 0        | 2500
-T003     | One Piece – Đảo hải tặc                     | Phiêu lưu           | Kim Đồng   | 2015  | 180    | 180   | 0        | 3000
-T004     | Naruto                                      | Phiêu lưu           | Kim Đồng   | 2014  | 160    | 160   | 0        | 3000
-T005     | Bảy viên ngọc rồng                          | Hành động           | Kim Đồng   | 2011  | 120    | 120   | 0        | 2500
-T006     | Harry Potter và Hòn đá Phù thủy             | Tiểu thuyết         | Trẻ        | 2013  | 100    | 100   | 0        | 4000
-T007     | Sherlock Holmes toàn tập                    | Trinh thám          | Trẻ        | 2010  | 110    | 110   | 0        | 3500
-T008     | Chúa tể những chiếc nhẫn                    | Giả tưởng           | Trẻ        | 2012  | 90     | 90    | 0        | 5000
-T009     | Người Hobbit                                | Giả tưởng           | Trẻ        | 2011  | 95     | 95    | 0        | 4500
-T010     | Đắc nhân tâm                                | Kỹ năng sống        | Tổng hợp   | 2015  | 200    | 200   | 0        | 2000
-T011     | Nhà giả kim                                 | Tiểu thuyết         | Trẻ        | 2016  | 130    | 130   | 0        | 3000
-T012     | Tuổi trẻ đáng giá bao nhiêu                 | Kỹ năng sống        | Trẻ        | 2018  | 170    | 170   | 0        | 2000
-T013     | Cho tôi xin một vé đi tuổi thơ              | Tiểu thuyết         | Trẻ        | 2017  | 150    | 150   | 0        | 2500
-T014     | Mắt biếc                                    | Tiểu thuyết         | Trẻ        | 2014  | 120    | 120   | 0        | 2500
-T015     | Tôi thấy hoa vàng trên cỏ xanh              | Tiểu thuyết         | Trẻ        | 2015  | 130    | 130   | 0        | 2500
-T016     | Điều kỳ diệu của tiệm tạp hóa Namiya        | Tiểu thuyết         | Trẻ        | 2019  | 100    | 100   | 0        | 3000
-T017     | Rừng Na Uy                                  | Tiểu thuyết         | Trẻ        | 2013  | 90     | 90    | 0        | 3000
-T018     | 1984                                        | Khoa học viễn tưởng | Tổng hợp   | 2012  | 95     | 95    | 0        | 3000
-T019     | Trại súc vật                                | Khoa học viễn tưởng | Tổng hợp   | 2011  | 100    | 100   | 0        | 2500
-T020     | Gatsby vĩ đại                               | Tiểu thuyết         | Tổng hợp   | 2010  | 80     | 80    | 0        | 3000
-T021     | Kiêu hãnh và định kiến                      | Tiểu thuyết         | Tổng hợp   | 2011  | 85     | 85    | 0        | 3000
-T022     | Chạng vạng                                  | Tiểu thuyết         | Trẻ        | 2014  | 120    | 120   | 0        | 3000
-T023     | Đấu trường sinh tử                          | Phiêu lưu           | Trẻ        | 2015  | 110    | 110   | 0        | 3000
-T024     | Nhật ký chú bé nhút nhát                    | Hài hước            | Kim Đồng   | 2018  | 200    | 200   | 0        | 2000
-T025     | Kinh Thánh                                  | Tâm linh            | Tôn giáo   | 2009  | 50     | 50    | 0        | 1500
-T026     | Sách giáo khoa Toán 12                      | Giáo dục            | GD         | 2020  | 300    | 300   | 0        | 1000
-T027     | Sách giáo khoa Ngữ văn 12                   | Giáo dục            | GD         | 2020  | 280    | 280   | 0        | 1000
-T028     | Sách giáo khoa Tiếng Anh 12                 | Giáo dục            | GD         | 2020  | 260    | 260   | 0        | 1000
-T029     | Lập trình C cơ bản                          | Công nghệ           | GD         | 2019  | 160    | 160   | 0        | 3000
-T030     | Thuật toán và lập trình                     | Công nghệ           | GD         | 2018  | 150    | 150   | 0        | 3000
-T031     | Lập trình hướng đối tượng                   | Công nghệ           | GD         | 2017  | 140    | 140   | 0        | 3000
-T032     | Cấu trúc dữ liệu và giải thuật              | Công nghệ           | GD         | 2016  | 130    | 130   | 0        | 3000
-T033     | Cha giàu cha nghèo                          | Kinh tế             | Trẻ        | 2015  | 170    | 170   | 0        | 3000
-T034     | Nghĩ giàu làm giàu                          | Kinh tế             | Trẻ        | 2014  | 160    | 160   | 0        | 3000
-T035     | Khởi nghiệp tinh gọn                        | Kinh tế             | Trẻ        | 2016  | 120    | 120   | 0        | 4000
-T036     | Bắt đầu với câu hỏi tại sao                 | Kỹ năng sống        | Trẻ        | 2017  | 110    | 110   | 0        | 3500
-T037     | Thói quen nguyên tử                         | Kỹ năng sống        | Trẻ        | 2019  | 200    | 200   | 0        | 4000
-T038     | Làm việc sâu                                | Kỹ năng sống        | Trẻ        | 2018  | 140    | 140   | 0        | 3500
-T039     | Ikigai – Bí mật sống lâu và hạnh phúc       | Kỹ năng sống        | Trẻ        | 2019  | 150    | 150   | 0        | 3000
-T040     | Chiến lược đại dương xanh                   | Kinh tế             | Trẻ        | 2015  | 120    | 120   | 0        | 4000
-T041     | Dế Mèn phiêu lưu ký                         | Thiếu nhi           | Kim Đồng   | 2010  | 250    | 250   | 0        | 2000
-T042     | Tắt đèn                                     | Văn học Việt Nam    | Tổng hợp   | 2011  | 140    | 140   | 0        | 2000
-T043     | Lão Hạc                                     | Văn học Việt Nam    | Tổng hợp   | 2011  | 130    | 130   | 0        | 2000
-T044     | Số đỏ                                       | Văn học Việt Nam    | Tổng hợp   | 2012  | 120    | 120   | 0        | 2000
-T045     | Chí Phèo                                    | Văn học Việt Nam    | Tổng hợp   | 2012  | 110    | 110   | 0        | 2000
-T046     | Vợ nhặt                                     | Văn học Việt Nam    | Tổng hợp   | 2013  | 100    | 100   | 0        | 2000
-T047     | Hai đứa trẻ                                 | Văn học Việt Nam    | Tổng hợp   | 2013  | 90     | 90    | 0        | 2000
-T048     | Chiếc lược ngà                              | Văn học Việt Nam    | Tổng hợp   | 2014  | 80     | 80    | 0        | 2000
-T049     | Lặng lẽ Sa Pa                               | Văn học Việt Nam    | Tổng hợp   | 2014  | 70     | 70    | 0        | 2000
-T050     | Bến quê                                     | Văn học Việt Nam    | Tổng hợp   | 2015  | 60     | 60    | 0        | 2000
+Số quyển truyện: 50
+Số lượng hiện tại: 6725
+Số lượng gốc: 6725
+
+MaTruyen | NormName                                 | TenTruyen                                | TacGia                     | TheLoai        | NXB        | NamXB | TonKho | Nhap | LuotMuon | GiaNgay |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+T002     | tham-tu-lung-danh-conan                  | Thám tử lừng danh Conan                  | Gosho Aoyama               | Trinh thám     | Kim Đồng   | 2012  | 140    | 140  | 0         | 2500   |
+T003     | one-piece                                | One Piece                                | Eiichiro Oda               | Phiêu lưu      | Kim Đồng   | 2015  | 180    | 180  | 0         | 3000   |
+T004     | naruto                                   | Naruto                                   | Masashi Kishimoto          | Phiêu lưu      | Kim Đồng   | 2014  | 160    | 160  | 0         | 3000   |
+T005     | bay-vien-ngoc-rong                       | Bảy viên ngọc rồng                       | Akira Toriyama             | Hành động      | Kim Đồng   | 2011  | 120    | 120  | 0         | 2500   |
+T006     | attack-on-titan                          | Attack on Titan                          | Hajime Isayama             | Hành động      | Kim Đồng   | 2018  | 130    | 130  | 0         | 3500   |
+T007     | bleach                                   | Bleach                                   | Tite Kubo                  | Hành động      | Kim Đồng   | 2016  | 140    | 140  | 0         | 3000   |
+T008     | death-note                               | Death Note                               | Tsugumi Ohba               | Trinh thám     | Kim Đồng   | 2013  | 125    | 125  | 0         | 3000   |
+T009     | demon-slayer                             | Thanh gươm diệt quỷ                      | Koyoharu Gotouge           | Hành động      | Kim Đồng   | 2020  | 190    | 190  | 0         | 3500   |
+T010     | jujutsu-kaisen                           | Jujutsu Kaisen                           | Gege Akutami               | Hành động      | Kim Đồng   | 2021  | 170    | 170  | 0         | 3500   |
+T011     | chainsaw-man                             | Chainsaw Man                             | Tatsuki Fujimoto           | Hành động      | Kim Đồng   | 2022  | 160    | 160  | 0         | 3500   |
+T012     | hunter-x-hunter                          | Hunter x Hunter                          | Yoshihiro Togashi          | Phiêu lưu      | Kim Đồng   | 2014  | 145    | 145  | 0         | 3000   |
+T013     | fairy-tail                               | Fairy Tail                               | Hiro Mashima               | Phiêu lưu      | Kim Đồng   | 2015  | 150    | 150  | 0         | 3000   |
+T014     | black-clover                             | Black Clover                             | Yuki Tabata                | Hành động      | Kim Đồng   | 2019  | 135    | 135  | 0         | 3000   |
+T015     | blue-lock                                | Blue Lock                                | Muneyuki Kaneshiro         | Thể thao       | Kim Đồng   | 2022  | 180    | 180  | 0         | 3500   |
+T016     | haikyuu                                  | Haikyuu!!                                | Haruichi Furudate          | Thể thao       | Kim Đồng   | 2018  | 155    | 155  | 0         | 3000   |
+T017     | kuroko-no-basket                         | Kuroko no Basket                         | Tadatoshi Fujimaki         | Thể thao       | Kim Đồng   | 2016  | 140    | 140  | 0         | 3000   |
+T018     | slam-dunk                                | Slam Dunk                                | Takehiko Inoue             | Thể thao       | Kim Đồng   | 2013  | 160    | 160  | 0         | 3000   |
+T019     | tokyo-revengers                          | Tokyo Revengers                          | Ken Wakui                  | Hành động      | Kim Đồng   | 2021  | 170    | 170  | 0         | 3500   |
+T020     | spy-x-family                             | Spy x Family                             | Tatsuya Endo               | Hài hước       | Kim Đồng   | 2021  | 180    | 180  | 0         | 3500   |
+T021     | dr-stone                                 | Dr. Stone                                | Riichiro Inagaki           | Khoa học       | Kim Đồng   | 2020  | 130    | 130  | 0         | 3000   |
+T022     | my-hero-academia                         | My Hero Academia                         | Kohei Horikoshi            | Hành động      | Kim Đồng   | 2019  | 160    | 160  | 0         | 3500   |
+T023     | fullmetal-alchemist                      | Fullmetal Alchemist                      | Hiromu Arakawa             | Phiêu lưu      | Kim Đồng   | 2012  | 125    | 125  | 0         | 3000   |
+T024     | yu-gi-oh                                 | Yu-Gi-Oh!                                | Kazuki Takahashi           | Phiêu lưu      | Kim Đồng   | 2011  | 120    | 120  | 0         | 2500   |
+T025     | pokemon-adventures                       | Pokemon Adventures                       | Hidenori Kusaka            | Phiêu lưu      | Kim Đồng   | 2017  | 145    | 145  | 0         | 3000   |
+T026     | inuyasha                                 | InuYasha                                 | Rumiko Takahashi           | Giả tưởng      | Kim Đồng   | 2010  | 110    | 110  | 0         | 2500   |
+T027     | gintama                                  | Gintama                                  | Hideaki Sorachi            | Hài hước       | Kim Đồng   | 2015  | 115    | 115  | 0         | 3000   |
+T028     | berserk                                  | Berserk                                  | Kentaro Miura              | Hành động      | Kim Đồng   | 2014  | 100    | 100  | 0         | 4000   |
+T029     | vagabond                                 | Vagabond                                 | Takehiko Inoue             | Lịch sử        | Kim Đồng   | 2013  | 95     | 95   | 0         | 4000   |
+T030     | jojos-bizarre-adventure                  | JoJo's Bizarre Adventure                 | Hirohiko Araki             | Hành động      | Kim Đồng   | 2016  | 140    | 140  | 0         | 3500   |
+T031     | sailor-moon                              | Sailor Moon                              | Naoko Takeuchi             | Giả tưởng      | Kim Đồng   | 2011  | 100    | 100  | 0         | 2500   |
+T032     | cardcaptor-sakura                        | Cardcaptor Sakura                        | CLAMP                      | Giả tưởng      | Kim Đồng   | 2012  | 110    | 110  | 0         | 2500   |
+T033     | detective-school-q                       | Detective School Q                       | Seimaru Amagi              | Trinh thám     | Kim Đồng   | 2010  | 105    | 105  | 0         | 2500   |
+T034     | kingdom                                  | Kingdom                                  | Yasuhisa Hara              | Lịch sử        | Kim Đồng   | 2019  | 130    | 130  | 0         | 3500   |
+T035     | the-promised-neverland                   | The Promised Neverland                   | Kaiu Shirai                | Kinh dị        | Kim Đồng   | 2020  | 125    | 125  | 0         | 3500   |
+T036     | fire-force                               | Fire Force                               | Atsushi Ohkubo             | Hành động      | Kim Đồng   | 2019  | 120    | 120  | 0         | 3000   |
+T037     | soul-eater                               | Soul Eater                               | Atsushi Ohkubo             | Hành động      | Kim Đồng   | 2015  | 110    | 110  | 0         | 3000   |
+T038     | assassination-classroom                  | Assassination Classroom                  | Yusei Matsui               | Hài hước       | Kim Đồng   | 2017  | 135    | 135  | 0         | 3000   |
+T039     | reborn                                   | Katekyo Hitman Reborn!                   | Akira Amano                | Hành động      | Kim Đồng   | 2014  | 125    | 125  | 0         | 3000   |
+T040     | noragami                                 | Noragami                                 | Adachitoka                 | Giả tưởng      | Kim Đồng   | 2018  | 120    | 120  | 0         | 3000   |
+T041     | komi-cant-communicate                    | Komi Can't Communicate                   | Tomohito Oda               | Hài hước       | Kim Đồng   | 2021  | 150    | 150  | 0         | 3000   |
+T042     | your-lie-in-april                        | Your Lie in April                        | Naoshi Arakawa             | Tình cảm       | Kim Đồng   | 2016  | 115    | 115  | 0         | 3000   |
+T043     | a-silent-voice                           | A Silent Voice                           | Yoshitoki Oima             | Tình cảm       | Kim Đồng   | 2017  | 120    | 120  | 0         | 3000   |
+T044     | fruits-basket                            | Fruits Basket                            | Natsuki Takaya             | Tình cảm       | Kim Đồng   | 2013  | 100    | 100  | 0         | 2500   |
+T045     | nana                                     | Nana                                     | Ai Yazawa                  | Tình cảm       | Kim Đồng   | 2012  | 90     | 90   | 0         | 2500   |
+T046     | beastars                                 | Beastars                                 | Paru Itagaki               | Tâm lý         | Kim Đồng   | 2020  | 130    | 130  | 0         | 3500   |
+T047     | parasyte                                 | Parasyte                                 | Hitoshi Iwaaki             | Kinh dị        | Kim Đồng   | 2015  | 105    | 105  | 0         | 3000   |
+T048     | akame-ga-kill                            | Akame ga Kill!                           | Takahiro                   | Hành động      | Kim Đồng   | 2016  | 115    | 115  | 0         | 3000   |
+T049     | classroom-of-the-elite                   | Classroom of the Elite                   | Syougo Kinugasa            | Tâm lý         | Kim Đồng   | 2021  | 140    | 140  | 0         | 3500   |
+T050     | oshi-no-ko                               | Oshi no Ko                               | Aka Akasaka                | Tâm lý         | Kim Đồng   | 2023  | 160    | 160  | 0         | 4000   |
