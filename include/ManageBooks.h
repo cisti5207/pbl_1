@@ -20,7 +20,29 @@
 #define MAX_BOOKS 1000
 #define BOOKS_FILE "data/dataTruyen.txt"
 
+typedef struct {
+    char CodeBook[CODE_BOOKS_LENGTH];
+    char NormNameBook[NORMNAME_BOOKS_LENGTH];
+    char NameBook[NAME_BOOKS_LENGTH];
+    char TypeBook[TYPE_BOOKS_LENGTH];
+    char AuthorBook[AUTHOR_BOOKS_LENGTH];
+    char PublisherBook[PUBLISHER_BOOKS_LENGTH];
+    int YearBook;
+    int StockBook;
+    int TotalImportBook;
+    int TotalBorrowBook;
+    int PriceBook;
+} Book;
+
+typedef struct {
+    Book *theArray;
+    int capacity;
+    int count;
+    int stockBooks;
+    int totalImportBooks;
+} BookList;
 
 void InitManageBooks();
+BookList *Loadbooks(const char *filename);
 
 #endif // MANAGE_BOOKS_H

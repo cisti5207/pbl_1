@@ -5,6 +5,8 @@
 
 #define MAX_INPUT 256
 
+#define BRIGHTWHITE (Color) {255, 255, 255, 255}
+
 #define FONT_SIZE 18
 #define Arial "font/arial/arial.ttf"
 #define ArialBold "font/arial/arialbd.ttf"

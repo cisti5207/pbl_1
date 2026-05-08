@@ -1,32 +1,56 @@
 #include "ManageBooks.h"
 #include "raylib.h"
+#include "libmanage.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 Font MANAGEBOOKS_FONT[MAX_FONT_MANAGEBOOKS];
 
-typedef struct {
-    char CodeBooks[CODE_BOOKS_LENGTH];
-    char NormNameBooks[NORMNAME_BOOKS_LENGTH];
-    char NameBooks[NAME_BOOKS_LENGTH];
-    char TypeBooks[TYPE_BOOKS_LENGTH];
-    char AuthorBooks[AUTHOR_BOOKS_LENGTH];
-    char PublisherBooks[PUBLISHER_BOOKS_LENGTH];
-    int YearBooks;
-    int StockBooks;
-    int TotalImportBooks;
-    int TotalBorrowBooks;
-    float PriceBooks;
-} Book;
+Vector2 MANAGEBOOKS_SCREEN;
+Vector2 MONITOR_SIZE;
 
-typedef struct {
-    Book *books;
-    int capacity;
-    int count;
-    int stockBooks;
-    int totalImportBooks;
-} BookList;
+void InitManageBooks()
+{
+    SetWindowTitle("Manage Books");
+
+    Vector2 MANAGEBOOKS_SCREEN = {
+        GetScreenWidth(),
+        GetScreenHeight()
+    };
+
+    Vector2 MONITOR_SIZE = {
+        GetMonitorWidth(0),
+        GetMonitorHeight(0)
+    };
+
+    BookList* Books = Loadbooks(BOOKS_FILE);
+
+    if (Books == NULL)
+    {
+        printf ("Failed!!! Can not load dataTruyen.txt!!!");
+        return;
+    }
+
+    
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground(LIGHTGRAY);
+
+        DrawRectangle
+
+        EndDrawing();
+    }
+
+    return;
+}
+
+void MANAGEBOOKS_Title(Texture2D icon)
+{
+
+}
 
 BookList *Loadbooks(const char *filename)
 {
@@ -43,8 +67,8 @@ BookList *Loadbooks(const char *filename)
         return NULL;
     }
 
-    bookList->books = (Book *)malloc(MAX_BOOKS * sizeof(Book));
-    if (!bookList->books) {
+    bookList->theArray = (Book *)malloc(MAX_BOOKS * sizeof(Book));
+    if (!bookList->theArray) {
         fprintf(stderr, "Error: Memory allocation failed\n");
         free(bookList);
         fclose(file);
@@ -52,43 +76,35 @@ BookList *Loadbooks(const char *filename)
     }
 
     bookList->capacity = MAX_BOOKS;
-    bookList->count;
-    bookList->stockBooks;
-    bookList->totalImportBooks;
+
+    fscanf(file, "Số quyển truyện: %d\n", &(bookList->count));
+    fscanf(file, "Số lượng truyện hiện tại: %d\n", &(bookList->stockBooks));
+    fscanf(file, "Số lượng truyện gốc: %d\n", &(bookList->totalImportBooks));
 
     Book book;
+
+    //| T002     | tham-tu-lung-danh-conan                  | Thám tử lừng danh Conan                  | Gosho Aoyama               | Trinh thám     | Kim Đồng   | 2012  | 140    | 140  | 0         | 2500   |
+    int count = 0;
+    while (fscanf(file, " | %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %d | %d | %d | %d | %d |", book.CodeBook, book.NormNameBook, book.NameBook, book.AuthorBook, book.TypeBook
+    , book.PublisherBook, &book.YearBook, &book.StockBook, &book.TotalImportBook, &book.TotalBorrowBook, &book.PriceBook) == 11)
+    {
+        trim(book.CodeBook);
+        trim(book.NormNameBook);
+        trim(book.NameBook);
+        trim(book.AuthorBook);
+        trim(book.TypeBook);
+        trim(book.PublisherBook);
+
+        bookList -> theArray[count++] = book;
+    }
+
+    if (count != bookList->count) 
+    {
+        printf ("Failed!!! Read %d of %d\n", count, bookList->count);
+        return NULL;
+    }
     
-    //T002     | tham-tu-lung-danh-conan                  | Thám tử lừng danh Conan                  | Gosho Aoyama               | Trinh thám     | Kim Đồng   | 2012  | 140    | 140  | 0         | 2500   |
 
     fclose(file);
     return bookList;
-}
-
-void InitManageBooks()
-{
-    SetWindowTitle("Manage Books");
-
-    Vector2 MANAGEBOOKS_SCREEN = {
-        getScreenWidth(),
-        getScreenHeight()
-    };
-
-    Vector2 MONITOR_SIZE = {
-        GetMonitorWidth(0),
-        GetMonitorHeight(0)
-    };
-
-
-
-    while (!WindowShouldClose())
-    {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        DrawText("Manage Books Screen", 10, 10, 20, DARKGRAY);
-
-        EndDrawing();
-    }
-
-    return;
 }

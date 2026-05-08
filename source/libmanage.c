@@ -3,20 +3,6 @@
 #include <ctype.h>
 #include <string.h>
 
-
-
-void GetSize(int *screenWidth, int *screenHeight, int *formX, int *formY, int *formWidth, int *formHeight)
-{
-    *screenWidth = GetScreenWidth();
-    *screenHeight = GetScreenHeight();
-
-    *formWidth = *screenWidth * 0.7f;
-    *formHeight = *screenHeight * 0.7f;
-
-    *formX = (*screenWidth - *formWidth) * 0.5f;
-    *formY = (*screenHeight - *formHeight) * 0.5f;
-}
-
 int lenStringUTF8(const char *str) {
     int len = 0;
     while (*str) {
