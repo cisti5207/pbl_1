@@ -44,5 +44,7 @@ typedef struct {
 
 void InitManageBooks();
 BookList *Loadbooks(const char *filename);
+void MANAGEBOOKS_UpdateSize();
+void MANAGEBOOKS_Title(Texture2D icon);
 
 #endif // MANAGE_BOOKS_H

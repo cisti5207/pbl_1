@@ -4,25 +4,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 Font MANAGEBOOKS_FONT[MAX_FONT_MANAGEBOOKS];
 
-Vector2 MANAGEBOOKS_SCREEN;
-Vector2 MONITOR_SIZE;
+Rectangle MANAGEBOOKS_SCREEN;
+Rectangle MANAGEBOOKS_MONITOR;
+Rectangle MANAGEBOOKS_TitleBox;
+Rectangle MANAGEBOOKS_HeaderBox;
+Rectangle MANAGEBOOKS_Panel;
+Rectangle MANAGEBOOKS_TitleBarBox;
+Vector2 MANAGEBOOKS_SCALE;
 
 void InitManageBooks()
 {
     SetWindowTitle("Manage Books");
 
-    MANAGEBOOKS_SCREEN = (Vector2) {
-        GetScreenWidth(),
-        GetScreenHeight()
-    };
-
-    MONITOR_SIZE = (Vector2) {
-        GetMonitorWidth(0),
-        GetMonitorHeight(0)
-    };
+    MANAGEBOOKS_UpdateSize();
 
     BookList* Books = Loadbooks(BOOKS_FILE);
 
@@ -32,14 +30,20 @@ void InitManageBooks()
         return;
     }
 
+    Texture2D Avatar = LoadTexture ("img/dut.png");
+
     
 
     while (!WindowShouldClose())
     {
-        BeginDrawing();
-        ClearBackground(LIGHTGRAY);
+        MANAGEBOOKS_UpdateSize();
 
-        DrawRectangle
+         
+
+        BeginDrawing();
+        ClearBackground(WHITESMOKE);
+
+        MANAGEBOOKS_Title(Avatar);
 
         EndDrawing();
     }
@@ -47,9 +51,61 @@ void InitManageBooks()
     return;
 }
 
+void MANAGEBOOKS_UpdateSize()
+{
+    MANAGEBOOKS_SCREEN = (Rectangle) {
+        0, 0,
+        (float)GetScreenWidth(),
+        (float)GetScreenHeight()
+    };
+
+    MANAGEBOOKS_MONITOR = (Rectangle) {
+        0, 0,
+        (float)GetMonitorWidth(0),
+        (float)GetMonitorHeight(0)
+    };
+
+    MANAGEBOOKS_SCALE = (Vector2) {
+        MANAGEBOOKS_SCREEN.width / MANAGEBOOKS_MONITOR.width,
+        MANAGEBOOKS_SCREEN.height / MANAGEBOOKS_MONITOR.height
+    };
+
+    MANAGEBOOKS_TitleBox = (Rectangle) {
+        0, 0,
+        MANAGEBOOKS_SCREEN.width,
+        MANAGEBOOKS_SCREEN.height * 0.08f * (float) pow(0.6, (double) MANAGEBOOKS_SCALE.y)
+    };
+    
+    MANAGEBOOKS_HeaderBox = (Rectangle) {
+        MANAGEBOOKS_TitleBox.width * 0.15f,
+        MANAGEBOOKS_TitleBox.height,
+        MANAGEBOOKS_TitleBox.width * 0.7f,
+        MANAGEBOOKS_TitleBox.height
+    };
+
+    MANAGEBOOKS_Panel = (Rectangle) {
+        MANAGEBOOKS_HeaderBox.x,
+        MANAGEBOOKS_HeaderBox.y + MANAGEBOOKS_TitleBox.height,
+        MANAGEBOOKS_HeaderBox.width,
+        MANAGEBOOKS_SCREEN.height - (MANAGEBOOKS_HeaderBox.y + MANAGEBOOKS_HeaderBox.height)
+    };
+
+}
+
 void MANAGEBOOKS_Title(Texture2D icon)
 {
+    Rectangle IconBox = {
+        MANAGEBOOKS_TitleBox.width * 0.02f,
+        MANAGEBOOKS_TitleBox.height * 0.5f,
+        MANAGEBOOKS_TitleBox.width * 0.08f,
+        MANAGEBOOKS_TitleBox.width * 0.08f
+    };
 
+    DrawRectangleRec(MANAGEBOOKS_TitleBox, BRIGHTWHITE);
+    DrawRectangleRec(MANAGEBOOKS_HeaderBox, LIGHTGRAY);
+    DrawRectangleRec(MANAGEBOOKS_Panel, SILVERGRAY);
+
+    DrawIcon(IconBox, icon);
 }
 
 BookList *Loadbooks(const char *filename)

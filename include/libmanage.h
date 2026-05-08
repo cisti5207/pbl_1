@@ -6,6 +6,10 @@
 #define MAX_INPUT 256
 
 #define BRIGHTWHITE (Color) {255, 255, 255, 255}
+#define BRIGHTGRAY  (Color) {209, 209, 209, 255}
+#define WHITESMOKE  (Color) {242, 242, 242, 255}
+#define TEALBLUE    (Color) {21, 96, 130, 255}
+#define SILVERGRAY  (Color) {191, 191, 191, 255}
 
 #define FONT_SIZE 18
 #define Arial "font/arial/arial.ttf"
