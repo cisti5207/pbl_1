@@ -76,6 +76,10 @@ int InitLogin()
     }
 
     LOGIN_SaveAccountData("data\\accounts.txt", _accounts, _accountCount);
+
+    for (int i = 0; i < 2; i++)
+        UnloadFont(LOGIN_Font[i]);
+
     return LOGIN_SUCCESS;
 }
 

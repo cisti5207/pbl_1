@@ -20,6 +20,11 @@
 #define MAX_BOOKS 1000
 #define BOOKS_FILE "data/dataTruyen.txt"
 
+#define MANAGEBOOKS_Func_1 "Tác Giả"
+#define MANAGEBOOKS_Func_2 "Nhà Xuất Bản"
+#define MANAGEBOOKS_Func_3 "Thể loại"
+#define MANAGEBOOKS_Func_4 "Trang Điều Hành"
+
 typedef struct {
     char CodeBook[CODE_BOOKS_LENGTH];
     char NormNameBook[NORMNAME_BOOKS_LENGTH];
@@ -42,9 +47,19 @@ typedef struct {
     int totalImportBooks;
 } BookList;
 
+typedef enum {
+    MANAGEBOOKS_Dashboard,
+    MANAGEBOOKS_Author,
+    MANAGEBOOKS_Publisher,
+    MANAGEBOOKS_Type,
+    MANAGEBOOKS_Main
+} MANAGEBOOKS_STATE;
+
 void InitManageBooks();
 BookList *Loadbooks(const char *filename);
 void MANAGEBOOKS_UpdateSize();
 void MANAGEBOOKS_Title(Texture2D icon);
+
+void MANAGEBOOKS_Func();
 
 #endif // MANAGE_BOOKS_H

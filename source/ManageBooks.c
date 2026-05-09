@@ -6,21 +6,25 @@
 #include <stdlib.h>
 #include <math.h>
 
-Font MANAGEBOOKS_FONT[MAX_FONT_MANAGEBOOKS];
+Font MANAGEBOOKS_Font[MAX_FONT_MANAGEBOOKS];
 
-Rectangle MANAGEBOOKS_SCREEN;
-Rectangle MANAGEBOOKS_MONITOR;
+Rectangle MANAGEBOOKS_Screen;
+Rectangle MANAGEBOOKS_Monitor;
 Rectangle MANAGEBOOKS_TitleBox;
 Rectangle MANAGEBOOKS_HeaderBox;
 Rectangle MANAGEBOOKS_Panel;
 Rectangle MANAGEBOOKS_TitleBarBox;
-Vector2 MANAGEBOOKS_SCALE;
+Vector2 MANAGEBOOKS_Scale;
+Vector2 MANAGEBOOKS_Mouse;
 
 void InitManageBooks()
 {
     SetWindowTitle("Manage Books");
 
+    MANAGEBOOKS_STATE State = MANAGEBOOKS_Dashboard;
     MANAGEBOOKS_UpdateSize();
+
+    MANAGEBOOKS_Font[0] = SetFontUTF8 (ArialBold, 50);
 
     BookList* Books = Loadbooks(BOOKS_FILE);
 
@@ -38,12 +42,13 @@ void InitManageBooks()
     {
         MANAGEBOOKS_UpdateSize();
 
-         
-
         BeginDrawing();
         ClearBackground(WHITESMOKE);
 
         MANAGEBOOKS_Title(Avatar);
+
+        MANAGEBOOKS_Func(&State);
+
 
         EndDrawing();
     }
@@ -53,27 +58,27 @@ void InitManageBooks()
 
 void MANAGEBOOKS_UpdateSize()
 {
-    MANAGEBOOKS_SCREEN = (Rectangle) {
+    MANAGEBOOKS_Screen = (Rectangle) {
         0, 0,
         (float)GetScreenWidth(),
         (float)GetScreenHeight()
     };
 
-    MANAGEBOOKS_MONITOR = (Rectangle) {
+    MANAGEBOOKS_Monitor = (Rectangle) {
         0, 0,
         (float)GetMonitorWidth(0),
         (float)GetMonitorHeight(0)
     };
 
-    MANAGEBOOKS_SCALE = (Vector2) {
-        MANAGEBOOKS_SCREEN.width / MANAGEBOOKS_MONITOR.width,
-        MANAGEBOOKS_SCREEN.height / MANAGEBOOKS_MONITOR.height
+    MANAGEBOOKS_Scale = (Vector2) {
+        MANAGEBOOKS_Screen.width / MANAGEBOOKS_Monitor.width,
+        MANAGEBOOKS_Screen.height / MANAGEBOOKS_Monitor.height
     };
 
     MANAGEBOOKS_TitleBox = (Rectangle) {
         0, 0,
-        MANAGEBOOKS_SCREEN.width,
-        MANAGEBOOKS_SCREEN.height * 0.08f * (float) pow(0.6, (double) MANAGEBOOKS_SCALE.y)
+        MANAGEBOOKS_Screen.width,
+        MANAGEBOOKS_Screen.height * 0.08f * (float) pow(0.6, (double) MANAGEBOOKS_Scale.y)
     };
     
     MANAGEBOOKS_HeaderBox = (Rectangle) {
@@ -87,8 +92,10 @@ void MANAGEBOOKS_UpdateSize()
         MANAGEBOOKS_HeaderBox.x,
         MANAGEBOOKS_HeaderBox.y + MANAGEBOOKS_TitleBox.height,
         MANAGEBOOKS_HeaderBox.width,
-        MANAGEBOOKS_SCREEN.height - (MANAGEBOOKS_HeaderBox.y + MANAGEBOOKS_HeaderBox.height)
+        MANAGEBOOKS_Screen.height - (MANAGEBOOKS_HeaderBox.y + MANAGEBOOKS_HeaderBox.height)
     };
+
+    MANAGEBOOKS_Mouse = GetMousePosition();
 
 }
 
@@ -106,6 +113,109 @@ void MANAGEBOOKS_Title(Texture2D icon)
     DrawRectangleRec(MANAGEBOOKS_Panel, SILVERGRAY);
 
     DrawIcon(IconBox, icon);
+}
+
+void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State)
+{
+    Rectangle IconBox = {
+        MANAGEBOOKS_TitleBox.width * 0.02f,
+        MANAGEBOOKS_TitleBox.height * 0.5f,
+        MANAGEBOOKS_TitleBox.width * 0.08f,
+        MANAGEBOOKS_TitleBox.width * 0.08f
+    };
+
+    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, IconBox))
+    {
+        DrawRectangleRec(IconBox, Fade(TEALBLUE, 0.1f));
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            *State = MANAGEBOOKS_Dashboard;
+    }
+    
+    Vector2 TextWidth;
+
+    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, 24, 2);
+
+    Rectangle AuthorBox = {
+        MANAGEBOOKS_TitleBox.width * 0.15f,
+        MANAGEBOOKS_TitleBox.height * 0.9f - TextWidth.y, 
+        TextWidth.x,
+        TextWidth.y
+    };
+    
+    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, AuthorBox)){
+        DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, (Vector2){AuthorBox.x - 8, AuthorBox.y - 4}, 26, 3, GOLDACCENT);
+        DrawLineEx((Vector2) {AuthorBox.x, AuthorBox.y + AuthorBox.height}, (Vector2) {AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height}, 3, BLACK);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            *State = MANAGEBOOKS_Author;
+        }
+    }
+    else {
+        DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, (Vector2){AuthorBox.x, AuthorBox.y}, 24, 2, BLACK);
+        DrawLineEx((Vector2) {AuthorBox.x, AuthorBox.y + AuthorBox.height}, (Vector2) {AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height}, 3, BLACK);
+    }
+
+    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_2, 24, 2);
+
+    Rectangle PublisherBox = {
+        AuthorBox.x + AuthorBox.width + MANAGEBOOKS_TitleBox.width * 0.03f,
+        AuthorBox.y,
+        TextWidth.x,
+        TextWidth.y
+    };
+
+    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, PublisherBox)){
+        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_2, (Vector2) {PublisherBox.x - 10, PublisherBox.y - 4}, 26, 3, GOLDACCENT);
+        DrawLineEx((Vector2) {PublisherBox.x, PublisherBox.y + PublisherBox.height}, (Vector2) {PublisherBox.x + PublisherBox.width, PublisherBox.y + PublisherBox.height}, 3, BLACK);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            *State = MANAGEBOOKS_Publisher;
+        }
+    }
+    else {
+        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_2, (Vector2) {PublisherBox.x, PublisherBox.y}, 24, 2, BLACK);
+        DrawLineEx((Vector2) {PublisherBox.x, PublisherBox.y + PublisherBox.height}, (Vector2) {PublisherBox.x + PublisherBox.width, PublisherBox.y + PublisherBox.height}, 3, BLACK);
+    }
+
+    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_3, 24, 2);
+
+    Rectangle TypeBox = {
+        PublisherBox.x + PublisherBox.width + MANAGEBOOKS_TitleBox.width * 0.03f,
+        PublisherBox.y,
+        TextWidth.x,
+        TextWidth.y
+    };
+
+    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, TypeBox)){
+        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_3, (Vector2) {TypeBox.x - 8, TypeBox.y - 4}, 26, 3, GOLDACCENT);
+        DrawLineEx((Vector2) {TypeBox.x, TypeBox.y + TypeBox.height}, (Vector2) {TypeBox.x + TypeBox.width, TypeBox.y + TypeBox.height}, 3, BLACK);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            *State = MANAGEBOOKS_Type;
+        }
+    }
+    else {
+        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_3, (Vector2) {TypeBox.x, TypeBox.y}, 24, 2, BLACK);
+        DrawLineEx((Vector2) {TypeBox.x, TypeBox.y + TypeBox.height}, (Vector2) {TypeBox.x + TypeBox.width, TypeBox.y + TypeBox.height}, 3, BLACK);
+    }
+
+    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, 24, 2);
+
+    Rectangle MainBox = {
+        TypeBox.x + TypeBox.width + MANAGEBOOKS_TitleBox.width * 0.03f,
+        TypeBox.y,
+        TextWidth.x,
+        TextWidth.y
+    };
+
+    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, MainBox)){
+        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, (Vector2) {MainBox.x - 8, MainBox.y - 4}, 26, 3, GOLDACCENT);
+        DrawLineEx((Vector2) {MainBox.x, MainBox.y + MainBox.height}, (Vector2) {MainBox.x + MainBox.width, MainBox.y + MainBox.height}, 3, BLACK);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            *State = MANAGEBOOKS_Main;
+        }
+    }
+    else {
+        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, (Vector2) {MainBox.x, MainBox.y}, 24, 2, BLACK);
+        DrawLineEx((Vector2) {MainBox.x, MainBox.y + MainBox.height}, (Vector2) {MainBox.x + MainBox.width, MainBox.y + MainBox.height}, 3, BLACK);
+    }
 }
 
 BookList *Loadbooks(const char *filename)
