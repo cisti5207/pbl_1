@@ -36,6 +36,8 @@
 #define Roboto_Semibold "font/roboto/Roboto-Semibold.ttf"
 #define Gill "font/gill/gillubcd.ttf"
 
+#define Icon_Find_lnk "img/icon5.png"
+
 typedef enum{
     IDLE = 0,
     TRUE,
@@ -48,13 +50,18 @@ typedef enum{
 typedef struct {
     Rectangle box;
     char text[MAX_INPUT];
+    char textLimit[MAX_INPUT];
     int length;
+    int lengthLimit;
     bool isFocused;
 } InputBox;
 
 Font SetFontUTF8(const char *fontPath, int fontSize);
 int lenStringUTF8(const char *str);
 void trim(char *str);
+
+void DeleteLastWord(InputBox *input);
+void PasteClipboard(InputBox *input);
 void DeleteLastChar(InputBox *input);
 void UpdateInputBox(InputBox *input);
 void DrawIcon(Rectangle box, Texture2D icon);

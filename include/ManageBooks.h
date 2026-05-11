@@ -27,6 +27,8 @@
 #define MANAGEBOOKS_Func_4 "Trang Điều Hành"
 #define MANAGEBOOKS_Func_5 "Tìm kiếm"
 
+#define MANAGEBOOKS_Avatar "img/dut.png"
+
 typedef struct {
     char CodeBook[CODE_BOOKS_LENGTH];
     char NormNameBook[NORMNAME_BOOKS_LENGTH];
@@ -63,6 +65,6 @@ BookList *Loadbooks(const char *filename);
 void MANAGEBOOKS_UpdateSize();
 void MANAGEBOOKS_Title(Texture2D icon);
 
-void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar);
+void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find);
 
 #endif // MANAGE_BOOKS_H

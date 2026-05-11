@@ -73,45 +73,141 @@ Font SetFontUTF8(const char *_font, int _fontSize)
 }
 // ===== HÀM PHỤ TRỢ: XÓA KÝ TỰ UTF-8 =====
 void DeleteLastChar(InputBox *input) {
+
     if (input->length > 0) {
+
         input->length--;
-        // Lùi lại để xóa trọn vẹn ký tự UTF-8 (có thể chiếm 2-3 byte)
-        while (input->length > 0 && (input->text[input->length] & 0xC0) == 0x80) {
+
+        // UTF-8 continuation byte
+        while (
+            input->length > 0 &&
+            (input->text[input->length] & 0xC0) == 0x80
+        ) {
             input->length--;
         }
+
         input->text[input->length] = '\0';
     }
 }
+
+// ===== DELETE LAST WORD =====
+void DeleteLastWord(InputBox *input) {
+
+    if (input->length <= 0) return;
+
+    // Xóa khoảng trắng cuối
+    while (
+        input->length > 0 &&
+        input->text[input->length - 1] == ' '
+    ) {
+        input->length--;
+    }
+
+    // Xóa nguyên từ
+    while (
+        input->length > 0 &&
+        input->text[input->length - 1] != ' '
+    ) {
+
+        input->length--;
+
+        // UTF-8 continuation byte
+        while (
+            input->length > 0 &&
+            (input->text[input->length] & 0xC0) == 0x80
+        ) {
+            input->length--;
+        }
+    }
+
+    input->text[input->length] = '\0';
+}
+
+// ===== PASTE =====
+void PasteClipboard(InputBox *input) {
+
+    const char *clip = GetClipboardText();
+
+    if (!clip) return;
+
+    int len = strlen(clip);
+
+    if (input->length + len >= MAX_INPUT) {
+        len = MAX_INPUT - input->length - 1;
+    }
+
+    if (len > 0) {
+
+        memcpy(
+            &input->text[input->length],
+            clip,
+            len
+        );
+
+        input->length += len;
+
+        input->text[input->length] = '\0';
+    }
+}
+
 // ===== UPDATE INPUT =====
 void UpdateInputBox(InputBox *input) {
-    // ===== XỬ LÝ XÓA (BACKSPACE) =====
-    // 1. Dùng GetKeyPressed() lấy sạch hàng đợi phím. 
-    // Việc này đảm bảo bắt dính lệnh Backspace tàng hình do Unikey gửi.
-    int keycode = GetKeyPressed();
-    while (keycode > 0) {
-        if (keycode == KEY_BACKSPACE) {
+
+    bool ctrl =
+        IsKeyDown(KEY_LEFT_CONTROL) ||
+        IsKeyDown(KEY_RIGHT_CONTROL);
+
+    // ===== CTRL + V =====
+    if (ctrl && IsKeyPressed(KEY_V)) {
+        PasteClipboard(input);
+    }
+
+    // ===== CTRL + BACKSPACE =====
+    if (ctrl && IsKeyPressed(KEY_BACKSPACE)) {
+        DeleteLastWord(input);
+    }
+    else {
+
+        // ===== BACKSPACE =====
+        int keycode = GetKeyPressed();
+
+        while (keycode > 0) {
+
+            if (keycode == KEY_BACKSPACE) {
+                DeleteLastChar(input);
+            }
+
+            keycode = GetKeyPressed();
+        }
+
+        if (IsKeyPressedRepeat(KEY_BACKSPACE)) {
             DeleteLastChar(input);
         }
-        keycode = GetKeyPressed(); // Lấy phím tiếp theo trong hàng đợi
     }
 
-    // 2. Vẫn giữ IsKeyPressedRepeat để người dùng có thể đè phím xóa liên tục
-    if (IsKeyPressedRepeat(KEY_BACKSPACE)) {
-        DeleteLastChar(input);
-    }
-
-    // ===== XỬ LÝ NHẬP CHỮ UTF-8 =====
+    // ===== INPUT UTF-8 =====
     int charKey = GetCharPressed();
+
     while (charKey > 0) {
+
         int size = 0;
-        const char *utf8 = CodepointToUTF8(charKey, &size);
+
+        const char *utf8 =
+            CodepointToUTF8(charKey, &size);
 
         if (input->length + size < MAX_INPUT) {
-            memcpy(&input->text[input->length], utf8, size);
+
+            memcpy(
+                &input->text[input->length],
+                utf8,
+                size
+            );
+
             input->length += size;
+
             input->text[input->length] = '\0';
         }
-        
+
         charKey = GetCharPressed();
     }
 }
