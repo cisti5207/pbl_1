@@ -17,6 +17,7 @@ Rectangle MANAGEBOOKS_TitleBarBox;
 Vector2 MANAGEBOOKS_Scale;
 Vector2 MANAGEBOOKS_Mouse;
 
+
 void InitManageBooks()
 {
     SetWindowTitle("Manage Books");
@@ -27,6 +28,7 @@ void InitManageBooks()
     MANAGEBOOKS_Font[0] = SetFontUTF8 (ArialBold, 50);
 
     BookList* Books = Loadbooks(BOOKS_FILE);
+    InputBox FindBar = {0};
 
     if (Books == NULL)
     {
@@ -47,9 +49,17 @@ void InitManageBooks()
 
         MANAGEBOOKS_Title(Avatar);
 
-        MANAGEBOOKS_Func(&State);
+        MANAGEBOOKS_Func(&State, &FindBar);
 
-
+        switch(State)
+        {
+            case MANAGEBOOKS_Dashboard:
+            case MANAGEBOOKS_Author:
+            case MANAGEBOOKS_Publisher:
+            case MANAGEBOOKS_Type:
+            case MANAGEBOOKS_Main:
+            case MANAGEBOOKS_Find:
+        }
         EndDrawing();
     }
 
@@ -96,7 +106,6 @@ void MANAGEBOOKS_UpdateSize()
     };
 
     MANAGEBOOKS_Mouse = GetMousePosition();
-
 }
 
 void MANAGEBOOKS_Title(Texture2D icon)
@@ -109,14 +118,15 @@ void MANAGEBOOKS_Title(Texture2D icon)
     };
 
     DrawRectangleRec(MANAGEBOOKS_TitleBox, BRIGHTWHITE);
-    DrawRectangleRec(MANAGEBOOKS_HeaderBox, LIGHTGRAY);
-    DrawRectangleRec(MANAGEBOOKS_Panel, SILVERGRAY);
+    DrawRectangleRec(MANAGEBOOKS_HeaderBox, GRAY);
+    DrawRectangleRec(MANAGEBOOKS_Panel, LIGHTGRAY);
 
     DrawIcon(IconBox, icon);
 }
 
-void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State)
+void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar)
 {
+    // khởi tạo hitbox cho Avatar
     Rectangle IconBox = {
         MANAGEBOOKS_TitleBox.width * 0.02f,
         MANAGEBOOKS_TitleBox.height * 0.5f,
@@ -124,36 +134,51 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State)
         MANAGEBOOKS_TitleBox.width * 0.08f
     };
 
+    // kiểm tra focus
     if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, IconBox))
     {
+        // Thể hiện đã focus
         DrawRectangleRec(IconBox, Fade(TEALBLUE, 0.1f));
+        
+        // Nếu mà bấm vào avatar thì *State -> Dashboard, hay quay lại màn hình chính cuả ManageBooks
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             *State = MANAGEBOOKS_Dashboard;
     }
     
+    // Khởi tạo biến TextWidth để lấy độ rộng (x, y) của Text sau khi in
     Vector2 TextWidth;
 
+    // "Tác giả"
     TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, 24, 2);
 
+    // Hit box của "Tác giả"
     Rectangle AuthorBox = {
+        // Lấy vị trí bắt đầu vẽ (x, y)
         MANAGEBOOKS_TitleBox.width * 0.15f,
-        MANAGEBOOKS_TitleBox.height * 0.9f - TextWidth.y, 
+        MANAGEBOOKS_TitleBox.height * 0.9f - TextWidth.y,
+        
+        // Chiều dài và rộng của hitbox Rectangle
         TextWidth.x,
         TextWidth.y
     };
     
+    // Kiểm tra điều kiện, nếu có focus thì highlight dòng chữ
     if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, AuthorBox)){
         DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, (Vector2){AuthorBox.x - 8, AuthorBox.y - 4}, 26, 3, GOLDACCENT);
         DrawLineEx((Vector2) {AuthorBox.x, AuthorBox.y + AuthorBox.height}, (Vector2) {AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height}, 3, BLACK);
+        
+        //Nếu bấm chọn chức năng này thì State -> Author, trang ứng dụng sẽ chuyển sang Tác giả
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
             *State = MANAGEBOOKS_Author;
         }
     }
     else {
+        // Nếu không có focus thì không highlight
         DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, (Vector2){AuthorBox.x, AuthorBox.y}, 24, 2, BLACK);
         DrawLineEx((Vector2) {AuthorBox.x, AuthorBox.y + AuthorBox.height}, (Vector2) {AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height}, 3, BLACK);
     }
 
+    // "Nhà xuất bản"
     TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_2, 24, 2);
 
     Rectangle PublisherBox = {
@@ -175,6 +200,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State)
         DrawLineEx((Vector2) {PublisherBox.x, PublisherBox.y + PublisherBox.height}, (Vector2) {PublisherBox.x + PublisherBox.width, PublisherBox.y + PublisherBox.height}, 3, BLACK);
     }
 
+    // "Thể loại"
     TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_3, 24, 2);
 
     Rectangle TypeBox = {
@@ -196,6 +222,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State)
         DrawLineEx((Vector2) {TypeBox.x, TypeBox.y + TypeBox.height}, (Vector2) {TypeBox.x + TypeBox.width, TypeBox.y + TypeBox.height}, 3, BLACK);
     }
 
+    // Trang màn hình chính
     TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, 24, 2);
 
     Rectangle MainBox = {
@@ -215,6 +242,42 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State)
     else {
         DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, (Vector2) {MainBox.x, MainBox.y}, 24, 2, BLACK);
         DrawLineEx((Vector2) {MainBox.x, MainBox.y + MainBox.height}, (Vector2) {MainBox.x + MainBox.width, MainBox.y + MainBox.height}, 3, BLACK);
+    }
+
+    // Thanh tìm kiếm
+    FindBar -> box = (Rectangle) {
+        MainBox.x + MainBox.width + MANAGEBOOKS_TitleBox.width * 0.15f * (MANAGEBOOKS_Scale).x,
+        MANAGEBOOKS_TitleBox.height * 0.1f,
+        (MANAGEBOOKS_TitleBox.width - FindBar -> box.x) * 0.8f,
+        MANAGEBOOKS_TitleBox.height * 0.8f
+    };
+
+    
+    
+    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_5, 20, 2);
+    Rectangle FindBarSize = {
+        FindBar -> box . x + FindBar -> box.width * 0.15f * (float) pow (0.5, (double) MANAGEBOOKS_Scale.x),
+        FindBar -> box . y + (FindBar -> box.height - TextWidth.y) * 0.5f,
+        TextWidth.x,
+        TextWidth.y
+    };
+
+    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, FindBar -> box))
+    {
+        DrawRectangleRounded (FindBar -> box, 1.0f, 10, WHITESMOKE);
+        DrawRectangleRoundedLines (FindBar -> box, 1.0f, 10, STEELBLUE);
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
+        {
+            if (IsKeyPressed(KEY_ENTER)) {}
+            else {}
+        }
+        else{
+            DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_5, (Vector2) {FindBarSize.x, FindBarSize.y}, 20, 2, GRAY);
+        }
+    }
+    else {
+        DrawRectangleRounded (FindBar -> box, 1.0f, 10, SILVERGRAY);
+        DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_5, (Vector2) {FindBarSize.x, FindBarSize.y}, 20, 2, GRAY);
     }
 }
 

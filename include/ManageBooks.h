@@ -2,6 +2,7 @@
 #define MANAGE_BOOKS_H
 
 #include "raylib.h"
+#include "libmanage.h"
 
 #define MAX_FONT_MANAGEBOOKS 128
 
@@ -24,6 +25,7 @@
 #define MANAGEBOOKS_Func_2 "Nhà Xuất Bản"
 #define MANAGEBOOKS_Func_3 "Thể loại"
 #define MANAGEBOOKS_Func_4 "Trang Điều Hành"
+#define MANAGEBOOKS_Func_5 "Tìm kiếm"
 
 typedef struct {
     char CodeBook[CODE_BOOKS_LENGTH];
@@ -52,6 +54,7 @@ typedef enum {
     MANAGEBOOKS_Author,
     MANAGEBOOKS_Publisher,
     MANAGEBOOKS_Type,
+    MANAGEBOOKS_Find,
     MANAGEBOOKS_Main
 } MANAGEBOOKS_STATE;
 
@@ -60,6 +63,6 @@ BookList *Loadbooks(const char *filename);
 void MANAGEBOOKS_UpdateSize();
 void MANAGEBOOKS_Title(Texture2D icon);
 
-void MANAGEBOOKS_Func();
+void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar);
 
 #endif // MANAGE_BOOKS_H
