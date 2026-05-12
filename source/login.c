@@ -7,13 +7,10 @@
 #include <ctype.h>
 
 Vector2 mousePosition;
-<<<<<<< HEAD
 extern Font font[6];
-=======
 Texture2D ImgForBackground;
 Texture2D ImgForFormLogin;
 Font _Font[QUANTITY_FONT];
->>>>>>> e966191979f3919c5bd90fb6c8040be007ee3fe9
 
 LoginState              LOGIN_STATE             = LOGIN;
 LoginResult             LOGIN_RESULT            = LOGIN_IDLE;
