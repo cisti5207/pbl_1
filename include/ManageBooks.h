@@ -62,6 +62,8 @@ typedef enum {
 
 void InitManageBooks();
 BookList *Loadbooks(const char *filename);
+bool Savebooks(BookList *Books);
+
 void MANAGEBOOKS_UpdateSize();
 void MANAGEBOOKS_Title(Texture2D icon);
 

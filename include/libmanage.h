@@ -25,6 +25,7 @@
 #define SUCCESSGREEN    (Color){46, 204, 113, 255}
 #define WARNINGORANGE   (Color){243, 156, 18, 255}
 #define ERRORRED        (Color){231, 76, 60, 255}
+#define DARKBLUE1       (Color){0, 14, 46, 255}
 
 #define FONT_SIZE 18
 #define Arial "font/arial/arial.ttf"
@@ -46,6 +47,10 @@ typedef enum{
     FOUND,
     FAILED
 } CheckResult;
+typedef enum {
+    STAFF = 0,
+    ADMINISTRATOR
+} Role;
 
 typedef struct {
     Rectangle box;
@@ -56,6 +61,13 @@ typedef struct {
     bool isFocused;
 } InputBox;
 
+typedef struct Particle {
+    Vector2 Position;
+    Vector2 Velocity;
+    float radius;
+    float alpha;
+} Particle;
+
 Font SetFontUTF8(const char *fontPath, int fontSize);
 int lenStringUTF8(const char *str);
 void trim(char *str);
@@ -65,6 +77,7 @@ void PasteClipboard(InputBox *input);
 void DeleteLastChar(InputBox *input);
 void UpdateInputBox(InputBox *input);
 void DrawIcon(Rectangle box, Texture2D icon);
+float FindRoundness(float len, float width, float height);
 
 
 #endif // LIBMANAGE_H

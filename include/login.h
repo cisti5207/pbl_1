@@ -40,7 +40,7 @@
 #define ICON_PASSWORD "img/icon2.png"
 #define SHOW_PASSWORD "img/icon3.png"
 
-int InitLogin();
+
 
 typedef struct Account {
     char username[MAX_LOGIN_USERNAME_LENGTH];
@@ -67,6 +67,8 @@ typedef enum {
     LOGIN_FAILED
 } LoginResult;
 
+int InitLogin(Account *account_return);
+
 void LOGIN_GetSize(int *screenWidth, int *screenHeight, int *formX, int *formY, int *formWidth, int *formHeight);
 
 void LOGIN_DrawBackground();
@@ -81,5 +83,6 @@ int InsertAccount(AccountList pL, Account *e, AccountPosition p);
 AccountList CreateHeaderNode();
 int LOGIN_GetAccountData(const char *filename, AccountList accounts, int *accountCount);
 int LOGIN_SaveAccountData(const char *filename, AccountList accounts, int accountCount);
+CheckResult Get_account_return(AccountList _account, Account *account, const char *username);
 
 #endif // LOGIN

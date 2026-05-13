@@ -25,7 +25,7 @@ int LOGIN_FormHeight;
 int LOGIN_FormX;
 int LOGIN_FormY;
 
-int InitLogin()
+int InitLogin(Account *account_return)
 {
     AccountList _accounts = CreateHeaderNode();
     if (_accounts == NULL) {
@@ -79,6 +79,15 @@ int InitLogin()
 
     for (int i = 0; i < 2; i++)
         UnloadFont(LOGIN_Font[i]);
+
+    UnloadTexture(LOGIN_ImgForBackground);
+    UnloadTexture(LOGIN_ImgForFormLogin);
+    UnloadTexture(_IconUsername);
+    UnloadTexture(_IconPassword);
+    UnloadTexture(_ShowPasswordIcon);
+
+
+    Get_account_return(_accounts, account_return, _LoginBox.text);
 
     return LOGIN_SUCCESS;
 }
@@ -531,4 +540,20 @@ void LOGIN_GetSize(int *screenWidth, int *screenHeight, int *formX, int *formY, 
 
     *formX = (*screenWidth - *formWidth) / 2;
     *formY = (*screenHeight - *formHeight) / 2;
+}
+CheckResult Get_account_return(AccountList _account, Account *account, const char *username){
+    Account A;
+
+    _account = _account -> next;
+    while (_account != NULL)
+    {
+        A = *(_account -> account);
+        if (strcmp(username, A.username) == 0){
+            *account = A;
+            return TRUE;
+        }
+        _account = _account -> next;
+    }   
+
+    return FAILED;
 }

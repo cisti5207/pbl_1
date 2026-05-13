@@ -229,5 +229,9 @@ void DrawIcon(Rectangle box, Texture2D icon) {
     DrawTexturePro(icon, source, dest, origin, 0.0f, WHITE);
 }
 
+float FindRoundness(float len, float width, float height){
+    float min = (width > height) ? height : width;
 
+    return len / min;
+}
 

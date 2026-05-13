@@ -68,12 +68,24 @@ void InitManageBooks()
             case MANAGEBOOKS_Find:
                 printf ("MANAGEBOOKS_Find\n");
                 break;
+            case MANAGEBOOKS_Main:
+                printf ("MANAGEBOOKS_Main\n");
+                break;
         }
         
         EndDrawing();
-        if (State == MANAGEBOOKS_Main) break;
+        if (State == MANAGEBOOKS_Main) {
+            break;
+        }
     }
 
+    UnloadFont(MANAGEBOOKS_Font[0]);
+
+    UnloadTexture(Avatar);
+    UnloadTexture(Icon_Find);
+
+    Savebooks(Books);
+    free(Books);
     return;
 }
 
@@ -362,8 +374,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
         *State = MANAGEBOOKS_Find;
 }
 
-BookList *Loadbooks(const char *filename)
-{
+BookList *Loadbooks(const char *filename){
     FILE *file = fopen(filename, "r");
     if (!file) {
         fprintf(stderr, "Error: Could not open file %s\n", filename);
@@ -417,4 +428,39 @@ BookList *Loadbooks(const char *filename)
 
     fclose(file);
     return bookList;
+}
+bool Savebooks(BookList *Books){
+    FILE *f = fopen (BOOKS_FILE, "w");
+
+    if (f == NULL){
+        printf ("Save FAILED!!!!");
+        return 0;
+    }
+
+    fprintf (f, "Số quyển truyện: %d\n", Books -> count);
+    fprintf (f, "Số lượng truyện hiện tại: %d\n", Books -> stockBooks);
+    fprintf (f, "Số lượng truyện gốc: %d\n\n", Books -> totalImportBooks);
+
+    Book A;
+    for (int i = 0; i < Books -> count; i++)
+    {
+        A = Books -> theArray[i];
+
+        fprintf (f, "| %*s | %*s | %*s | %*s | %*s | %*s | %*d | %*d | %*d | %*d | %*d |\n",
+            -(CODE_BOOKS_LENGTH + ((int)strlen(A.CodeBook - lenStringUTF8(A.CodeBook)))), A.CodeBook,
+            -(NORMNAME_BOOKS_LENGTH), A.NormNameBook,
+            -(NAME_BOOKS_LENGTH + ((int)strlen(A.NameBook) - lenStringUTF8(A.NameBook))), A.NameBook,
+            -(AUTHOR_BOOKS_LENGTH + ((int)strlen(A.AuthorBook) - lenStringUTF8(A.AuthorBook))), A.AuthorBook,
+            -(TYPE_BOOKS_LENGTH + ((int)strlen(A.TypeBook) - lenStringUTF8(A.TypeBook))), A.TypeBook,
+            -(PUBLISHER_BOOKS_LENGTH + ((int)strlen(A.PublisherBook) - lenStringUTF8(A.PublisherBook))), A.PublisherBook,
+            -YEAR_BOOKS_LENGTH, A.YearBook,
+            -STOCK_BOOKS_LENGTH, A.StockBook,
+            -TOTAL_IMPORT_BOOKS_LENGTH, A.TotalImportBook,
+            -TOTAL_BORROW_BOOKS_LENGTH, A.TotalBorrowBook,
+            -PRICE_BOOKS_LENGTH, A.PriceBook
+        );
+    }
+
+    fclose(f);
+    return 1;
 }
