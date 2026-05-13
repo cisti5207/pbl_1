@@ -11,7 +11,7 @@ Texture2D LOGIN_ImgForBackground;
 Texture2D LOGIN_ImgForFormLogin;
 Font LOGIN_Font[QUANTITYLOGIN_FONT];
 
-LoginResult             LOGIN_RESULT            = LOGIN_IDLE;
+LoginResult             LOGIN_RESULT;
 
 int LOGIN_ScreenWidth;
 int LOGIN_ScreenHeight;
@@ -27,6 +27,7 @@ int LOGIN_FormY;
 
 int InitLogin(Account *account_return)
 {
+    LOGIN_RESULT = LOGIN_IDLE;
     AccountList _accounts = CreateHeaderNode();
     if (_accounts == NULL) {
         printf("Failed to create header node for accounts.\n");

@@ -33,6 +33,7 @@ void InitManageBooks()
     if (Books == NULL)
     {
         printf ("Failed!!! Can not load dataTruyen.txt!!!");
+        State = MANAGEBOOKS_Main;
         return;
     }
 
@@ -406,8 +407,19 @@ BookList *Loadbooks(const char *filename){
 
     //| T002     | tham-tu-lung-danh-conan                  | Thám tử lừng danh Conan                  | Gosho Aoyama               | Trinh thám     | Kim Đồng   | 2012  | 140    | 140  | 0         | 2500   |
     int count = 0;
-    while (fscanf(file, " | %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %d | %d | %d | %d | %d |", book.CodeBook, book.NormNameBook, book.NameBook, book.AuthorBook, book.TypeBook
-    , book.PublisherBook, &book.YearBook, &book.StockBook, &book.TotalImportBook, &book.TotalBorrowBook, &book.PriceBook) == 11)
+    while (fscanf(file, " | %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %[^|]| %d | %d | %d | %d | %d |\n", 
+        book.CodeBook, 
+        book.NormNameBook, 
+        book.NameBook, 
+        book.AuthorBook, 
+        book.TypeBook, 
+        book.PublisherBook, 
+        
+        &book.YearBook, 
+        &book.StockBook, 
+        &book.TotalImportBook, 
+        &book.TotalBorrowBook, 
+        &book.PriceBook) == 11)
     {
         trim(book.CodeBook);
         trim(book.NormNameBook);
@@ -424,6 +436,27 @@ BookList *Loadbooks(const char *filename){
         printf ("Failed!!! Read %d of %d\n", count, bookList->count);
         return NULL;
     }
+
+    Book A;
+    for (int i = 0; i < bookList -> count; i++)
+    {
+        A = bookList -> theArray[i];
+
+        printf ("| %-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %-*d | %-*d | %-*d | %-*d | %-*d |\n",
+            UTF8Width(A.CodeBook, CODE_BOOKS_LENGTH)            - 2, A.CodeBook,
+            UTF8Width(A.NormNameBook, NORMNAME_BOOKS_LENGTH)    - 2, A.NormNameBook,
+            UTF8Width(A.NameBook, NAME_BOOKS_LENGTH)            - 2, A.NameBook,
+            UTF8Width(A.AuthorBook, AUTHOR_BOOKS_LENGTH)        - 2, A.AuthorBook,
+            UTF8Width(A.TypeBook, TYPE_BOOKS_LENGTH)            - 2, A.TypeBook,
+            UTF8Width(A.PublisherBook, PUBLISHER_BOOKS_LENGTH)  - 2, A.PublisherBook,
+
+            YEAR_BOOKS_LENGTH               - 2, A.YearBook,
+            STOCK_BOOKS_LENGTH              - 2, A.StockBook,
+            TOTAL_IMPORT_BOOKS_LENGTH       - 2, A.TotalImportBook,
+            TOTAL_BORROW_BOOKS_LENGTH       - 2, A.TotalBorrowBook,
+            PRICE_BOOKS_LENGTH              - 2, A.PriceBook 
+        );
+    }
     
 
     fclose(file);
@@ -439,25 +472,26 @@ bool Savebooks(BookList *Books){
 
     fprintf (f, "Số quyển truyện: %d\n", Books -> count);
     fprintf (f, "Số lượng truyện hiện tại: %d\n", Books -> stockBooks);
-    fprintf (f, "Số lượng truyện gốc: %d\n\n", Books -> totalImportBooks);
+    fprintf (f, "Số lượng truyện gốc: %d\n", Books -> totalImportBooks);
 
     Book A;
     for (int i = 0; i < Books -> count; i++)
     {
         A = Books -> theArray[i];
 
-        fprintf (f, "| %*s | %*s | %*s | %*s | %*s | %*s | %*d | %*d | %*d | %*d | %*d |\n",
-            -(CODE_BOOKS_LENGTH + ((int)strlen(A.CodeBook - lenStringUTF8(A.CodeBook)))), A.CodeBook,
-            -(NORMNAME_BOOKS_LENGTH), A.NormNameBook,
-            -(NAME_BOOKS_LENGTH + ((int)strlen(A.NameBook) - lenStringUTF8(A.NameBook))), A.NameBook,
-            -(AUTHOR_BOOKS_LENGTH + ((int)strlen(A.AuthorBook) - lenStringUTF8(A.AuthorBook))), A.AuthorBook,
-            -(TYPE_BOOKS_LENGTH + ((int)strlen(A.TypeBook) - lenStringUTF8(A.TypeBook))), A.TypeBook,
-            -(PUBLISHER_BOOKS_LENGTH + ((int)strlen(A.PublisherBook) - lenStringUTF8(A.PublisherBook))), A.PublisherBook,
-            -YEAR_BOOKS_LENGTH, A.YearBook,
-            -STOCK_BOOKS_LENGTH, A.StockBook,
-            -TOTAL_IMPORT_BOOKS_LENGTH, A.TotalImportBook,
-            -TOTAL_BORROW_BOOKS_LENGTH, A.TotalBorrowBook,
-            -PRICE_BOOKS_LENGTH, A.PriceBook
+        fprintf (f, "| %-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %-*d | %-*d | %-*d | %-*d | %-*d |\n",
+            UTF8Width(A.CodeBook, CODE_BOOKS_LENGTH)            - 2, A.CodeBook,
+            UTF8Width(A.NormNameBook, NORMNAME_BOOKS_LENGTH)    - 2, A.NormNameBook,
+            UTF8Width(A.NameBook, NAME_BOOKS_LENGTH)            - 2, A.NameBook,
+            UTF8Width(A.AuthorBook, AUTHOR_BOOKS_LENGTH)        - 2, A.AuthorBook,
+            UTF8Width(A.TypeBook, TYPE_BOOKS_LENGTH)            - 2, A.TypeBook,
+            UTF8Width(A.PublisherBook, PUBLISHER_BOOKS_LENGTH)  - 2, A.PublisherBook,
+
+            YEAR_BOOKS_LENGTH               - 2, A.YearBook,
+            STOCK_BOOKS_LENGTH              - 2, A.StockBook,
+            TOTAL_IMPORT_BOOKS_LENGTH       - 2, A.TotalImportBook,
+            TOTAL_BORROW_BOOKS_LENGTH       - 2, A.TotalBorrowBook,
+            PRICE_BOOKS_LENGTH              - 2, A.PriceBook 
         );
     }
 

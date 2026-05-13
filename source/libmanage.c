@@ -235,3 +235,6 @@ float FindRoundness(float len, float width, float height){
     return len / min;
 }
 
+int UTF8Width(const char *s, int width){
+    return width + ((int)strlen(s) - lenStringUTF8(s));
+}

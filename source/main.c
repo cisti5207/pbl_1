@@ -45,8 +45,6 @@ int main()
         return 1;
     }
 
-    
-
     printf ("| %s | %s | %s | %s | %s | %s |\n",
         _Account.username,
         _Account.realName,
@@ -54,7 +52,7 @@ int main()
         _Account.cccd,
         _Account.dateOfBirth,
         _Account.role
-    );
+    ); 
 
     while (!WindowShouldClose()){
         MAIN_UpdateParticlesPosition();
@@ -69,33 +67,48 @@ int main()
 
         MAIN_DrawPanel(PanelBox, DecribeBox, FuncBox, ShowFuncBox);
         MAIN_Func(ShowFuncBox);
+        
+        EndDrawing();
 
         switch(APP_STATE){
             case HOME:
+                SetWindowTitle("Home");
                 break;
             
             case LOGINAPP:
+                SetWindowTitle("Login");
+                _Account = (Account) {0};
                 if (InitLogin(&_Account) == LOGIN_SUCCESS) {
                     APP_STATE = HOME;
                 } else {
                     printf("Login failed.\n");
                     return 1;
                 }
+                printf ("| %s | %s | %s | %s | %s | %s |\n",
+                    _Account.username,
+                    _Account.realName,
+                    _Account.password,
+                    _Account.cccd,
+                    _Account.dateOfBirth,        
+                    _Account.role
+                );
                 break;
 
             case MANAGEBOOKS:
+                SetWindowTitle("Manage Books");
                 InitManageBooks();
                 APP_STATE = HOME;
                 break;
 
             case MANAGEUSER:
+                SetWindowTitle("Manage User");
                 break;
 
             case MANAGEBORROWING:
+                SetWindowTitle("Manage Borrow");
                 break;
         }
 
-        EndDrawing();
     }
 
     
@@ -299,12 +312,22 @@ void MAIN_Func(Rectangle ShowFuncBox){
 
     float roundness = widthCard * 0.1f;
 
+    float WidthText;
+
     DrawRectangleRounded(
         ManageBooksBox,
         FindRoundness(roundness, ManageBooksBox.width, ManageBooksBox.height),
         10,
         BLACK
     );
+
+    WidthText = MeasureText ("Manage Books", 20);
+    Vector2 ManageBooksText = {
+        ManageBooksBox.x + (ManageBooksBox.width - WidthText) * 0.5f,
+        ManageBooksBox.y + ManageBooksBox.height + 50 
+    };
+
+    DrawText("Manage Books", (int) ManageBooksText.x, (int) ManageBooksText.y, 20, BLACK);
     
     DrawRectangleRounded(
         ManageUserBox,
@@ -342,7 +365,7 @@ void MAIN_Func(Rectangle ShowFuncBox){
         return;
     }
     
-    if (CheckCollisionPointRec(MAIN_Mouse, ManageBooksBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+    if (CheckCollisionPointRec(MAIN_Mouse, Login) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = LOGINAPP;
         return;
     }

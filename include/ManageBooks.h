@@ -6,17 +6,17 @@
 
 #define MAX_FONT_MANAGEBOOKS 128
 
-#define CODE_BOOKS_LENGTH 16
+#define CODE_BOOKS_LENGTH 4
 #define NORMNAME_BOOKS_LENGTH 64
-#define NAME_BOOKS_LENGTH 128
+#define NAME_BOOKS_LENGTH 64
 #define TYPE_BOOKS_LENGTH 32
 #define AUTHOR_BOOKS_LENGTH 32
 #define PUBLISHER_BOOKS_LENGTH 32
-#define YEAR_BOOKS_LENGTH 16
-#define STOCK_BOOKS_LENGTH 16
-#define TOTAL_IMPORT_BOOKS_LENGTH 16
-#define TOTAL_BORROW_BOOKS_LENGTH 32
-#define PRICE_BOOKS_LENGTH 16
+#define YEAR_BOOKS_LENGTH 5
+#define STOCK_BOOKS_LENGTH 4
+#define TOTAL_IMPORT_BOOKS_LENGTH 4
+#define TOTAL_BORROW_BOOKS_LENGTH 5
+#define PRICE_BOOKS_LENGTH 6
 
 #define MAX_BOOKS 1000
 #define BOOKS_FILE "data/dataTruyen.txt"
@@ -30,12 +30,12 @@
 #define MANAGEBOOKS_Avatar "img/dut.png"
 
 typedef struct {
-    char CodeBook[CODE_BOOKS_LENGTH];
-    char NormNameBook[NORMNAME_BOOKS_LENGTH];
-    char NameBook[NAME_BOOKS_LENGTH];
-    char TypeBook[TYPE_BOOKS_LENGTH];
-    char AuthorBook[AUTHOR_BOOKS_LENGTH];
-    char PublisherBook[PUBLISHER_BOOKS_LENGTH];
+    char CodeBook[256];
+    char NormNameBook[256];
+    char NameBook[256];
+    char TypeBook[256];
+    char AuthorBook[256];
+    char PublisherBook[256];
     int YearBook;
     int StockBook;
     int TotalImportBook;

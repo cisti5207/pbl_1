@@ -78,6 +78,7 @@ void DeleteLastChar(InputBox *input);
 void UpdateInputBox(InputBox *input);
 void DrawIcon(Rectangle box, Texture2D icon);
 float FindRoundness(float len, float width, float height);
+int UTF8Width(const char *s, int width);
 
 
 #endif // LIBMANAGE_H
