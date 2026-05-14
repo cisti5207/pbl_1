@@ -75,21 +75,44 @@ typedef struct {
 } Size;
 
 void LoadSize(Size *FormSize, Vector2 monitor, Vector2 screen, Vector2 scale, Vector2 mouse);
+/*
+    Cấp giá trị monitor, screen, scale và mouse cho Size
+    Với (Vector2) {0} thì các giá trị của Vector2 đó không đổi
+*/
 
 Font SetFontUTF8(const char *fontPath, int fontSize);
-int lenStringUTF8(const char *str);
-void trim(char *str);
+/*
+    Dùng hàm này để cấp các font có sẵn trong folder "font"
+*/
 
+int lenStringUTF8(const char *str);
+/*
+    Hàm này sẽ độ dài chữ của UTF8
+*/
+void trim(char *str);
+/*
+    loại bỏ các dấu cách thừa phía trước và sau của chuỗi
+*/
 void DeleteLastWord(InputBox *input);
+// Ctrl + Backspace
+
 void PasteClipboard(InputBox *input);
+// Ctrl + V
+
 void DeleteLastChar(InputBox *input);
+// BackSpace
+
 void UpdateInputBox(InputBox *input);
+// Cập nhật chữ trong InputBox.text
+
 int UTF8Width(const char *s, int width);
+// Hàm này gọi là distance của utf8 sẽ hợp lí hơn, nó sẽ tính chênh lệch độ dài giữa độ dài thực tế và độ dài bit của string
 
 void DrawIcon(Rectangle box, Texture2D icon);
+// Vẽ icon theo khung box
 
 float FindRoundness(float len, float width, float height);
-
+// Tính tỉ lệ roundness của rounded hay circle, ví dụ dùng rounded thì cần cấp giá trị float roundness, nhưng t sẽ dùng hàm này để điều khiển tỉ lệ đó bo tròn theo ý thích
 
 
 #endif // LIBMANAGE_H
