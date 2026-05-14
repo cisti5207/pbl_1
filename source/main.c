@@ -8,13 +8,7 @@
 
 Particle MAIN_Particles[MAX_PARTICLE];
 
-
-Rectangle MAIN_Screen;
-Rectangle MAIN_Monitor;
-Vector2 MAIN_Scale;
-Vector2 MAIN_Mouse;
-
-AppState                    APP_STATE           =           LOGINAPP;
+AppState APP_STATE = LOGINAPP;
 int main()
 {
     InitWindow(1200, 800, "Login");
@@ -22,29 +16,35 @@ int main()
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowMinSize(1000, 600);
 
-    MAIN_Monitor = (Rectangle) {
-        0,
-        0,
-        GetMonitorWidth(0),
-        GetMonitorHeight(0)
-    };
-    MAIN_LoadSize();
-    MAIN_InitParticles();
+    Size MainSize;
+    LoadSize(
+        &MainSize,
+        (Vector2) {
+            GetMonitorWidth(0),
+            GetMonitorHeight(0)
+        },
+        (Vector2) {
+            GetScreenWidth(),
+            GetScreenHeight()
+        },
+        (Vector2) {
+            GetScreenWidth() / GetMonitorWidth(0),
+            GetScreenHeight() / GetMonitorHeight(0)
+        },
+        GetMousePosition()
+    );
 
-    Rectangle PanelBox;
-    Rectangle DecribeBox;
-    Rectangle FuncBox;
-    Rectangle ShowFuncBox;
+    MainContainers Containers;
+    MainInitParticles(MainSize);
+
 
     Account _Account;
-
     if (InitLogin(&_Account) == LOGIN_SUCCESS) {
         APP_STATE = HOME;
     } else {
         printf("Login failed.\n");
         return 1;
     }
-
     printf ("| %s | %s | %s | %s | %s | %s |\n",
         _Account.username,
         _Account.realName,
@@ -55,18 +55,40 @@ int main()
     ); 
 
     while (!WindowShouldClose()){
-        MAIN_UpdateParticlesPosition();
-        MAIN_LoadSize();
-        MAIN_LoadPanel(&PanelBox, &DecribeBox, &FuncBox, &ShowFuncBox);
+        MainUpdateParticlesPosition(MainSize);
+        MainSize.Mouse = GetMousePosition();
+        if (IsWindowResized()){
+            LoadSize(
+                &MainSize,
+                (Vector2) {0},
+                (Vector2) {
+                    GetScreenWidth(),
+                    GetScreenHeight()
+                },
+                (Vector2) {
+                    GetScreenWidth() / GetMonitorWidth(0),
+                    GetScreenHeight() / GetMonitorHeight(0)
+                },
+                (Vector2) {0}
+            );
+        }
+        
+        MainLoadContainers(
+            &Containers,
+            MainSize
+        );
 
         BeginDrawing();
-        ClearBackground(MAIN_AnimatedBackground());
+        ClearBackground(MainAnimatedBackground());
 
-        MAIN_DrawParticle();
-        MAIN_DrawConnection();
+        MainDrawParticle();
+        MainDrawConnection();
 
-        MAIN_DrawPanel(PanelBox, DecribeBox, FuncBox, ShowFuncBox);
-        MAIN_Func(ShowFuncBox);
+        MainDrawPanel(
+            Containers
+        );
+
+        MainFunc(Containers.ShowFuncBox, MainSize.Mouse);
         
         EndDrawing();
 
@@ -77,13 +99,15 @@ int main()
             
             case LOGINAPP:
                 SetWindowTitle("Login");
+                
                 _Account = (Account) {0};
-                if (InitLogin(&_Account) == LOGIN_SUCCESS) {
+                if (InitLogin(&_Account) == LOGIN_SUCCESS)
                     APP_STATE = HOME;
-                } else {
+                else {
                     printf("Login failed.\n");
                     return 1;
                 }
+
                 printf ("| %s | %s | %s | %s | %s | %s |\n",
                     _Account.username,
                     _Account.realName,
@@ -92,84 +116,71 @@ int main()
                     _Account.dateOfBirth,        
                     _Account.role
                 );
+
                 break;
 
             case MANAGEBOOKS:
                 SetWindowTitle("Manage Books");
+                
                 InitManageBooks();
+                
                 APP_STATE = HOME;
+                
                 break;
 
             case MANAGEUSER:
                 SetWindowTitle("Manage User");
+                
                 break;
 
             case MANAGEBORROWING:
                 SetWindowTitle("Manage Borrow");
+                
                 break;
         }
 
     }
-
-    
 
     printf("Exiting login screen...\n");
 
     return 0;
 }
 
-void MAIN_LoadPanel(Rectangle *PanelBox, Rectangle *DecribeBox, Rectangle *FuncBox, Rectangle *ShowFuncBox){
-    *PanelBox = (Rectangle) {
-        MAIN_Screen.width * 0.15f * pow(0.9, (double) MAIN_Scale.x),
-        MAIN_Screen.height * 0.1f * pow(0.9, (double) MAIN_Scale.y),
-        MAIN_Screen.width - 2 * PanelBox->x,
-        MAIN_Screen.height - PanelBox->y 
+void MainLoadContainers(MainContainers *Containers, Size MainSize){
+    Containers->PanelBox = (Rectangle) {
+        MainSize.Screen.x * 0.15f * pow(0.9, (double) MainSize.Scale.x),
+        MainSize.Screen.y * 0.1f * pow(0.9, (double) MainSize.Scale.y),
+        MainSize.Screen.x - 2 * Containers->PanelBox.x,
+        MainSize.Screen.y - Containers->PanelBox.y 
     };
 
-    *DecribeBox = (Rectangle) {
-        PanelBox->x,
-        PanelBox->y,
-        PanelBox->width,
-        PanelBox->height * 0.2f
+    Containers->DecribeBox = (Rectangle) {
+        Containers->PanelBox.x,
+        Containers->PanelBox.y,
+        Containers->PanelBox.width,
+        Containers->PanelBox.height * 0.2f
     };
 
-    *FuncBox = (Rectangle) {
-        PanelBox->x,
-        DecribeBox->y + DecribeBox->height + PanelBox->height * 0.02f,
-        PanelBox->width,
-        PanelBox->height * 0.05f
+    Containers->FuncBox = (Rectangle) {
+        Containers->PanelBox.x,
+        Containers->DecribeBox.y + Containers->DecribeBox.height + Containers->PanelBox.height * 0.02f,
+        Containers->PanelBox.width,
+        Containers->PanelBox.height * 0.05f
     };
 
-    *ShowFuncBox = (Rectangle) {
-        PanelBox->x,
-        FuncBox->y + FuncBox->height + PanelBox->height * 0.02f,
-        PanelBox->width,
-        (PanelBox->height + PanelBox->y - ShowFuncBox->y) + PanelBox->width * 0.01f
+    Containers->ShowFuncBox = (Rectangle) {
+        Containers->PanelBox.x,
+        Containers->FuncBox.y + Containers->FuncBox.height + Containers->PanelBox.height * 0.02f,
+        Containers->PanelBox.width,
+        (Containers->PanelBox.height + Containers->PanelBox.y - Containers->ShowFuncBox.y) + Containers->PanelBox.width * 0.01f
     };
 }
 
-void MAIN_LoadSize(void){
-    MAIN_Screen = (Rectangle) {
-        0,
-        0,
-        GetScreenWidth(),
-        GetScreenHeight()
-    };
-
-    MAIN_Scale = (Vector2) {
-        MAIN_Screen.width / MAIN_Monitor.width,
-        MAIN_Screen.height / MAIN_Monitor.height
-    };
-
-
-    MAIN_Mouse = GetMousePosition();
-}
-
-void MAIN_InitParticles(void){
+void MainInitParticles(Size MainSize){
     for (int i = 0; i < MAX_PARTICLE; i++){
         MAIN_Particles[i].Position = (Vector2) {
-            (float)(GetRandomValue(0, MAIN_Monitor.width)),
-            (float)(GetRandomValue(0, MAIN_Monitor.height))
+            (float)(GetRandomValue(0, MainSize.Monitor.x)),
+            (float)(GetRandomValue(0, MainSize.Monitor.y))
         };
 
         MAIN_Particles[i].Velocity = (Vector2) {
@@ -182,25 +193,25 @@ void MAIN_InitParticles(void){
     }
 }
 
-void MAIN_UpdateParticlesPosition(void){
+void MainUpdateParticlesPosition(Size MainSize){
     for (int i = 0; i < MAX_PARTICLE; i++){
         MAIN_Particles[i].Position.x += MAIN_Particles[i].Velocity.x;
         MAIN_Particles[i].Position.y += MAIN_Particles[i].Velocity.y;
 
         if (MAIN_Particles[i].Position.x < -10) 
-            MAIN_Particles[i].Position.x = MAIN_Monitor.width + 10;
+            MAIN_Particles[i].Position.x = MainSize.Monitor.x + 10;
 
-        if (MAIN_Particles[i].Position.x > MAIN_Monitor.width + 10)
+        if (MAIN_Particles[i].Position.x > MainSize.Monitor.x + 10)
             MAIN_Particles[i].Position.x = -10;
 
         if (MAIN_Particles[i].Position.y < -10){
-            MAIN_Particles[i].Position.y = MAIN_Monitor.height + 10;
-            MAIN_Particles[i].Position.x = (float)(GetRandomValue(0, MAIN_Monitor.width));
+            MAIN_Particles[i].Position.y = MainSize.Monitor.y + 10;
+            MAIN_Particles[i].Position.x = (float)(GetRandomValue(0, MainSize.Monitor.x));
         }
     }
 }
 
-void MAIN_DrawParticle(void){
+void MainDrawParticle(void){
     for (int i = 0; i < MAX_PARTICLE; i++){
         DrawCircleV(
             MAIN_Particles[i].Position,
@@ -210,7 +221,7 @@ void MAIN_DrawParticle(void){
     }
 }
 
-void MAIN_DrawConnection(void){
+void MainDrawConnection(void){
     for (int i = 0; i < MAX_PARTICLE; i++){
         for (int j = i + 1; j < MAX_PARTICLE; j++)
         {
@@ -233,7 +244,7 @@ void MAIN_DrawConnection(void){
     }
 }
 
-Color MAIN_AnimatedBackground(void){
+Color MainAnimatedBackground(void){
     float t = GetTime();
 
     int r = 10 + (int)(sin(t * 0.4f) * 10.0f);
@@ -243,39 +254,55 @@ Color MAIN_AnimatedBackground(void){
     return (Color){ r, g, b, 255 };
 }
 
-void MAIN_DrawPanel(Rectangle PanelBox, Rectangle DecribeBox, Rectangle FuncBox, Rectangle ShowFuncBox){
-    float rounded = PanelBox.width * 0.01f;
+void MainDrawPanel(MainContainers Containers){
+    float rounded = Containers.PanelBox.width * 0.01f;
 
     DrawRectangleRounded (
-        PanelBox,
-        FindRoundness(rounded, PanelBox.width, PanelBox.height),
+        Containers.PanelBox,
+        FindRoundness(
+            rounded, 
+            Containers.PanelBox.width, 
+            Containers.PanelBox.height
+        ),
         10,
         Fade(SOFTWHITE, 0.1f)
     );
 
     DrawRectangleRounded(
-        DecribeBox,
-        FindRoundness(rounded, DecribeBox.width, DecribeBox.height),
+        Containers.DecribeBox,
+        FindRoundness(
+            rounded, 
+            Containers.DecribeBox.width, 
+            Containers.DecribeBox.height
+        ),
         10,
         BRIGHTWHITE
     );
     
     DrawRectangleRounded (
-        FuncBox,
-        FindRoundness(rounded, FuncBox.width, FuncBox.height),
+        Containers.FuncBox,
+        FindRoundness(
+            rounded, 
+            Containers.FuncBox.width, 
+            Containers.FuncBox.height
+        ),
         10,
         BRIGHTWHITE
     );
 
     DrawRectangleRounded (
-        ShowFuncBox,
-        FindRoundness(rounded, ShowFuncBox.width, ShowFuncBox.height),
+        Containers.ShowFuncBox,
+        FindRoundness(
+            rounded, 
+            Containers.ShowFuncBox.width, 
+            Containers.ShowFuncBox.height
+        ),
         10,
         BRIGHTWHITE
     );
 }
 
-void MAIN_Func(Rectangle ShowFuncBox){
+void MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
     int i = 0;
     float ratioDistance = 0.1f;
     float widthScissor = ShowFuncBox.width - ShowFuncBox.width/4 * ratioDistance;
@@ -350,26 +377,25 @@ void MAIN_Func(Rectangle ShowFuncBox){
         BLACK
     );
 
-    if (CheckCollisionPointRec(MAIN_Mouse, ManageBooksBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+    if (CheckCollisionPointRec(Mouse, ManageBooksBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = MANAGEBOOKS;
         return;
     }
     
-    if (CheckCollisionPointRec(MAIN_Mouse, ManageUserBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+    if (CheckCollisionPointRec(Mouse, ManageUserBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = MANAGEUSER;
         return;
     }
 
-    if (CheckCollisionPointRec(MAIN_Mouse, ManageBorrowBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+    if (CheckCollisionPointRec(Mouse, ManageBorrowBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = MANAGEBORROWING;
         return;
     }
     
-    if (CheckCollisionPointRec(MAIN_Mouse, Login) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+    if (CheckCollisionPointRec(Mouse, Login) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = LOGINAPP;
         return;
     }
-
 
     return;
 }

@@ -65,17 +65,17 @@ typedef enum {
 
 int InitLogin(Account *account_return);
 
-void LOGIN_DrawBackground(Size LoginSize, Texture2D Img_Bg);
-void LOGIN_DrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font);
-void LOGIN_DrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT);
-void LOGIN_DrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font);
-void LOGIN_DrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse);
+void LoginDrawBackground(Size LoginSize, Texture2D Img_Bg);
+void LoginDrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font);
+void LoginDrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT);
+void LoginDrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font);
+void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse);
 LoginResult CheckLogin(AccountList accounts, const char *username, const char *password);
 
 int InsertAccount(AccountList pL, Account *e, AccountPosition p);
 AccountList CreateHeaderNode();
-int LOGIN_GetAccountData(const char *filename, AccountList accounts, int *accountCount);
-int LOGIN_SaveAccountData(const char *filename, AccountList accounts, int accountCount);
+int LoginGetAccountData(const char *filename, AccountList accounts, int *accountCount);
+int LoginSaveAccountData(const char *filename, AccountList accounts, int accountCount);
 CheckResult Get_account_return(AccountList _account, Account *account, const char *username);
 
 #endif // LOGIN

@@ -43,7 +43,7 @@ int InitLogin(Account *account_return)
 
     int _accountCount = 0;
     printf("Loading account data...\n");
-    if (LOGIN_GetAccountData("data\\accounts.txt", _accounts, &_accountCount) == FAILED) {
+    if (LoginGetAccountData("data\\accounts.txt", _accounts, &_accountCount) == FAILED) {
         printf("Failed to load account data.\n");
         return FAILED;
     }
@@ -54,7 +54,7 @@ int InitLogin(Account *account_return)
     Font _Font[2];
 
     _Font[0] = SetFontUTF8(ArialBold, 100);
-    _Font[1] = SetFontUTF8(Roboto_Semibold, 30);
+    _Font[1] = SetFontUTF8(Roboto_Semibold, 100);
 
     InputBox _LoginBox = { 0 }; 
         Texture2D _IconUsername = LoadTexture(ICON_USERNAME);
@@ -92,9 +92,9 @@ int InitLogin(Account *account_return)
         BeginDrawing();
         ClearBackground(BLACK);
         
-        LOGIN_DrawBackground(LoginSize, Img_Bg);
-        LOGIN_DrawForm(Form, Img_FormLogin, _Font);
-        LOGIN_DrawLoginForm(
+        LoginDrawBackground(LoginSize, Img_Bg);
+        LoginDrawForm(Form, Img_FormLogin, _Font);
+        LoginDrawLoginForm(
             &_LoginBox, 
             &_PasswordBox, 
             _accounts, 
@@ -111,7 +111,7 @@ int InitLogin(Account *account_return)
         EndDrawing();
     }
 
-    LOGIN_SaveAccountData("data\\accounts.txt", _accounts, _accountCount);
+    LoginSaveAccountData("data\\accounts.txt", _accounts, _accountCount);
 
     for (int i = 0; i < 2; i++)
         UnloadFont(_Font[i]);
@@ -133,7 +133,7 @@ int InitLogin(Account *account_return)
 }
 
 
-void LOGIN_DrawBackground(Size LoginSize, Texture2D Img_Bg){
+void LoginDrawBackground(Size LoginSize, Texture2D Img_Bg){
     float scaleX = LoginSize.Monitor.x / Img_Bg.width;
     float scaleY = LoginSize.Monitor.y / Img_Bg.height;
     float scale = (scaleX > scaleY)? scaleX : scaleY;
@@ -175,7 +175,7 @@ void LOGIN_DrawBackground(Size LoginSize, Texture2D Img_Bg){
         Fade(BLACK, 0.5f)
     );
 }
-void LOGIN_DrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font){    
+void LoginDrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font){    
     Rectangle FormRect = { 
         Form.x, 
         Form.y, 
@@ -300,7 +300,7 @@ void LOGIN_DrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font){
         Fade(BLACK, 0.8f)
     );
 }
-void LOGIN_DrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT) {
+void LoginDrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT) {
     Vector2 _TextWidth = MeasureTextEx(
         _Font[0], 
         LOGIN_TEXT, 
@@ -322,8 +322,8 @@ void LOGIN_DrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountLis
         BLACK
     );
 
-    LOGIN_DrawLoginUsername(_loginBox, _IconUsername, Form, mouse, _Font);
-    LOGIN_DrawLoginPassword(_passwordBox, _IconPassword, _ShowPasswordIcon, Form, _Font, mouse);
+    LoginDrawLoginUsername(_loginBox, _IconUsername, Form, mouse, _Font);
+    LoginDrawLoginPassword(_passwordBox, _IconPassword, _ShowPasswordIcon, Form, _Font, mouse);
 
     Vector2 _TextWidthButton = MeasureTextEx(
         _Font[1], 
@@ -455,7 +455,7 @@ void LOGIN_DrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountLis
         }
     }
 }
-void LOGIN_DrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font) {
+void LoginDrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font) {
     _LoginBox->box = (Rectangle){
         Form.x + Form.width * 0.55f, 
         Form.y + Form.height * 0.5f, 
@@ -560,7 +560,7 @@ void LOGIN_DrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Recta
         );
     }
 }
-void LOGIN_DrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse) {
+void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse) {
     _PasswordBox->box = (Rectangle){
         Form.x + Form.width * 0.55f, 
         Form.y + Form.height * 0.6f, 
@@ -784,7 +784,7 @@ AccountList CreateHeaderNode() {
 
     return header;
 }
-int LOGIN_GetAccountData(const char *filename, AccountList accounts, int *accountCount) {
+int LoginGetAccountData(const char *filename, AccountList accounts, int *accountCount) {
     FILE *file = fopen(filename, "r");
 
     if (file == NULL) {
@@ -833,7 +833,7 @@ int LOGIN_GetAccountData(const char *filename, AccountList accounts, int *accoun
         return TRUE;
     }
 }
-int LOGIN_SaveAccountData(const char *filename, AccountList accounts, int accountCount) {
+int LoginSaveAccountData(const char *filename, AccountList accounts, int accountCount) {
     FILE *file = fopen(filename, "w");
 
     if (file == NULL) {

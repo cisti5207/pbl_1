@@ -30,6 +30,11 @@
 #define MANAGEBOOKS_Avatar "img/dut.png"
 
 typedef struct {
+    Rectangle TitleBox;
+    Rectangle HeaderBox;
+    Rectangle Panel;
+} ManageBooksUI;
+typedef struct {
     char CodeBook[256];
     char NormNameBook[256];
     char NameBook[256];
@@ -76,10 +81,10 @@ Author *LoadAuthor(BookList *Books);
 Type *LoadType(BookList *Books);
 bool Savebooks(BookList *Books);
 
-void MANAGEBOOKS_UpdateSize();
-void MANAGEBOOKS_Title(Texture2D icon);
+void LoadManageBooksUI (ManageBooksUI *UI, Size size);
+void ManageBooksTitle(Texture2D icon, ManageBooksUI UI);
 
-void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find);
+void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);
 
 
 

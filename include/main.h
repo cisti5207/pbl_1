@@ -5,8 +5,6 @@
 
 #define MAX_PARTICLE 256
 
-
-
 typedef enum{
     LOGINAPP,
     HOME,
@@ -15,15 +13,22 @@ typedef enum{
     MANAGEBORROWING,
 } AppState;
 
-void MAIN_LoadPanel(Rectangle *PanelBox, Rectangle *DecribeBox, Rectangle *FuncBox, Rectangle *ShowFuncBox);
-void MAIN_LoadSize();
-void MAIN_InitParticles(void);
-void MAIN_UpdateParticlesPosition(void);
-void MAIN_DrawParticle(void);
-void MAIN_DrawConnection(void);
-Color MAIN_AnimatedBackground(void);
-void MAIN_DrawPanel(Rectangle PanelBox, Rectangle DecribeBox, Rectangle FuncBox, Rectangle ShowFuncBox);
-void MAIN_Func(Rectangle ShowFuncBox);
+typedef struct {
+    Rectangle PanelBox;
+    Rectangle DecribeBox;
+    Rectangle FuncBox;
+    Rectangle ShowFuncBox;
+
+} MainContainers;
+
+void MainLoadContainers(MainContainers *Containers, Size MainSize);
+void MainInitParticles(Size MainSize);
+void MainUpdateParticlesPosition(Size MainSize);
+void MainDrawParticle(void);
+void MainDrawConnection(void);
+Color MainAnimatedBackground(void);
+void MainDrawPanel(MainContainers Containers);
+void MainFunc(Rectangle ShowFuncBox, Vector2 Mouse);
 
 
 #endif // MAIN_H

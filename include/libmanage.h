@@ -27,7 +27,9 @@
 #define ERRORRED        (Color){231, 76, 60, 255}
 #define DARKBLUE1       (Color){0, 14, 46, 255}
 
+#define QuantityFont 32
 #define FONT_SIZE 18
+
 #define Arial "font/arial/arial.ttf"
 #define ArialBold "font/arial/arialbd.ttf"
 #define Cooper "font/cooper/COOPBL.ttf"
@@ -65,6 +67,14 @@ typedef struct Particle {
     float radius;
     float alpha;
 } Particle;
+typedef struct {
+    Vector2 Mouse;
+    Vector2 Screen;
+    Vector2 Monitor;
+    Vector2 Scale;
+} Size;
+
+void LoadSize(Size *FormSize, Vector2 monitor, Vector2 screen, Vector2 scale, Vector2 mouse);
 
 Font SetFontUTF8(const char *fontPath, int fontSize);
 int lenStringUTF8(const char *str);
@@ -74,9 +84,12 @@ void DeleteLastWord(InputBox *input);
 void PasteClipboard(InputBox *input);
 void DeleteLastChar(InputBox *input);
 void UpdateInputBox(InputBox *input);
-void DrawIcon(Rectangle box, Texture2D icon);
-float FindRoundness(float len, float width, float height);
 int UTF8Width(const char *s, int width);
+
+void DrawIcon(Rectangle box, Texture2D icon);
+
+float FindRoundness(float len, float width, float height);
+
 
 
 #endif // LIBMANAGE_H

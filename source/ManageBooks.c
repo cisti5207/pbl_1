@@ -6,38 +6,47 @@
 #include <stdlib.h>
 #include <math.h>
 
-Font MANAGEBOOKS_Font[MAX_FONT_MANAGEBOOKS];
+void InitManageBooks(){
+    Size ManageBooksSize;
+    LoadSize(
+        &ManageBooksSize,
+        (Vector2) {
+            GetMonitorWidth(0),
+            GetMonitorWidth(0)
+        },
+        (Vector2) {
+            GetScreenWidth(),
+            GetScreenHeight()
+        },
+        (Vector2) {
+            GetScreenWidth() / GetMonitorWidth(0),
+            GetScreenHeight() / GetMonitorHeight(0)
+        },
+        GetMousePosition()
+    );
 
-Rectangle MANAGEBOOKS_Screen;
-Rectangle MANAGEBOOKS_Monitor;
-Rectangle MANAGEBOOKS_TitleBox;
-Rectangle MANAGEBOOKS_HeaderBox;
-Rectangle MANAGEBOOKS_Panel;
-Rectangle MANAGEBOOKS_TitleBarBox;
-Vector2 MANAGEBOOKS_Scale;
-Vector2 MANAGEBOOKS_Mouse;
-
-
-void InitManageBooks()
-{
-    SetWindowTitle("Manage Books");
+    ManageBooksUI customUI;
+    LoadManageBooksUI(
+        &customUI, 
+        ManageBooksSize
+    );
 
     MANAGEBOOKS_STATE State = MANAGEBOOKS_Dashboard;
-    MANAGEBOOKS_UpdateSize();
 
-    MANAGEBOOKS_Font[0] = SetFontUTF8 (ArialBold, 50);
+    Font _Font[2];
+    _Font[0] = SetFontUTF8 (ArialBold, 50);
 
     BookList* Books = Loadbooks(BOOKS_FILE);
     Author* Authors = LoadAuthor(Books);
     Type* Types = LoadType(Books);
-    InputBox FindBar = {0};
 
-    if (Books == NULL)
-    {
+    if (Books == NULL || Authors == NULL || Types == NULL){
         printf ("Failed!!! Can not load dataTruyen.txt!!!");
         State = MANAGEBOOKS_Main;
         return;
     }
+
+    InputBox FindBar = {0};
 
     Texture2D Avatar = LoadTexture (MANAGEBOOKS_Avatar);
     Texture2D Icon_Find = LoadTexture (Icon_Find_lnk);
@@ -46,33 +55,48 @@ void InitManageBooks()
     while (!WindowShouldClose())
     {
 
-        MANAGEBOOKS_UpdateSize();
+        if (IsWindowResized()){
+            LoadSize(
+                &ManageBooksSize,
+                (Vector2) {0},
+                (Vector2) {
+                    GetScreenWidth(),
+                    GetScreenHeight()
+                },
+                (Vector2) {
+                    GetScreenWidth() / GetMonitorWidth(0),
+                    GetScreenHeight() / GetMonitorHeight(0)
+                },
+                (Vector2) {0}
+            );
+
+            LoadManageBooksUI(
+                &customUI, 
+                ManageBooksSize
+            );
+        }
+        ManageBooksSize.Mouse = GetMousePosition();
 
         BeginDrawing();
         ClearBackground(WHITESMOKE);
 
-        MANAGEBOOKS_Title(Avatar);
+        ManageBooksTitle(Avatar, customUI);
 
-        MANAGEBOOKS_Func(&State, &FindBar, Icon_Find);
+        ManageBooksFunc(&State, &FindBar, Icon_Find, customUI, ManageBooksSize, _Font);
 
         switch(State)
         {
             case MANAGEBOOKS_Dashboard:
                 break;
             case MANAGEBOOKS_Author:
-                printf ("MANAGEBOOKS_Author\n");
                 break;
             case MANAGEBOOKS_Publisher:
-                printf ("MANAGEBOOKS_Publisher\n");
                 break;
             case MANAGEBOOKS_Type:
-                printf ("MANAGEBOOKS_Type\n");
                 break;
             case MANAGEBOOKS_Find:
-                printf ("MANAGEBOOKS_Find\n");
                 break;
             case MANAGEBOOKS_Main:
-                printf ("MANAGEBOOKS_Main\n");
                 break;
         }
         
@@ -82,7 +106,7 @@ void InitManageBooks()
         }
     }
 
-    UnloadFont(MANAGEBOOKS_Font[0]);
+    UnloadFont(_Font[0]);
 
     UnloadTexture(Avatar);
     UnloadTexture(Icon_Find);
@@ -92,79 +116,75 @@ void InitManageBooks()
     return;
 }
 
-void MANAGEBOOKS_UpdateSize()
-{
-    MANAGEBOOKS_Screen = (Rectangle) {
-        0, 0,
-        (float)GetScreenWidth(),
-        (float)GetScreenHeight()
+void LoadManageBooksUI (ManageBooksUI *UI, Size size){
+    UI->TitleBox = (Rectangle) {
+        0,
+        0,
+        size.Screen.x,
+        size.Screen.y * 0.08f * (float) pow(0.6, (double)size.Scale.x)
     };
 
-    MANAGEBOOKS_Monitor = (Rectangle) {
-        0, 0,
-        (float)GetMonitorWidth(0),
-        (float)GetMonitorHeight(0)
+    UI->HeaderBox = (Rectangle) {
+        UI->TitleBox.width * 0.15f,
+        UI->TitleBox.height,
+        UI->TitleBox.width * 0.7f,
+        UI->TitleBox.height
     };
 
-    MANAGEBOOKS_Scale = (Vector2) {
-        MANAGEBOOKS_Screen.width / MANAGEBOOKS_Monitor.width,
-        MANAGEBOOKS_Screen.height / MANAGEBOOKS_Monitor.height
+    UI->Panel = (Rectangle) {
+        UI->HeaderBox.x,
+        UI->HeaderBox.y + UI->TitleBox.height,
+        UI->HeaderBox.width,
+        size.Screen.y - (UI->HeaderBox.height + UI->TitleBox.height)
     };
-
-    MANAGEBOOKS_TitleBox = (Rectangle) {
-        0, 0,
-        MANAGEBOOKS_Screen.width,
-        MANAGEBOOKS_Screen.height * 0.08f * (float) pow(0.6, (double) MANAGEBOOKS_Scale.y)
-    };
-    
-    MANAGEBOOKS_HeaderBox = (Rectangle) {
-        MANAGEBOOKS_TitleBox.width * 0.15f,
-        MANAGEBOOKS_TitleBox.height,
-        MANAGEBOOKS_TitleBox.width * 0.7f,
-        MANAGEBOOKS_TitleBox.height
-    };
-
-    MANAGEBOOKS_Panel = (Rectangle) {
-        MANAGEBOOKS_HeaderBox.x,
-        MANAGEBOOKS_HeaderBox.y + MANAGEBOOKS_TitleBox.height,
-        MANAGEBOOKS_HeaderBox.width,
-        MANAGEBOOKS_Screen.height - (MANAGEBOOKS_HeaderBox.y + MANAGEBOOKS_HeaderBox.height)
-    };
-
-    MANAGEBOOKS_Mouse = GetMousePosition();
 }
 
-void MANAGEBOOKS_Title(Texture2D icon)
-{
+void ManageBooksTitle(Texture2D icon, ManageBooksUI UI){
     Rectangle IconBox = {
-        MANAGEBOOKS_TitleBox.width * 0.02f,
-        MANAGEBOOKS_TitleBox.height * 0.5f,
-        MANAGEBOOKS_TitleBox.width * 0.08f,
-        MANAGEBOOKS_TitleBox.width * 0.08f
+        UI.TitleBox.width * 0.02f,
+        UI.TitleBox.height * 0.5f,
+        UI.TitleBox.width * 0.08f,
+        UI.TitleBox.width * 0.08f
     };
 
-    DrawRectangleRec(MANAGEBOOKS_TitleBox, BRIGHTWHITE);
-    DrawRectangleRec(MANAGEBOOKS_HeaderBox, GRAY);
-    DrawRectangleRec(MANAGEBOOKS_Panel, LIGHTGRAY);
+    DrawRectangleRec(
+        UI.TitleBox, 
+        BRIGHTWHITE
+    );
 
-    DrawIcon(IconBox, icon);
+    DrawRectangleRec(
+        UI.HeaderBox, 
+        GRAY
+    );
+    
+    DrawRectangleRec(
+        UI.Panel, 
+        LIGHTGRAY
+    );
+
+    DrawIcon(
+        IconBox, 
+        icon
+    );
 }
 
-void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find)
-{
+void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font){
     // khởi tạo hitbox cho Avatar
     Rectangle IconBox = {
-        MANAGEBOOKS_TitleBox.width * 0.02f,
-        MANAGEBOOKS_TitleBox.height * 0.5f,
-        MANAGEBOOKS_TitleBox.width * 0.08f,
-        MANAGEBOOKS_TitleBox.width * 0.08f
+        UI.TitleBox.width * 0.02f,
+        UI.TitleBox.height * 0.5f,
+        UI.TitleBox.width * 0.08f,
+        UI.TitleBox.width * 0.08f
     };
 
     // kiểm tra focus
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, IconBox))
+    if (CheckCollisionPointRec(size.Mouse, IconBox))
     {
         // Thể hiện đã focus
-        DrawRectangleRec(IconBox, Fade(TEALBLUE, 0.1f));
+        DrawRectangleRec(
+            IconBox, 
+            Fade(TEALBLUE, 0.1f)
+        );
         
         // Nếu mà bấm vào avatar thì *State -> Dashboard, hay quay lại màn hình chính cuả ManageBooks
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -175,13 +195,18 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
     Vector2 TextWidth;
 
     // "Tác giả"
-    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, 24, 2);
+    TextWidth = MeasureTextEx (
+        _Font[0], 
+        MANAGEBOOKS_Func_1, 
+        24, 
+        2
+    );
 
     // Hit box của "Tác giả"
     Rectangle AuthorBox = {
         // Lấy vị trí bắt đầu vẽ (x, y)
-        MANAGEBOOKS_TitleBox.width * 0.15f,
-        MANAGEBOOKS_TitleBox.height * 0.9f - TextWidth.y,
+        UI.TitleBox.width * 0.15f,
+        UI.TitleBox.height * 0.9f - TextWidth.y,
         
         // Chiều dài và rộng của hitbox Rectangle
         TextWidth.x,
@@ -189,9 +214,31 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
     };
     
     // Kiểm tra điều kiện, nếu có focus thì highlight dòng chữ
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, AuthorBox)){
-        DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, (Vector2){AuthorBox.x - 8, AuthorBox.y - 4}, 26, 3, GOLDACCENT);
-        DrawLineEx((Vector2) {AuthorBox.x, AuthorBox.y + AuthorBox.height}, (Vector2) {AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height}, 3, BLACK);
+    if (CheckCollisionPointRec(size.Mouse, AuthorBox)){
+        DrawTextEx(
+            _Font[0], 
+            MANAGEBOOKS_Func_1, 
+            (Vector2) {
+                AuthorBox.x - 8, 
+                AuthorBox.y - 4
+            }, 
+            26, 
+            3, 
+            GOLDACCENT
+        );
+
+        DrawLineEx(
+            (Vector2) {
+                AuthorBox.x, 
+                AuthorBox.y + AuthorBox.height
+            }, 
+            (Vector2) {
+                AuthorBox.x + AuthorBox.width, 
+                AuthorBox.y + AuthorBox.height
+            }, 
+            3, 
+            BLACK
+        );
         
         //Nếu bấm chọn chức năng này thì State -> Author, trang ứng dụng sẽ chuyển sang Tác giả
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
@@ -200,82 +247,252 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
     }
     else {
         // Nếu không có focus thì không highlight
-        DrawTextEx(MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_1, (Vector2){AuthorBox.x, AuthorBox.y}, 24, 2, BLACK);
-        DrawLineEx((Vector2) {AuthorBox.x, AuthorBox.y + AuthorBox.height}, (Vector2) {AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height}, 3, BLACK);
+        DrawTextEx(
+            _Font[0], 
+            MANAGEBOOKS_Func_1, 
+            (Vector2) {
+                AuthorBox.x, 
+                AuthorBox.y
+            }, 
+            24, 
+            2, 
+            BLACK
+        );
+
+        DrawLineEx(
+            (Vector2) {
+                AuthorBox.x, 
+                AuthorBox.y + AuthorBox.height
+            }, 
+            (Vector2) {
+                AuthorBox.x + AuthorBox.width, 
+                AuthorBox.y + AuthorBox.height
+            }, 
+            3, 
+            BLACK
+        );
     }
 
     // "Nhà xuất bản"
-    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_2, 24, 2);
+    TextWidth = MeasureTextEx (
+        _Font[0], 
+        MANAGEBOOKS_Func_2, 
+        24, 
+        2
+    );
 
     Rectangle PublisherBox = {
-        AuthorBox.x + AuthorBox.width + MANAGEBOOKS_TitleBox.width * 0.03f,
+        AuthorBox.x + AuthorBox.width + UI.TitleBox.width * 0.03f,
         AuthorBox.y,
         TextWidth.x,
         TextWidth.y
     };
 
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, PublisherBox)){
-        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_2, (Vector2) {PublisherBox.x - 10, PublisherBox.y - 4}, 26, 3, GOLDACCENT);
-        DrawLineEx((Vector2) {PublisherBox.x, PublisherBox.y + PublisherBox.height}, (Vector2) {PublisherBox.x + PublisherBox.width, PublisherBox.y + PublisherBox.height}, 3, BLACK);
+    if (CheckCollisionPointRec(size.Mouse, PublisherBox)){
+        DrawTextEx (
+            _Font[0], 
+            MANAGEBOOKS_Func_2, 
+            (Vector2) {
+                PublisherBox.x - 10, 
+                PublisherBox.y - 4
+            }, 
+            26, 
+            3, 
+            GOLDACCENT
+        );
+
+        DrawLineEx(
+            (Vector2) {
+                PublisherBox.x, 
+                PublisherBox.y + PublisherBox.height
+            }, 
+            (Vector2) {
+                PublisherBox.x + PublisherBox.width, 
+                PublisherBox.y + PublisherBox.height
+            }, 
+            3, 
+            BLACK
+        );
+        
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Publisher;
         }
     }
     else {
-        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_2, (Vector2) {PublisherBox.x, PublisherBox.y}, 24, 2, BLACK);
-        DrawLineEx((Vector2) {PublisherBox.x, PublisherBox.y + PublisherBox.height}, (Vector2) {PublisherBox.x + PublisherBox.width, PublisherBox.y + PublisherBox.height}, 3, BLACK);
+        DrawTextEx (
+            _Font[0], 
+            MANAGEBOOKS_Func_2, 
+            (Vector2) {
+                PublisherBox.x, 
+                PublisherBox.y
+            }, 
+            24, 
+            2, 
+            BLACK
+        );
+        
+        DrawLineEx (
+            (Vector2) {
+                PublisherBox.x, 
+                PublisherBox.y + PublisherBox.height
+            }, 
+            (Vector2) {
+                PublisherBox.x + PublisherBox.width, 
+                PublisherBox.y + PublisherBox.height
+            }, 
+            3, 
+            BLACK
+        );
     }
 
     // "Thể loại"
-    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_3, 24, 2);
+    TextWidth = MeasureTextEx (
+        _Font[0], 
+        MANAGEBOOKS_Func_3, 
+        24, 
+        2
+    );
 
     Rectangle TypeBox = {
-        PublisherBox.x + PublisherBox.width + MANAGEBOOKS_TitleBox.width * 0.03f,
+        PublisherBox.x + PublisherBox.width + UI.TitleBox.width * 0.03f,
         PublisherBox.y,
         TextWidth.x,
         TextWidth.y
     };
 
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, TypeBox)){
-        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_3, (Vector2) {TypeBox.x - 8, TypeBox.y - 4}, 26, 3, GOLDACCENT);
-        DrawLineEx((Vector2) {TypeBox.x, TypeBox.y + TypeBox.height}, (Vector2) {TypeBox.x + TypeBox.width, TypeBox.y + TypeBox.height}, 3, BLACK);
+    if (CheckCollisionPointRec(size.Mouse, TypeBox)){
+        DrawTextEx (
+            _Font[0], 
+            MANAGEBOOKS_Func_3, 
+            (Vector2) {
+                TypeBox.x - 8, 
+                TypeBox.y - 4
+            }, 
+            26, 
+            3, 
+            GOLDACCENT
+        );
+
+        DrawLineEx(
+            (Vector2) {
+                TypeBox.x, 
+                TypeBox.y + TypeBox.height
+            }, 
+            (Vector2) {
+                TypeBox.x + TypeBox.width, 
+                TypeBox.y + TypeBox.height
+            }, 
+            3, 
+            BLACK
+        );
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Type;
         }
     }
     else {
-        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_3, (Vector2) {TypeBox.x, TypeBox.y}, 24, 2, BLACK);
-        DrawLineEx((Vector2) {TypeBox.x, TypeBox.y + TypeBox.height}, (Vector2) {TypeBox.x + TypeBox.width, TypeBox.y + TypeBox.height}, 3, BLACK);
+        DrawTextEx (
+            _Font[0], 
+            MANAGEBOOKS_Func_3, 
+            (Vector2) {
+                TypeBox.x, 
+                TypeBox.y
+            }, 
+            24, 
+            2, 
+            BLACK
+        );
+
+        DrawLineEx(
+            (Vector2) {
+                TypeBox.x, 
+                TypeBox.y + TypeBox.height
+            }, 
+            (Vector2) {
+                TypeBox.x + TypeBox.width, 
+                TypeBox.y + TypeBox.height
+            }, 
+            3, 
+            BLACK
+        );
     }
 
     // Trang màn hình chính
-    TextWidth = MeasureTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, 24, 2);
+    TextWidth = MeasureTextEx (
+        _Font[0], 
+        MANAGEBOOKS_Func_4, 
+        24, 
+        2
+    );
 
     Rectangle MainBox = {
-        TypeBox.x + TypeBox.width + MANAGEBOOKS_TitleBox.width * 0.03f,
+        TypeBox.x + TypeBox.width + UI.TitleBox.width * 0.03f,
         TypeBox.y,
         TextWidth.x,
         TextWidth.y
     };
 
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, MainBox)){
-        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, (Vector2) {MainBox.x - 8, MainBox.y - 4}, 26, 3, GOLDACCENT);
-        DrawLineEx((Vector2) {MainBox.x, MainBox.y + MainBox.height}, (Vector2) {MainBox.x + MainBox.width, MainBox.y + MainBox.height}, 3, BLACK);
+    if (CheckCollisionPointRec(size.Mouse, MainBox)){
+        DrawTextEx (
+            _Font[0], 
+            MANAGEBOOKS_Func_4, 
+            (Vector2) {
+                MainBox.x - 8, 
+                MainBox.y - 4
+            }, 
+            26, 
+            3, 
+            GOLDACCENT
+        );
+
+        DrawLineEx(
+            (Vector2) {
+                MainBox.x, 
+                MainBox.y + MainBox.height
+            }, 
+            (Vector2) {
+                MainBox.x + MainBox.width, 
+                MainBox.y + MainBox.height
+            }, 
+            3, 
+            BLACK
+        );
+
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Main;
         }
     }
     else {
-        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_4, (Vector2) {MainBox.x, MainBox.y}, 24, 2, BLACK);
-        DrawLineEx((Vector2) {MainBox.x, MainBox.y + MainBox.height}, (Vector2) {MainBox.x + MainBox.width, MainBox.y + MainBox.height}, 3, BLACK);
+        DrawTextEx (
+            _Font[0], 
+            MANAGEBOOKS_Func_4, 
+            (Vector2) {
+                MainBox.x, 
+                MainBox.y
+            }, 
+            24, 
+            2, 
+            BLACK
+        );
+        DrawLineEx(
+            (Vector2) {
+                MainBox.x, 
+                MainBox.y + MainBox.height
+            }, 
+            (Vector2) {
+                MainBox.x + MainBox.width, 
+                MainBox.y + MainBox.height
+            }, 
+            3, 
+            BLACK
+        );
     }
 
     // Thanh tìm kiếm
     FindBar -> box = (Rectangle) {
-        MainBox.x + MainBox.width + MANAGEBOOKS_TitleBox.width * 0.1f * (float) pow (0.9 ,(double)MANAGEBOOKS_Scale.x),
-        MANAGEBOOKS_TitleBox.height * 0.1f,
-        (MANAGEBOOKS_TitleBox.width - FindBar -> box.x) * 0.9f,
-        MANAGEBOOKS_TitleBox.height * 0.8f
+        MainBox.x + MainBox.width + UI.TitleBox.width * 0.1f * (float) pow (0.9 ,(double)size.Scale.x),
+        UI.TitleBox.height * 0.1f,
+        (UI.TitleBox.width - FindBar -> box.x) * 0.9f,
+        UI.TitleBox.height * 0.8f
     };
 
     Rectangle FindBarTextPos = {
@@ -299,7 +516,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
         FindBar -> box.height
     };
 
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, FindBarTextBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    if (CheckCollisionPointRec(size.Mouse, FindBarTextBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         FindBar->isFocused = true;
     else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         FindBar->isFocused = false;
@@ -342,7 +559,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
         UpdateInputBox(FindBar);
         
         float w = MeasureTextEx(
-            MANAGEBOOKS_Font[0], 
+            _Font[0], 
             FindBar->text, 
             20, 
             2
@@ -355,7 +572,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
         };
 
         DrawTextEx (
-            MANAGEBOOKS_Font[0], 
+            _Font[0], 
             FindBar->text, 
             position, 
             20, 
@@ -393,7 +610,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
         );
         
         float w = MeasureTextEx(
-            MANAGEBOOKS_Font[0], 
+            _Font[0], 
             FindBar->text, 
             20, 
             2
@@ -406,7 +623,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
         };
 
         DrawTextEx (
-            MANAGEBOOKS_Font[0], 
+            _Font[0], 
             FindBar->text, 
             position, 
             20, 
@@ -449,7 +666,7 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
     );
 
     DrawIcon(IconFindBox, Icon_Find);
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, IconFindBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && FindBar -> length > 0)
+    if (CheckCollisionPointRec(size.Mouse, IconFindBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && FindBar -> length > 0)
         *State = MANAGEBOOKS_Find;
 }
 

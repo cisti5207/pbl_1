@@ -3,7 +3,22 @@
 #include <ctype.h>
 #include <string.h>
 
-int lenStringUTF8(const char *str) {
+
+void LoadSize(Size *FormSize, Vector2 monitor, Vector2 screen, Vector2 scale, Vector2 mouse){
+    if (monitor.x || monitor.y)
+        FormSize->Monitor = monitor;
+
+    if (mouse.x || mouse.y)
+        FormSize->Mouse = mouse;
+
+    if (scale.x || scale.y)
+        FormSize->Scale = scale;
+    
+    if (screen.x || screen.y)
+        FormSize->Screen = screen;
+}
+
+int lenStringUTF8(const char *str){
     int len = 0;
     while (*str) {
         if ((*str & 0xC0) != 0x80) { // Kiểm tra nếu không phải là byte tiếp theo của một ký tự UTF-8
@@ -13,7 +28,7 @@ int lenStringUTF8(const char *str) {
     }
     return len;
 }
-void trim(char *str) {
+void trim(char *str){
     // Xóa khoảng trắng ở đầu
     char *start = str;
     while (*start && isspace((unsigned char)*start)) {
@@ -32,8 +47,7 @@ void trim(char *str) {
         memmove(str, start, end - start + 2); // +2 để bao gồm cả ký tự null
     }
 }
-Font SetFontUTF8(const char *_font, int _fontSize)
-{
+Font SetFontUTF8(const char *_font, int _fontSize){
     int codepoints[] = {
     // Basic Latin (ký tự thường)
     32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
@@ -71,8 +85,8 @@ Font SetFontUTF8(const char *_font, int _fontSize)
 
     return finalFont;
 }
-// ===== HÀM PHỤ TRỢ: XÓA KÝ TỰ UTF-8 =====
-void DeleteLastChar(InputBox *input) {
+
+void DeleteLastChar(InputBox *input){
 
     if (input->length > 0) {
 
@@ -89,9 +103,7 @@ void DeleteLastChar(InputBox *input) {
         input->text[input->length] = '\0';
     }
 }
-
-// ===== DELETE LAST WORD =====
-void DeleteLastWord(InputBox *input) {
+void DeleteLastWord(InputBox *input){
 
     if (input->length <= 0) return;
 
@@ -122,9 +134,7 @@ void DeleteLastWord(InputBox *input) {
 
     input->text[input->length] = '\0';
 }
-
-// ===== PASTE =====
-void PasteClipboard(InputBox *input) {
+void PasteClipboard(InputBox *input){
 
     const char *clip = GetClipboardText();
 
@@ -149,9 +159,7 @@ void PasteClipboard(InputBox *input) {
         input->text[input->length] = '\0';
     }
 }
-
-// ===== UPDATE INPUT =====
-void UpdateInputBox(InputBox *input) {
+void UpdateInputBox(InputBox *input){
 
     bool ctrl =
         IsKeyDown(KEY_LEFT_CONTROL) ||
@@ -211,8 +219,11 @@ void UpdateInputBox(InputBox *input) {
         charKey = GetCharPressed();
     }
 }
+int UTF8Width(const char *s, int width){
+    return width + ((int)strlen(s) - lenStringUTF8(s));
+}
 
-void DrawIcon(Rectangle box, Texture2D icon) {
+void DrawIcon(Rectangle box, Texture2D icon){
     float scaleX = box.width / icon.width;
     float scaleY = box.height / icon.height;
     float scale = (scaleX < scaleY) ? scaleX : scaleY;
@@ -233,8 +244,4 @@ float FindRoundness(float len, float width, float height){
     float min = (width > height) ? height : width;
 
     return len / min;
-}
-
-int UTF8Width(const char *s, int width){
-    return width + ((int)strlen(s) - lenStringUTF8(s));
 }
