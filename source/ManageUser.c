@@ -1,13 +1,30 @@
 #include "ManageUser.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 void InitForm(Nhap *form) {
-    memset(form, 0, sizeof(Nhap));
-}
-
-void SinhMaTheTuDong(int currentCount, char *maThe) {
-    sprintf(maThe, "%08d", currentCount + 1);
+    memset(form->hoTen.text, 0, 256);
+    memset(form->sdt.text, 0, 256);
+    memset(form->cccd.text, 0, 256);
+    memset(form->hanSD.text, 0, 256);
+    form->hoTen.letterCount = 0;
+    form->sdt.letterCount = 0;
+    form->cccd.letterCount = 0;
+    form->hanSD.letterCount = 0;
+    
+    form->hoTen.backspaceCounter = 0;
+    form->sdt.backspaceCounter = 0;
+    form->cccd.backspaceCounter = 0;
+    form->hanSD.backspaceCounter = 0;
+    
+    form->hoTen.isFocused = true; 
+    form->sdt.isFocused = false;
+    form->cccd.isFocused = false;
+    form->hanSD.isFocused = false;
+    
+    form->showSuccess = false;
+    form->successTimer = 0;
 }
 
 void UpdateFormPosition(Nhap *form) {
@@ -16,16 +33,13 @@ void UpdateFormPosition(Nhap *form) {
     float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
     if (scale < 0.5f) scale = 0.5f;
 
-    float cardW = 650 * scale;
-    float cardH = 420 * scale;
-    float cardX = (screenW - cardW) / 2.0f;
-    float cardY = (screenH - cardH) / 2.0f;
+    Rectangle card = { (screenW - 650*scale)/2, (screenH - 420*scale)/2, 650*scale, 420*scale };
     
-    float inputX = cardX + 270 * scale;
-    float inputY = cardY + 110 * scale;
+    float inputX = card.x + 270 * scale;
+    float inputY = card.y + 95 * scale; 
     float inputW = 340 * scale;
-    float inputH = 45 * scale;
-    float spacing = 70 * scale;
+    float inputH = 42 * scale;
+    float spacing = 78 * scale;
 
     form->hoTen.rec = (Rectangle){ inputX, inputY + (0 * spacing), inputW, inputH };
     form->sdt.rec   = (Rectangle){ inputX, inputY + (1 * spacing), inputW, inputH };
@@ -33,49 +47,93 @@ void UpdateFormPosition(Nhap *form) {
     form->hanSD.rec = (Rectangle){ inputX, inputY + (3 * spacing), inputW, inputH };
 }
 
-void DeleteLastCharUTF8(char* text, int* count) {
-    if (*count > 0) {
-        do {
-            (*count)--;
-        } while (*count > 0 && (text[*count] & 0xC0) == 0x80);
-        text[*count] = '\0';
+void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *maThe) {
+    if (form->showSuccess) {
+        form->successTimer -= GetFrameTime();
+        if (form->successTimer <= 0) {
+            form->showSuccess = false;
+            InitForm(form);
+            (*currentTotalUsers)++;
+            SinhMaTheTuDong(*currentTotalUsers, maThe);
+        }
+        return; 
     }
-}
 
-void UpdateInputForm(Nhap *form) {
     InputBox_BD* boxes[] = {&form->hoTen, &form->sdt, &form->cccd, &form->hanSD};
-    Vector2 mousePos = GetMousePosition();
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 mousePoint = GetMousePosition();
+        for (int i = 0; i < 4; i++) {
+            if (CheckCollisionPointRec(mousePoint, boxes[i]->rec)) {
+                for (int j = 0; j < 4; j++) boxes[j]->isFocused = false;
+                boxes[i]->isFocused = true;
+                break;
+            }
+        }
+    }
 
     for (int i = 0; i < 4; i++) {
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            boxes[i]->isFocused = CheckCollisionPointRec(mousePos, boxes[i]->rec);
-        }
-
         if (boxes[i]->isFocused) {
-            SetMouseCursor(MOUSE_CURSOR_IBEAM);
-            
-            // 1. Xử lý Backspace trong vòng lặp key (theo code bạn bro)
+            // Xử lý phím Backspace hàng đợi (Fix lỗi Unikey nhân đôi chữ)
             int key = GetKeyPressed();
             while (key > 0) {
                 if (key == KEY_BACKSPACE) {
-                    DeleteLastCharUTF8(boxes[i]->text, &boxes[i]->letterCount);
+                    if (boxes[i]->letterCount > 0) {
+                        do { boxes[i]->letterCount--; } while (boxes[i]->letterCount > 0 && (boxes[i]->text[boxes[i]->letterCount] & 0xC0) == 0x80);
+                        boxes[i]->text[boxes[i]->letterCount] = '\0';
+                    }
                 }
-                key = GetKeyPressed(); 
+                key = GetKeyPressed();
             }
 
-            // 2. Lấy ký tự Unicode
-            int codepoint = GetCharPressed();
-            while (codepoint > 0) {
-                if (boxes[i]->letterCount < 250) {
-                    int utf8Len = 0;
-                    const char* utf8Char = CodepointToUTF8(codepoint, &utf8Len);
-                    for (int j = 0; j < utf8Len; j++) {
-                        boxes[i]->text[boxes[i]->letterCount] = utf8Char[j];
-                        boxes[i]->letterCount++;
+            // Xử lý đè phím Backspace
+            if (IsKeyDown(KEY_BACKSPACE)) {
+                boxes[i]->backspaceCounter += GetFrameTime();
+                if (boxes[i]->backspaceCounter >= 0.5f) { 
+                    if (boxes[i]->letterCount > 0) {
+                        do { boxes[i]->letterCount--; } while (boxes[i]->letterCount > 0 && (boxes[i]->text[boxes[i]->letterCount] & 0xC0) == 0x80);
+                        boxes[i]->text[boxes[i]->letterCount] = '\0';
                     }
-                    boxes[i]->text[boxes[i]->letterCount] = '\0';
                 }
-                codepoint = GetCharPressed();
+            } else boxes[i]->backspaceCounter = 0;
+
+            // Nhận ký tự Tiếng Việt UTF-8
+            int charCode = GetCharPressed();
+            while (charCode > 0) {
+                if ((charCode >= 32) && (boxes[i]->letterCount < 250)) {
+                    int byteSize = 0;
+                    const char* utf8Char = CodepointToUTF8(charCode, &byteSize);
+                    if (boxes[i]->letterCount + byteSize < 255) {
+                        for (int j = 0; j < byteSize; j++) {
+                            boxes[i]->text[boxes[i]->letterCount] = utf8Char[j];
+                            boxes[i]->letterCount++;
+                        }
+                        boxes[i]->text[boxes[i]->letterCount] = '\0';
+                    }
+                }
+                charCode = GetCharPressed();
+            }
+            
+            if (IsKeyPressed(KEY_TAB)) {
+                boxes[i]->isFocused = false;
+                boxes[(i + 1) % 4]->isFocused = true;
+                break;
+            }
+        }
+    }
+
+    // Logic xác nhận
+    float screenW = (float)GetScreenWidth();
+    float screenH = (float)GetScreenHeight();
+    float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
+    Rectangle btnConfirm = { (screenW - 180*scale) / 2, ((screenH - 420*scale)/2) + 420*scale + 30*scale, 180*scale, 50*scale };
+
+    if (IsKeyPressed(KEY_ENTER) || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), btnConfirm))) {
+        if (form->hoTen.letterCount > 0) {
+            if (LuuThanhVienVaoFile(maThe, form)) {
+                ThemBanDocVaoList(head, maThe, form);
+                form->showSuccess = true;    
+                form->successTimer = 3.0f;   
             }
         }
     }
@@ -89,52 +147,104 @@ void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
 
     Rectangle card = { (screenW - 650*scale)/2, (screenH - 420*scale)/2, 650*scale, 420*scale };
     
-    DrawRectangleRounded((Rectangle){card.x+6*scale, card.y+6*scale, card.width, card.height}, 0.1f, 10, Fade(BLACK, 0.2f));
-    DrawRectangleRounded(card, 0.1f, 10, RAYWHITE);
-    DrawRectangleGradientV(card.x, card.y, card.width, card.height, Fade(PINK, 0.4f), WHITE);
+    // Đổ bóng & Nền thẻ
+    DrawRectangleRounded((Rectangle){card.x + 6*scale, card.y + 6*scale, card.width, card.height}, 0.1f, 10, Fade(BLACK, 0.2f));
+    DrawRectangleRounded(card, 0.1f, 10, GetColor(0xffd1dcff)); 
+    DrawRectangleRoundedLines(card, 0.1f, 10, MAROON);
 
-    // Avatar Bóng Hồng
-    Rectangle imgBox = { card.x + 40*scale, card.y + 80*scale, 180*scale, 240*scale };
-    DrawRectangleRoundedLines(imgBox, 0.05f, 10, PINK); 
-    DrawCircle(imgBox.x + imgBox.width/2, imgBox.y + imgBox.height/2 - 35*scale, 45*scale, Fade(PINK, 0.7f)); 
-    DrawEllipse(imgBox.x + imgBox.width/2, imgBox.y + imgBox.height/2 + 65*scale, 65*scale, 55*scale, Fade(PINK, 0.7f)); 
+    // Vẽ Avatar Silhouette
+    Rectangle avatarBox = { card.x + 45*scale, card.y + 80*scale, 180*scale, 230*scale };
+    DrawRectangleRounded(avatarBox, 0.05f, 5, WHITE);
+    DrawRectangleRoundedLines(avatarBox, 0.05f, 5, MAROON); 
+    DrawCircle(avatarBox.x + avatarBox.width/2, avatarBox.y + 80*scale, 40*scale, Fade(MAROON, 0.3f));
+    DrawEllipse(avatarBox.x + avatarBox.width/2, avatarBox.y + 180*scale, 60*scale, 45*scale, Fade(MAROON, 0.3f));
 
-    DrawTextEx(font, "HuuHoang_DUT library", (Vector2){card.x + 270*scale, card.y + 40*scale}, 38*scale, 1, MAROON);
-    DrawTextEx(font, TextFormat("ID: %s", maThe), (Vector2){card.x + 40*scale, card.y + 340*scale}, 24*scale, 1, PINK);
+    DrawTextEx(font, "HoanHoang_DUT library", (Vector2){card.x + 260*scale, card.y + 32*scale}, 36*scale, 1, MAROON);
+    DrawTextEx(font, TextFormat("ID: %s", maThe), (Vector2){card.x + 45*scale, card.y + 340*scale}, 24*scale, 1, MAROON); 
 
     const char* labels[] = {"Họ tên:", "SĐT:", "CCCD:", "Hạn SD:"};
     InputBox_BD* boxes[] = {&form->hoTen, &form->sdt, &form->cccd, &form->hanSD};
 
     for (int i = 0; i < 4; i++) {
-        DrawTextEx(font, labels[i], (Vector2){boxes[i]->rec.x, boxes[i]->rec.y - 22*scale}, 18*scale, 1, MAROON);
+        DrawTextEx(font, labels[i], (Vector2){boxes[i]->rec.x, boxes[i]->rec.y - 22*scale}, 16*scale, 1, MAROON);
+        DrawRectangleRounded(boxes[i]->rec, 0.2f, 10, WHITE);
+        DrawRectangleRoundedLines(boxes[i]->rec, 0.2f, 10, boxes[i]->isFocused ? MAROON : LIGHTGRAY);
         
-        DrawRectangleRounded(boxes[i]->rec, 0.15f, 10, WHITE);
-        Color borderColor = boxes[i]->isFocused ? PINK : LIGHTGRAY;
-        DrawRectangleRoundedLines(boxes[i]->rec, 0.15f, 10, borderColor); 
-
-        // --- LOGIC CUỘN CHỮ THÔNG MINH ---
-        float fontSize = 22*scale;
-        float padding = 15*scale;
-        float maxTextWidth = boxes[i]->rec.width - (padding * 2);
+        float fontSize = 20 * scale;
         Vector2 textSize = MeasureTextEx(font, boxes[i]->text, fontSize, 1);
-        
-        // Tính toán độ lệch (Offset)
-        float textOffsetX = 0;
-        if (textSize.x > maxTextWidth) {
-            textOffsetX = textSize.x - maxTextWidth; 
-        }
+        float textOffsetX = (textSize.x > (boxes[i]->rec.width - 20)) ? (textSize.x - (boxes[i]->rec.width - 20)) : 0;
 
-        // Bật Scissor Mode: Chỉ vẽ bên trong ô nhập (trừ đi padding)
-        BeginScissorMode((int)(boxes[i]->rec.x + padding), (int)boxes[i]->rec.y, (int)maxTextWidth, (int)boxes[i]->rec.height);
-            
-            Vector2 textPos = { boxes[i]->rec.x + padding - textOffsetX, boxes[i]->rec.y + 10*scale };
+        BeginScissorMode((int)boxes[i]->rec.x + 5, (int)boxes[i]->rec.y, (int)boxes[i]->rec.width - 10, (int)boxes[i]->rec.height);
+            Vector2 textPos = { boxes[i]->rec.x + 10 - textOffsetX, boxes[i]->rec.y + (boxes[i]->rec.height - fontSize)/2 };
             DrawTextEx(font, boxes[i]->text, textPos, fontSize, 1, PINK);
 
-            // Con trỏ nháy (Cũng phải chạy theo chữ)
-            if (boxes[i]->isFocused && (int)(GetTime() * 2) % 2 == 0) {
-                DrawRectangle((int)(textPos.x + textSize.x + 2), (int)(textPos.y + 2), 2, (int)(18*scale), PINK);
+            if (boxes[i]->isFocused && (((int)(GetTime() * 1.5f)) % 2 == 0)) {
+                DrawRectangleV((Vector2){ textPos.x + textSize.x + 2, textPos.y + 2 }, (Vector2){ 2, fontSize - 4 }, MAROON);
             }
+        EndScissorMode();
+    }
 
-        EndScissorMode(); // Tắt Scissor Mode
+    // Nút xác nhận
+    Rectangle btnConfirm = { (screenW - 180*scale) / 2, card.y + card.height + 30 * scale, 180*scale, 50*scale };
+    bool isHover = CheckCollisionPointRec(GetMousePosition(), btnConfirm);
+    DrawRectangleRounded(btnConfirm, 0.3f, 10, isHover ? MAROON : PINK);
+    DrawTextEx(font, "XÁC NHẬN", (Vector2){btnConfirm.x + (btnConfirm.width - MeasureTextEx(font, "XÁC NHẬN", 20*scale, 1).x)/2, btnConfirm.y + (btnConfirm.height - 20*scale)/2}, 20*scale, 1, WHITE);
+}
+
+void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer) {
+    float screenW = (float)GetScreenWidth();
+    float screenH = (float)GetScreenHeight();
+
+    if (background2.id != 0) {
+        DrawTexturePro(background2, (Rectangle){0, 0, (float)background2.width, (float)background2.height}, 
+                      (Rectangle){0, 0, screenW, screenH}, (Vector2){0, 0}, 0, WHITE);
+    }
+    DrawRectangle(0, 0, (int)screenW, (int)screenH, Fade(BLACK, 0.5f));
+    
+    Rectangle panel = { screenW/2 - 250, screenH/2 - 150, 500, 300 };
+    DrawRectangleRounded(panel, 0.1f, 10, WHITE);
+    DrawRectangleRoundedLines(panel, 0.1f, 10, PINK);
+
+    DrawCircle((int)screenW/2, (int)screenH/2 - 60, 45, PINK);
+    DrawTextEx(font, "V", (Vector2){screenW/2 - 15, screenH/2 - 85}, 60, 1, WHITE);
+
+    const char* msg = "TẠO THẺ THÀNH CÔNG!";
+    Vector2 msgSize = MeasureTextEx(font, msg, 32, 1);
+    DrawTextEx(font, msg, (Vector2){(screenW - msgSize.x)/2, screenH/2 + 20}, 32, 1, MAROON);
+
+    float progress = currentTimer / 3.0f; 
+    DrawRectangle((int)panel.x + 50, (int)panel.y + panel.height - 50, 400, 12, LIGHTGRAY);
+    DrawRectangle((int)panel.x + 50, (int)panel.y + panel.height - 50, (int)(400 * (1.0f - progress)), 12, PINK);
+}
+
+bool LuuThanhVienVaoFile(char *maThe, Nhap *form) {
+    FILE *f = fopen("data/Phieumuon/User.txt", "a"); 
+    if (f == NULL) f = fopen("data/Phieumuon/User.txt", "a");
+    
+    if (f == NULL) {
+        return false;
+    }
+
+    fprintf(f, "%s | %-25s | %-12s | %-15s | %-12s\n", 
+            maThe, form->hoTen.text, form->sdt.text, form->cccd.text, form->hanSD.text);
+    
+    fflush(f); 
+    fclose(f);
+    return true;
+}
+
+void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form) {
+    BanDoc *newNode = (BanDoc*)malloc(sizeof(BanDoc));
+    if (newNode) {
+        strcpy(newNode->maThe, maThe);
+        strcpy(newNode->hoTen, form->hoTen.text);
+        strcpy(newNode->sdt, form->sdt.text);
+        strcpy(newNode->cccd, form->cccd.text);
+        strcpy(newNode->hanSD, form->hanSD.text);
+        newNode->next = *head;
+        *head = newNode;
     }
 }
+
+void SinhMaTheTuDong(int currentCount, char *maThe) { sprintf(maThe, "%08d", currentCount + 1); }
+void FreeMemberList(BanDoc *head) { while (head) { BanDoc *t = head; head = head->next; free(t); } }

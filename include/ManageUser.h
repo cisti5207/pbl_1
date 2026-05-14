@@ -3,11 +3,21 @@
 
 #include "raylib.h"
 
+typedef struct BanDoc {
+    char maThe[15];
+    char hoTen[100];
+    char sdt[20];
+    char cccd[25];
+    char hanSD[20];
+    struct BanDoc* next;
+} BanDoc;
+
 typedef struct {
     Rectangle rec;
     char text[256];
     int letterCount;
     bool isFocused;
+    float backspaceCounter; // Biến đếm thời gian để xử lý đè phím
 } InputBox_BD;
 
 typedef struct {
@@ -15,12 +25,19 @@ typedef struct {
     InputBox_BD sdt;
     InputBox_BD cccd;
     InputBox_BD hanSD;
+    bool showSuccess;    
+    float successTimer;  
 } Nhap;
 
 void InitForm(Nhap *form);
 void UpdateFormPosition(Nhap *form); 
-void UpdateInputForm(Nhap *form);
+void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *maThe); 
 void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font);
+void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer); 
+
 void SinhMaTheTuDong(int currentCount, char *maThe);
+void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form);
+bool LuuThanhVienVaoFile(char *maThe, Nhap *form);
+void FreeMemberList(BanDoc *head);
 
 #endif
