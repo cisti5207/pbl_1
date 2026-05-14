@@ -18,10 +18,6 @@
 #define LEN_SHOW_DOB 21
 #define LEN_SHOW_ROLE 13
 
-
-
-#define QUANTITYLOGIN_FONT 100
-
 #define LOGIN_BACKGROUND_IMG "img/image2.png"
 #define FORM_LOGIN_IMG "img/image4.png"
 #define WELCOME_TEXT "Welcome to HoanHoangLIB_DUT!"
@@ -69,14 +65,11 @@ typedef enum {
 
 int InitLogin(Account *account_return);
 
-void LOGIN_GetSize(int *screenWidth, int *screenHeight, int *formX, int *formY, int *formWidth, int *formHeight);
-
-void LOGIN_DrawBackground();
-void LOGIN_DrawForm();
-void LOGIN_DrawLoginForm(InputBox *loginBox, InputBox *passwordBox, AccountList accounts, int accountCount, Texture2D IconUsername, Texture2D IconPassword, Texture2D ShowPasswordIcon);
-void LOGIN_DrawLoginUsername(InputBox *LoginBox, Texture2D IconUsername);
-void LOGIN_DrawLoginPassword(InputBox *PasswordBox, Texture2D IconPassword, Texture2D ShowPasswordIcon);
-
+void LOGIN_DrawBackground(Size LoginSize, Texture2D Img_Bg);
+void LOGIN_DrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font);
+void LOGIN_DrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT);
+void LOGIN_DrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font);
+void LOGIN_DrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse);
 LoginResult CheckLogin(AccountList accounts, const char *username, const char *password);
 
 int InsertAccount(AccountList pL, Account *e, AccountPosition p);

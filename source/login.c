@@ -6,28 +6,35 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-Vector2 LOGIN_mousePosition;
-Texture2D LOGIN_ImgForBackground;
-Texture2D LOGIN_ImgForFormLogin;
-Font LOGIN_Font[QUANTITYLOGIN_FONT];
-
-LoginResult             LOGIN_RESULT;
-
-int LOGIN_ScreenWidth;
-int LOGIN_ScreenHeight;
-
-int LOGIN_MonitorWidth;
-int LOGIN_MonitorHeight;
-
-int LOGIN_FormWidth;
-int LOGIN_FormHeight;
-
-int LOGIN_FormX;
-int LOGIN_FormY;
-
 int InitLogin(Account *account_return)
 {
-    LOGIN_RESULT = LOGIN_IDLE;
+    LoginResult LOGIN_RESULT = LOGIN_IDLE;
+
+    Size LoginSize;
+    LoadSize(
+        &LoginSize,
+        (Vector2) {
+            GetMonitorWidth(0),
+            GetMonitorHeight(0)
+        },
+        (Vector2) {
+            GetScreenWidth(),
+            GetScreenHeight()
+        },
+        (Vector2) {
+            GetScreenWidth() / GetMonitorWidth(0),
+            GetScreenHeight() /GetMonitorHeight(0)
+        },
+        GetMousePosition()
+    );
+
+    Rectangle Form = {
+        LoginSize.Screen.x * 0.1f,
+        LoginSize.Screen.y * 0.1f,
+        LoginSize.Screen.x * 0.8f,
+        LoginSize.Screen.y * 0.8f
+    };
+    
     AccountList _accounts = CreateHeaderNode();
     if (_accounts == NULL) {
         printf("Failed to create header node for accounts.\n");
@@ -40,16 +47,14 @@ int InitLogin(Account *account_return)
         printf("Failed to load account data.\n");
         return FAILED;
     }
-    LOGIN_ImgForBackground = LoadTexture(LOGIN_BACKGROUND_IMG);
-    LOGIN_ImgForFormLogin = LoadTexture(FORM_LOGIN_IMG);
 
-    LOGIN_MonitorWidth = GetMonitorWidth(0);
-    LOGIN_MonitorHeight = GetMonitorHeight(0);
+    Texture2D Img_Bg = LoadTexture(LOGIN_BACKGROUND_IMG);
+    Texture2D Img_FormLogin = LoadTexture(FORM_LOGIN_IMG);
 
-    LOGIN_GetSize(&LOGIN_ScreenWidth, &LOGIN_ScreenHeight, &LOGIN_FormX, &LOGIN_FormY, &LOGIN_FormWidth, &LOGIN_FormHeight);
+    Font _Font[2];
 
-    LOGIN_Font[0] = SetFontUTF8(ArialBold, 100);
-    LOGIN_Font[1] = SetFontUTF8(Roboto_Semibold, 30);
+    _Font[0] = SetFontUTF8(ArialBold, 100);
+    _Font[1] = SetFontUTF8(Roboto_Semibold, 30);
 
     InputBox _LoginBox = { 0 }; 
         Texture2D _IconUsername = LoadTexture(ICON_USERNAME);
@@ -59,19 +64,49 @@ int InitLogin(Account *account_return)
         Texture2D _ShowPasswordIcon = LoadTexture(SHOW_PASSWORD);
 
     while (!WindowShouldClose() && LOGIN_RESULT != LOGIN_SUCCESS) {
-        if (IsWindowResized())
-        {
-            LOGIN_GetSize(&LOGIN_ScreenWidth, &LOGIN_ScreenHeight, &LOGIN_FormX, &LOGIN_FormY, &LOGIN_FormWidth, &LOGIN_FormHeight);
+        if (IsWindowResized()){
+            LoadSize(
+                &LoginSize,
+                (Vector2) {0},
+                (Vector2) {
+                    GetScreenWidth(),
+                    GetScreenHeight()
+                },
+                (Vector2) {
+                    GetScreenWidth() / GetMonitorWidth(0),
+                    GetScreenHeight() /GetMonitorHeight(0)
+                },
+                (Vector2) {0}
+            );
+
+            Form = (Rectangle) {
+                LoginSize.Screen.x * 0.1f,
+                LoginSize.Screen.y * 0.1f,
+                LoginSize.Screen.x * 0.8f,
+                LoginSize.Screen.y * 0.8f
+            };
         }
 
-        LOGIN_mousePosition = GetMousePosition();
+        LoginSize.Mouse = GetMousePosition();
 
         BeginDrawing();
         ClearBackground(BLACK);
         
-        LOGIN_DrawBackground();
-        LOGIN_DrawForm();
-        LOGIN_DrawLoginForm(&_LoginBox, &_PasswordBox, _accounts, _accountCount, _IconUsername, _IconPassword, _ShowPasswordIcon);
+        LOGIN_DrawBackground(LoginSize, Img_Bg);
+        LOGIN_DrawForm(Form, Img_FormLogin, _Font);
+        LOGIN_DrawLoginForm(
+            &_LoginBox, 
+            &_PasswordBox, 
+            _accounts, 
+            _accountCount, 
+            _IconUsername, 
+            _IconPassword, 
+            _ShowPasswordIcon,
+            _Font,
+            Form,
+            LoginSize.Mouse,
+            &LOGIN_RESULT
+        );
 
         EndDrawing();
     }
@@ -79,111 +114,151 @@ int InitLogin(Account *account_return)
     LOGIN_SaveAccountData("data\\accounts.txt", _accounts, _accountCount);
 
     for (int i = 0; i < 2; i++)
-        UnloadFont(LOGIN_Font[i]);
+        UnloadFont(_Font[i]);
 
-    UnloadTexture(LOGIN_ImgForBackground);
-    UnloadTexture(LOGIN_ImgForFormLogin);
+    UnloadTexture(Img_Bg);
+    UnloadTexture(Img_FormLogin);
     UnloadTexture(_IconUsername);
     UnloadTexture(_IconPassword);
     UnloadTexture(_ShowPasswordIcon);
 
 
-    Get_account_return(_accounts, account_return, _LoginBox.text);
+    Get_account_return(
+        _accounts, 
+        account_return, 
+        _LoginBox.text
+    );
 
     return LOGIN_SUCCESS;
 }
 
-void LOGIN_DrawBackground() {
-    float _scaleX = (float)LOGIN_MonitorWidth / LOGIN_ImgForBackground.width;
-    float _scaleY = (float)LOGIN_MonitorHeight / LOGIN_ImgForBackground.height;
-    
-    float _scale = (_scaleX > _scaleY) ? _scaleX : _scaleY;
+
+void LOGIN_DrawBackground(Size LoginSize, Texture2D Img_Bg){
+    float scaleX = LoginSize.Monitor.x / Img_Bg.width;
+    float scaleY = LoginSize.Monitor.y / Img_Bg.height;
+    float scale = (scaleX > scaleY)? scaleX : scaleY;
 
     Rectangle source = {
         0,
         0,
-        LOGIN_ImgForBackground.width,
-        LOGIN_ImgForBackground.height
+        Img_Bg.width,
+        Img_Bg.height
     };
 
     Rectangle dest = {
-        (LOGIN_ScreenWidth - LOGIN_ImgForBackground.width * _scale) / 2,
-        (LOGIN_ScreenHeight - LOGIN_ImgForBackground.height * _scale) / 2,
-        LOGIN_ImgForBackground.width * _scale,
-        LOGIN_ImgForBackground.height * _scale
+        (LoginSize.Screen.x - Img_Bg.width * scale) / 2,
+        (LoginSize.Screen.y - Img_Bg.height * scale) / 2,
+        Img_Bg.width * scale,
+        Img_Bg.height * scale
     };
 
-    Vector2 origin = { 0, 0 };
+    Vector2 origin = { 
+        0, 
+        0 
+    };
     
-    DrawTexturePro(LOGIN_ImgForBackground, source, dest, origin, 0.0f, WHITE);
-    DrawRectangleGradientV(0, 0, LOGIN_ScreenWidth, LOGIN_ScreenHeight, Fade(WHITE, 0.0f), Fade(BLACK, 0.5f));
+    DrawTexturePro(
+        Img_Bg, 
+        source, 
+        dest, 
+        origin, 
+        0.0f, 
+        WHITE
+    );
+
+    DrawRectangleGradientV(
+        0, 
+        0, 
+        LoginSize.Screen.x, 
+        LoginSize.Screen.y, 
+        Fade(WHITE, 0.0f), 
+        Fade(BLACK, 0.5f)
+    );
 }
-void LOGIN_DrawForm()
-{    Rectangle FormRect = { 
-        LOGIN_FormX, 
-        LOGIN_FormY, 
-        LOGIN_FormWidth, 
-        LOGIN_FormHeight 
+void LOGIN_DrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font){    
+    Rectangle FormRect = { 
+        Form.x, 
+        Form.y, 
+        Form.width, 
+        Form.height 
     };
 
     Rectangle FormRectLoginRight = { 
-        LOGIN_FormX + LOGIN_FormWidth / 2, 
-        LOGIN_FormY, 
-        LOGIN_FormWidth / 2, 
-        LOGIN_FormHeight 
+        Form.x + Form.width / 2, 
+        Form.y, 
+        Form.width / 2, 
+        Form.height 
     };
 
     Rectangle FormRectLoginLeft = { 
-        LOGIN_FormX, 
-        LOGIN_FormY, 
-        LOGIN_FormWidth / 2, 
-        LOGIN_FormHeight 
+        Form.x, 
+        Form.y, 
+        Form.width / 2, 
+        Form.height
     };
 
     Rectangle BoxWelcomeText = {
-        LOGIN_FormX + (LOGIN_FormWidth / 2) * 0.1f,
-        LOGIN_FormY + LOGIN_FormHeight * 0.3f,
-        LOGIN_FormWidth / 2 * 0.8f,
-        LOGIN_FormHeight * 0.5f,
+        Form.x + (Form.width / 2) * 0.1f,
+        Form.y + Form.height * 0.3f,
+        Form.width / 2 * 0.8f,
+        Form.height * 0.5f,
     };
 
-    DrawRectangleRec(FormRect, WHITE);
+    DrawRectangleRec(
+        FormRect, 
+        WHITE
+    );
 
-    float _ScaleTextureY = FormRectLoginRight.height / LOGIN_ImgForFormLogin.height;
-    float _ScaleTextureX = FormRectLoginRight.width / LOGIN_ImgForFormLogin.width;
+    float _ScaleTextureY = FormRectLoginRight.height / Img_FormLogin.height;
+    float _ScaleTextureX = FormRectLoginRight.width / Img_FormLogin.width;
 
     float _ScaleTexture = (_ScaleTextureX > _ScaleTextureY) ? _ScaleTextureX : _ScaleTextureY;
 
     Rectangle source = {
-        LOGIN_ImgForFormLogin.width * 0.2f,
-        LOGIN_ImgForFormLogin.height - LOGIN_FormHeight / _ScaleTexture,
+        Img_FormLogin.width * 0.2f,
+        Img_FormLogin.height - Form.height / _ScaleTexture,
         FormRectLoginRight.width / _ScaleTexture,
         FormRectLoginRight.height / _ScaleTexture
     };
 
     Rectangle dest = {
-        LOGIN_FormX,
-        LOGIN_FormY,
+        Form.x,
+        Form.y,
         source.width * _ScaleTexture,
         source.height * _ScaleTexture
     };
 
     Vector2 origin = { 0, 0 };
 
-    DrawTexturePro(LOGIN_ImgForFormLogin, source, dest, origin, 0.0f, WHITE);
+    DrawTexturePro(
+        Img_FormLogin, 
+        source, 
+        dest, 
+        origin, 
+        0.0f, 
+        WHITE
+    );
     
+    Vector2 _TextWidth = MeasureTextEx(
+        _Font[0], 
+        WELCOME_TEXT, 
+        Form.height * 0.06f, 
+        2
+    );
     
-    
-    Vector2 _TextWidth = MeasureTextEx(LOGIN_Font[0], WELCOME_TEXT, LOGIN_FormHeight * 0.06f, 2);
-    
-    int LOGIN_TextPerRectX = _TextWidth.x / (LOGIN_FormWidth / 2);
-    int LOGIN_FontSize = LOGIN_FormHeight * 0.06f * 0.7f / LOGIN_TextPerRectX;
+    int TextPerRect = _TextWidth.x / (Form.width / 2);
+    int FontSize = Form.height * 0.06f * 0.7f / TextPerRect;
 
-    _TextWidth = MeasureTextEx(LOGIN_Font[0], WELCOME_TEXT, LOGIN_FontSize, 2);
+    _TextWidth = MeasureTextEx(
+        _Font[0], 
+        WELCOME_TEXT, 
+        FontSize, 
+        2
+    );
 
     Vector2 _Text = {
-        LOGIN_FormX + (LOGIN_FormWidth / 2 - _TextWidth.x) * 0.5f,
-        LOGIN_FormY + LOGIN_FormHeight * 0.1f
+        Form.x + (Form.width / 2 - _TextWidth.x) * 0.5f,
+        Form.y + Form.height * 0.1f
     };
 
     Vector2 _ShadowText = {
@@ -191,117 +266,254 @@ void LOGIN_DrawForm()
         _Text.y
     };
 
-    DrawRectangleGradientV(FormRectLoginLeft.x, FormRectLoginLeft.y, FormRectLoginLeft.width, FormRectLoginLeft.height, Fade(PINK, 0.2f), Fade(BLACK, 0.4f));
-    DrawRectangleRounded(BoxWelcomeText, 0.1f, 100, Fade(WHITE, 0.5f));
-    DrawTextEx(LOGIN_Font[0], WELCOME_TEXT, _ShadowText, LOGIN_FontSize + 2, 1, YELLOW);
-    DrawTextEx(LOGIN_Font[0], WELCOME_TEXT, _Text, LOGIN_FontSize, 2, Fade(BLACK, 0.8f));
-    
-}
+    DrawRectangleGradientV(
+        FormRectLoginLeft.x, 
+        FormRectLoginLeft.y, 
+        FormRectLoginLeft.width, 
+        FormRectLoginLeft.height, 
+        Fade(PINK, 0.2f),
+        Fade(BLACK, 0.4f)
+    );
 
-void LOGIN_DrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon) {
-    Vector2 _TextWidth = MeasureTextEx(LOGIN_Font[0], LOGIN_TEXT, LOGIN_FormHeight * 0.1f, 2);
+    DrawRectangleRounded(
+        BoxWelcomeText, 
+        0.1f, 
+        100, 
+        Fade(WHITE, 0.5f)
+    );
+
+    DrawTextEx(
+        _Font[0], 
+        WELCOME_TEXT, 
+        _ShadowText, 
+        FontSize + 2, 
+        1, 
+        YELLOW
+    );
+
+    DrawTextEx(
+        _Font[0], 
+        WELCOME_TEXT, 
+        _Text, 
+        FontSize, 
+        2, 
+        Fade(BLACK, 0.8f)
+    );
+}
+void LOGIN_DrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT) {
+    Vector2 _TextWidth = MeasureTextEx(
+        _Font[0], 
+        LOGIN_TEXT, 
+        Form.height * 0.1f, 
+        2
+    );
+
     Vector2 _Text = {
-        LOGIN_FormX + LOGIN_FormWidth/2 + (LOGIN_FormWidth / 2 - _TextWidth.x) * 0.5f,
-        LOGIN_FormY + LOGIN_FormHeight * 0.2f
+        Form.x + Form.width/2 + (Form.width / 2 - _TextWidth.x) * 0.5f,
+        Form.y + Form.height * 0.2f
     };
 
-    DrawTextEx(LOGIN_Font[0], LOGIN_TEXT, _Text, LOGIN_FormHeight * 0.1f, 2, BLACK);
+    DrawTextEx(
+        _Font[0], 
+        LOGIN_TEXT, 
+        _Text, 
+        Form.height * 0.1f, 
+        2, 
+        BLACK
+    );
 
-    LOGIN_DrawLoginUsername(_loginBox, _IconUsername);
-    LOGIN_DrawLoginPassword(_passwordBox, _IconPassword, _ShowPasswordIcon);
+    LOGIN_DrawLoginUsername(_loginBox, _IconUsername, Form, mouse, _Font);
+    LOGIN_DrawLoginPassword(_passwordBox, _IconPassword, _ShowPasswordIcon, Form, _Font, mouse);
 
-    Vector2 _TextWidthButton = MeasureTextEx(LOGIN_Font[1], LoginButtonText, LOGIN_FormHeight * 0.04f, 2);
+    Vector2 _TextWidthButton = MeasureTextEx(
+        _Font[1], 
+        LoginButtonText, 
+        Form.height * 0.04f, 
+        2
+    );
+
     Rectangle buttonRect = {
-        LOGIN_FormX + (LOGIN_FormWidth / 2 - _TextWidthButton.x) * 0.5f + LOGIN_FormWidth * 0.5f - 20,
-        LOGIN_FormY + LOGIN_FormHeight * 0.8f - 10,
+        Form.x + (Form.width / 2 - _TextWidthButton.x) * 0.5f + Form.width * 0.5f - 20,
+        Form.y + Form.height * 0.8f - 10,
         _TextWidthButton.x + 40,
         _TextWidthButton.y + 20
     };
 
-    DrawRectangleRounded(buttonRect, 0.1f, 15, (CheckCollisionPointRec(LOGIN_mousePosition, buttonRect)) ? Fade(WHITE, 0.5f) : LIGHTGRAY);
-    DrawRectangleRoundedLinesEx(buttonRect, 0.1f, 15, 2.0f, BLACK);
+    DrawRectangleRounded(
+        buttonRect, 
+        0.1f, 
+        15, 
+        (CheckCollisionPointRec(mouse, buttonRect)) ? Fade(WHITE, 0.5f) : LIGHTGRAY
+    );
+
+    DrawRectangleRoundedLinesEx(
+        buttonRect, 
+        0.1f, 
+        15, 
+        2.0f, 
+        BLACK
+    );
 
     Vector2 _TextButton = {
         buttonRect.x + 20,
         buttonRect.y + 10
     };
 
-    DrawTextEx(LOGIN_Font[1], LoginButtonText, _TextButton, LOGIN_FormHeight * 0.04f, 2, BLACK);
+    DrawTextEx(
+        _Font[1], 
+        LoginButtonText, 
+        _TextButton, 
+        Form.height * 0.04f, 
+        2, 
+        BLACK
+    );
 
     Vector2 _TextWidthLoginResult;
     Vector2 _TextLoginResult;
-    switch(LOGIN_RESULT)
+    
+    switch(*LOGIN_RESULT)
     {
         case LOGIN_IDLE: 
             break;
         case LOGIN_SUCCESS: 
-            _TextWidthLoginResult = MeasureTextEx(LOGIN_Font[1], LoginSuccessText, LOGIN_FormHeight * 0.02f, 2);
+            _TextWidthLoginResult = MeasureTextEx(
+                _Font[1], 
+                LoginSuccessText, 
+                Form.height * 0.02f, 
+                2
+            );
             
             _TextLoginResult = (Vector2){
-                LOGIN_FormX + (LOGIN_FormWidth / 2 - _TextWidthLoginResult.x) * 0.5f + LOGIN_FormWidth * 0.5f,
-                LOGIN_FormY + LOGIN_FormHeight * 0.75f
+                Form.x + (Form.width / 2 - _TextWidthLoginResult.x) * 0.5f + Form.width * 0.5f,
+                Form.y + Form.height * 0.75f
             };
 
-            DrawTextEx(LOGIN_Font[1], LoginSuccessText, _TextLoginResult, LOGIN_FormHeight * 0.02f, 2, GREEN); 
+            DrawTextEx(
+                _Font[1], 
+                LoginSuccessText, 
+                _TextLoginResult, 
+                Form.height * 0.02f, 
+                2, 
+                GREEN
+            );
+
             break;
         case LOGIN_EMPTY: 
-            _TextWidthLoginResult = MeasureTextEx(LOGIN_Font[1], LoginEmptyText, LOGIN_FormHeight * 0.02f, 2);
+            _TextWidthLoginResult = MeasureTextEx(
+                _Font[1], 
+                LoginEmptyText, 
+                Form.height * 0.02f, 
+                2
+            );
+
             _TextLoginResult = (Vector2){
-                LOGIN_FormX + (LOGIN_FormWidth / 2 - _TextWidthLoginResult.x) * 0.5f + LOGIN_FormWidth * 0.5f,
-                LOGIN_FormY + LOGIN_FormHeight * 0.75f
+                Form.x + (Form.width / 2 - _TextWidthLoginResult.x) * 0.5f + Form.width * 0.5f,
+                Form.y + Form.height * 0.75f
             };
-            DrawTextEx(LOGIN_Font[1], LoginEmptyText, _TextLoginResult, LOGIN_FormHeight * 0.02f, 2, ORANGE); 
+
+            DrawTextEx(
+                _Font[1], 
+                LoginEmptyText, 
+                _TextLoginResult, 
+                Form.height * 0.02f, 
+                2, 
+                ORANGE
+            );
+
             break;
         case LOGIN_FAILED: 
-            _TextWidthLoginResult = MeasureTextEx(LOGIN_Font[1], LoginFailedText, LOGIN_FormHeight * 0.02f, 2);
+            _TextWidthLoginResult = MeasureTextEx(
+                _Font[1], 
+                LoginFailedText, 
+                Form.height * 0.02f, 
+                2
+            );
+            
             _TextLoginResult = (Vector2){
-                LOGIN_FormX + (LOGIN_FormWidth / 2 - _TextWidthLoginResult.x) * 0.5f + LOGIN_FormWidth * 0.5f,
-                LOGIN_FormY + LOGIN_FormHeight * 0.75f
+                Form.x + (Form.width / 2 - _TextWidthLoginResult.x) * 0.5f + Form.width * 0.5f,
+                Form.y + Form.height * 0.75f
             };
-            DrawTextEx(LOGIN_Font[1], LoginFailedText, _TextLoginResult, LOGIN_FormHeight * 0.02f, 2, RED); 
+
+            DrawTextEx(
+                _Font[1], 
+                LoginFailedText, 
+                _TextLoginResult, 
+                Form.height * 0.02f, 
+                2, 
+                RED
+            );
+
             break;
     }
 
-    if (CheckCollisionPointRec(LOGIN_mousePosition, buttonRect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (CheckCollisionPointRec(mouse, buttonRect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         if (_loginBox -> length > 0 && _passwordBox -> length > 0) {
-            LOGIN_RESULT = CheckLogin(accounts, _loginBox->text, _passwordBox->text);
+            *LOGIN_RESULT = CheckLogin(accounts, _loginBox->text, _passwordBox->text);
         }
         else {
-            LOGIN_RESULT = LOGIN_EMPTY;
+            *LOGIN_RESULT = LOGIN_EMPTY;
         }
     }
-
 }
-void LOGIN_DrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername) {
+void LOGIN_DrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font) {
     _LoginBox->box = (Rectangle){
-        LOGIN_FormX + LOGIN_FormWidth * 0.55f, 
-        LOGIN_FormY + LOGIN_FormHeight * 0.5f, 
-        LOGIN_FormWidth * 0.4f,
-        LOGIN_FormHeight * 0.06f
+        Form.x + Form.width * 0.55f, 
+        Form.y + Form.height * 0.5f, 
+        Form.width * 0.4f,
+        Form.height * 0.06f
     };
 
     Rectangle IconBox_Username = {
-        LOGIN_FormX + LOGIN_FormWidth * 0.55f,
-        LOGIN_FormY + LOGIN_FormHeight * 0.5f,
+        Form.x + Form.width * 0.55f,
+        Form.y + Form.height * 0.5f,
         _LoginBox->box.height,
         _LoginBox->box.height
     };
 
     Vector2 _Text = {
         _LoginBox->box.x + IconBox_Username.width + 10,
-        _LoginBox->box.y + (_LoginBox->box.height - MeasureTextEx(LOGIN_Font[0], "a", FONT_SIZE, 1).y) / 2
+        _LoginBox->box.y + (_LoginBox->box.height - MeasureTextEx(_Font[0], "a", FONT_SIZE, 1).y) / 2
     };
 
-    DrawRectangleRounded(_LoginBox->box, 0.1f, 15, (CheckCollisionPointRec(LOGIN_mousePosition, _LoginBox->box) || _LoginBox->isFocused || _LoginBox->length > 0) ? WHITE : LIGHTGRAY);
+    DrawRectangleRounded(
+        _LoginBox->box, 
+        0.1f, 
+        15, 
+        (CheckCollisionPointRec(mouse, _LoginBox->box) || _LoginBox->isFocused || _LoginBox->length > 0) ? WHITE : LIGHTGRAY
+    );
     
-    DrawRectangleRec(IconBox_Username, LIGHTGRAY);
-    DrawRectangleRoundedLinesEx(_LoginBox->box, 0.1f, 1, 2.0f, BLACK);
+    DrawRectangleRec(
+        IconBox_Username, 
+        LIGHTGRAY
+    );
 
-    DrawLineEx((Vector2){IconBox_Username.x + IconBox_Username.width, IconBox_Username.y}, (Vector2){IconBox_Username.x + IconBox_Username.width, IconBox_Username.y + IconBox_Username.height}, 2.0f, BLACK);
+    DrawRectangleRoundedLinesEx(
+        _LoginBox->box, 
+        0.1f, 
+        1, 
+        2.0f, 
+        BLACK
+    );
 
-    DrawIcon(IconBox_Username, _IconUsername);
+    DrawLineEx(
+        (Vector2) {
+            IconBox_Username.x + IconBox_Username.width, 
+            IconBox_Username.y
+        },
+        (Vector2) {
+            IconBox_Username.x + IconBox_Username.width, 
+            IconBox_Username.y + IconBox_Username.height
+        }, 
+        2.0f, 
+        BLACK
+    );
 
-    if (CheckCollisionPointRec(LOGIN_mousePosition, _LoginBox->box) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    DrawIcon(
+        IconBox_Username, 
+        _IconUsername
+    );
+
+    if (CheckCollisionPointRec(mouse, _LoginBox->box) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         _LoginBox->isFocused = true;
     }
     else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -311,30 +523,54 @@ void LOGIN_DrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername) {
     if (_LoginBox->isFocused) {
         UpdateInputBox(_LoginBox);
 
-        DrawTextEx(LOGIN_Font[0], _LoginBox->text, _Text, FONT_SIZE, 1, BLACK);
+        DrawTextEx(
+            _Font[0], 
+            _LoginBox->text, 
+            _Text, 
+            FONT_SIZE, 
+            1, 
+            BLACK
+        );
 
-        float w = MeasureTextEx(LOGIN_Font[0], _LoginBox->text,FONT_SIZE, 1).x;
+        float w = MeasureTextEx(
+            _Font[0], 
+            _LoginBox->text,
+            FONT_SIZE, 
+            1
+        ).x;
+
         if ((int)(GetTime()*2) % 2 == 0) {
-            DrawRectangle(_Text.x + w + 2, _Text.y, 2,FONT_SIZE, BLACK);
+            DrawRectangle(
+                _Text.x + w + 2, 
+                _Text.y, 
+                2,
+                FONT_SIZE, 
+                BLACK
+            );
         }
     }
     else if (_LoginBox -> length > 0) {
-        DrawTextEx(LOGIN_Font[0], _LoginBox->text, _Text,FONT_SIZE, 1, BLACK);
+        DrawTextEx(
+            _Font[0], 
+            _LoginBox->text, 
+            _Text,
+            FONT_SIZE, 
+            1, 
+            BLACK
+        );
     }
-    
-
 }
-void LOGIN_DrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon) {
+void LOGIN_DrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse) {
     _PasswordBox->box = (Rectangle){
-        LOGIN_FormX + LOGIN_FormWidth * 0.55f, 
-        LOGIN_FormY + LOGIN_FormHeight * 0.6f, 
-        LOGIN_FormWidth * 0.4f,
-        LOGIN_FormHeight * 0.06f
+        Form.x + Form.width * 0.55f, 
+        Form.y + Form.height * 0.6f, 
+        Form.width * 0.4f,
+        Form.height * 0.06f
     };
 
     Rectangle IconBox_Password = {
-        LOGIN_FormX + LOGIN_FormWidth * 0.55f,
-        LOGIN_FormY + LOGIN_FormHeight * 0.6f,
+        Form.x + Form.width * 0.55f,
+        Form.y + Form.height * 0.6f,
         _PasswordBox->box.height,
         _PasswordBox->box.height
     };
@@ -347,19 +583,52 @@ void LOGIN_DrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Te
 
     Vector2 _Text = {
         _PasswordBox->box.x + IconBox_Password.width + 10,
-        _PasswordBox->box.y + (_PasswordBox->box.height - MeasureTextEx(LOGIN_Font[0], "a", FONT_SIZE, 1).y) / 2
+        _PasswordBox->box.y + (_PasswordBox->box.height - MeasureTextEx(_Font[0], "a", FONT_SIZE, 1).y) / 2
     };
 
-    DrawRectangleRounded(_PasswordBox->box, 0.1f, 15, (CheckCollisionPointRec(LOGIN_mousePosition, _PasswordBox->box) || _PasswordBox->isFocused || _PasswordBox->length > 0) ? WHITE : LIGHTGRAY);
+    DrawRectangleRounded(
+        _PasswordBox->box, 
+        0.1f, 
+        15, 
+        (CheckCollisionPointRec(mouse, _PasswordBox->box) || _PasswordBox->isFocused || _PasswordBox->length > 0) ? WHITE : LIGHTGRAY
+    );
     
-    DrawRectangleRec(IconBox_Password, LIGHTGRAY);
-    DrawRectangleRoundedLinesEx(_PasswordBox->box, 0.1f, 1, 2.0f, BLACK);
+    DrawRectangleRec(
+        IconBox_Password, 
+        LIGHTGRAY
+    );
     
-    DrawLineEx((Vector2){IconBox_Password.x + IconBox_Password.width, IconBox_Password.y}, (Vector2){IconBox_Password.x + IconBox_Password.width, IconBox_Password.y + IconBox_Password.height}, 2.0f, BLACK);
+    DrawRectangleRoundedLinesEx(
+        _PasswordBox->box, 
+        0.1f, 
+        1, 
+        2.0f, 
+        BLACK
+    );
     
-    DrawIcon(IconBox_Password, _IconPassword);
-    DrawIcon(Show_PasswordBox, _ShowPasswordIcon);
-    if (CheckCollisionPointRec(LOGIN_mousePosition, _PasswordBox->box) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    DrawLineEx(
+        (Vector2) {
+            IconBox_Password.x + IconBox_Password.width, 
+            IconBox_Password.y
+        }, 
+        (Vector2) {
+            IconBox_Password.x + IconBox_Password.width, 
+            IconBox_Password.y + IconBox_Password.height
+        }, 
+        2.0f, 
+        BLACK
+    );
+    
+    DrawIcon(
+        IconBox_Password, 
+        _IconPassword
+    );
+    
+    DrawIcon(
+        Show_PasswordBox, 
+        _ShowPasswordIcon
+    );
+    if (CheckCollisionPointRec(mouse, _PasswordBox->box) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         _PasswordBox->isFocused = true;
     }
     else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -370,34 +639,97 @@ void LOGIN_DrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Te
         UpdateInputBox(_PasswordBox);
 
         char maskedText[MAX_INPUT];
-        float w = MeasureTextEx(LOGIN_Font[0], _PasswordBox->text, FONT_SIZE, 1).x;
-        memset(maskedText, '*', _PasswordBox->length);
+        float w = MeasureTextEx(
+            _Font[0], 
+            _PasswordBox->text, 
+            FONT_SIZE, 
+            1
+        ).x;
+        
+        memset(
+            maskedText, 
+            '*', 
+            _PasswordBox->length
+        );
+
         maskedText[_PasswordBox->length] = '\0';
 
-        if (CheckCollisionPointRec(LOGIN_mousePosition, Show_PasswordBox) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-            DrawTextEx(LOGIN_Font[0], _PasswordBox->text, _Text, FONT_SIZE, 1, BLACK);
-            w = MeasureTextEx(LOGIN_Font[0], _PasswordBox->text,FONT_SIZE, 1).x;
+        if (CheckCollisionPointRec(mouse, Show_PasswordBox) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            DrawTextEx(
+                _Font[0], 
+                _PasswordBox->text, 
+                _Text, 
+                FONT_SIZE, 
+                1, 
+                BLACK
+            );
+
+            w = MeasureTextEx(
+                _Font[0], 
+                _PasswordBox->text,
+                FONT_SIZE, 
+                1
+            ).x;
+            
             if ((int)(GetTime()*2) % 2 == 0) {
-                DrawRectangle(_Text.x + w + 2, _Text.y, 2,FONT_SIZE, BLACK);
+                DrawRectangle(
+                    _Text.x + w + 2, 
+                    _Text.y, 
+                    2,
+                    FONT_SIZE, 
+                    BLACK
+                );
             }
         }
         else {
-            DrawTextEx(LOGIN_Font[0], maskedText, _Text, FONT_SIZE, 1, BLACK);
-            w = MeasureTextEx(LOGIN_Font[0], maskedText, FONT_SIZE, 1).x;
+            DrawTextEx(
+                _Font[0], 
+                maskedText, 
+                _Text, 
+                FONT_SIZE, 
+                1, 
+                BLACK
+            );
+
+            w = MeasureTextEx(
+                _Font[0], 
+                maskedText, 
+                FONT_SIZE, 
+                1
+            ).x;
+            
             if ((int)(GetTime()*2) % 2 == 0) {
-                DrawRectangle(_Text.x + w + 2, _Text.y, 2, FONT_SIZE, BLACK);
+                DrawRectangle(
+                    _Text.x + w + 2, 
+                    _Text.y, 
+                    2, 
+                    FONT_SIZE, 
+                    BLACK
+                );
             }
         }
     }
 
     else if (_PasswordBox -> length > 0) {
         char maskedText[MAX_INPUT];
-        memset(maskedText, '*', _PasswordBox->length);
+        memset(
+            maskedText, 
+            '*', 
+            _PasswordBox->length
+        );
         maskedText[_PasswordBox->length] = '\0';
 
-        DrawTextEx(LOGIN_Font[0], (CheckCollisionPointRec(LOGIN_mousePosition, _PasswordBox->box) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) ? _PasswordBox->text : maskedText, _Text, FONT_SIZE, 1, BLACK);
+        DrawTextEx(
+            _Font[0], 
+            (CheckCollisionPointRec(mouse, _PasswordBox->box) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) ? _PasswordBox->text : maskedText, 
+            _Text, 
+            FONT_SIZE, 
+            1, 
+            BLACK
+        );
     }
 }
+
 LoginResult CheckLogin(AccountList accounts, const char *username, const char *password) {
     Node *current = accounts->next; // Bắt đầu từ node đầu tiên sau header
 
@@ -532,17 +864,7 @@ int LOGIN_SaveAccountData(const char *filename, AccountList accounts, int accoun
     return TRUE;
 }
 
-void LOGIN_GetSize(int *screenWidth, int *screenHeight, int *formX, int *formY, int *formWidth, int *formHeight) {
-    *screenWidth = GetScreenWidth();
-    *screenHeight = GetScreenHeight();
-
-    *formWidth = *screenWidth * 0.8f;
-    *formHeight = *screenHeight * 0.8f;
-
-    *formX = (*screenWidth - *formWidth) / 2;
-    *formY = (*screenHeight - *formHeight) / 2;
-}
-CheckResult Get_account_return(AccountList _account, Account *account, const char *username){
+CheckResult Get_account_return(AccountList _account, Account *account, const char *username) {
     Account A;
 
     _account = _account -> next;

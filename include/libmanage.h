@@ -55,9 +55,7 @@ typedef enum {
 typedef struct {
     Rectangle box;
     char text[MAX_INPUT];
-    char textLimit[MAX_INPUT];
     int length;
-    int lengthLimit;
     bool isFocused;
 } InputBox;
 

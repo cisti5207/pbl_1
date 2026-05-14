@@ -28,6 +28,8 @@ void InitManageBooks()
     MANAGEBOOKS_Font[0] = SetFontUTF8 (ArialBold, 50);
 
     BookList* Books = Loadbooks(BOOKS_FILE);
+    Author* Authors = LoadAuthor(Books);
+    Type* Types = LoadType(Books);
     InputBox FindBar = {0};
 
     if (Books == NULL)
@@ -270,15 +272,17 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
 
     // Thanh tìm kiếm
     FindBar -> box = (Rectangle) {
-        MainBox.x + MainBox.width + MANAGEBOOKS_TitleBox.width * 0.1f * (float) pow (1,(double)MANAGEBOOKS_Scale.x),
+        MainBox.x + MainBox.width + MANAGEBOOKS_TitleBox.width * 0.1f * (float) pow (0.9 ,(double)MANAGEBOOKS_Scale.x),
         MANAGEBOOKS_TitleBox.height * 0.1f,
         (MANAGEBOOKS_TitleBox.width - FindBar -> box.x) * 0.9f,
         MANAGEBOOKS_TitleBox.height * 0.8f
     };
 
-    Vector2 FindBarTextPos = {
+    Rectangle FindBarTextPos = {
         FindBar -> box.x + 10,
-        FindBar -> box.y + (FindBar -> box.height - 20.0f) / 2
+        FindBar -> box.y + (FindBar -> box.height - 20.0f) / 2,
+        FindBar -> box.width - (15 + FindBar -> box.height),
+        20
     };
 
     Rectangle FindBarTextBox = {
@@ -295,80 +299,154 @@ void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Ico
         FindBar -> box.height
     };
 
-    DrawRectangleRoundedLines(FindBar -> box, 0.3f, 10, LIGHTGRAY);
-    DrawRectangleRounded(FindBar -> box, 0.3f, 10, LIGHTGRAY);
+    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, FindBarTextBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        FindBar->isFocused = true;
+    else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        FindBar->isFocused = false;
 
-    if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, FindBarTextBox)){
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-            FindBar -> isFocused = true;
-        DrawRectangleRounded(FindBar -> box, 0.3f, 10, SILVERGRAY); 
-    }
-    else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        FindBar -> isFocused = false;
-    }
+    float roundness = FindRoundness (
+        0.05f * FindBar->box.width, 
+        FindBar->box.width, 
+        FindBar->box.height
+    );
 
-    if (FindBar -> isFocused) {
-        DrawRectangleRounded(FindBar -> box, 0.3f, 10, BRIGHTGRAY);
+    DrawRectangleRoundedLinesEx (
+        FindBar->box, 
+        roundness, 
+        10, 
+        2.0f, 
+        LIGHTGRAY
+    );
+
+    DrawRectangleRounded (
+        FindBar->box, 
+        roundness, 
+        10, 
+        GRAY
+    );
+
+    if (FindBar->isFocused == true){
+        DrawRectangleRounded (
+            FindBar->box, 
+            roundness, 
+            10, 
+            WHITESMOKE
+        );
+        BeginScissorMode(
+            FindBarTextPos.x, 
+            FindBarTextPos.y, 
+            FindBarTextPos.width, 
+            FindBarTextPos.height
+        );
 
         UpdateInputBox(FindBar);
+        
+        float w = MeasureTextEx(
+            MANAGEBOOKS_Font[0], 
+            FindBar->text, 
+            20, 
+            2
+        ).x;
 
-        FindBar -> textLimit[0] = '\0';
-        FindBar -> lengthLimit = 0;
+        float dx = ((w - FindBarTextPos.width) > 0) ? w - FindBarTextPos.width : 0;
+        Vector2 position = {
+            FindBarTextPos.x - dx,
+            FindBarTextPos.y
+        };
 
-        float maxWidth = FindBar -> box.width - 20.0f - MeasureTextEx (MANAGEBOOKS_Font[0], "...", 20, 2).x - IconFindBox.width;
-        float w = MeasureTextEx (MANAGEBOOKS_Font[0], FindBar -> text, 20, 2).x;
+        DrawTextEx (
+            MANAGEBOOKS_Font[0], 
+            FindBar->text, 
+            position, 
+            20, 
+            2, 
+            GRAY
+        );
 
-        if (w > maxWidth){
-            char tmp[256];
-
-            for (int i = FindBar -> length; i > 0; i--)
-            {
-                strncpy(tmp, &(FindBar -> text[FindBar -> length - i]), i);
-                tmp[i] = '\0';
-                
-                float textWidth = MeasureTextEx(MANAGEBOOKS_Font[0], tmp, 20, 2).x;
-
-                if (textWidth <= maxWidth){
-                    strcpy(FindBar -> textLimit, tmp);
-                    FindBar -> lengthLimit = i;
-
-                    break;
-                }
-            }
+        if ((int)(GetTime() * 2) % 2 == 0){
+            DrawRectangle(
+                FindBarTextPos.x + w - dx + 2,
+                FindBarTextPos.y,
+                2,
+                20,
+                BLACK
+            );
         }
+        EndScissorMode();
 
-        if (FindBar -> lengthLimit == 0) {
-            DrawTextEx (MANAGEBOOKS_Font[0], FindBar -> text, FindBarTextPos, 20, 2, BLACK);
-            
-            w = MeasureTextEx (MANAGEBOOKS_Font[0], FindBar -> text, 20, 2).x;
-            if ((int) (GetTime() * 2) % 2 == 1)
-                DrawRectangle(FindBarTextPos.x + w + 2, FindBarTextPos.y, 2, 20, BLACK);
+        if (IsKeyPressed(KEY_ENTER)){
+            *State = MANAGEBOOKS_Find;
         }
-        else {
-            DrawTextEx (MANAGEBOOKS_Font[0], "...", FindBarTextPos, 20, 2, BLACK);
-
-            w = MeasureTextEx (MANAGEBOOKS_Font[0], "...", 20, 2).x;
-            FindBarTextPos.x += w + 2;
-            DrawTextEx (MANAGEBOOKS_Font[0], FindBar -> textLimit, FindBarTextPos, 20, 2, BLACK);
-        }
-
-        if (IsKeyPressed(KEY_ENTER)) *State = MANAGEBOOKS_Find;
     }
-    else if (FindBar -> length > 0) {
-        if (FindBar -> lengthLimit == 0) {
-            DrawTextEx (MANAGEBOOKS_Font[0], FindBar -> text, FindBarTextPos, 20, 2, BLACK);
-        }
-        else {
-            DrawTextEx (MANAGEBOOKS_Font[0], "...", FindBarTextPos, 20, 2, BLACK);
+    else if (FindBar->length > 0){
+        DrawRectangleRounded (
+            FindBar->box, 
+            roundness, 
+            10, 
+            WHITESMOKE
+        );
+        BeginScissorMode(
+            FindBarTextPos.x, 
+            FindBarTextPos.y, 
+            FindBarTextPos.width, 
+            FindBarTextPos.height
+        );
+        
+        float w = MeasureTextEx(
+            MANAGEBOOKS_Font[0], 
+            FindBar->text, 
+            20, 
+            2
+        ).x;
 
-            float w = MeasureTextEx (MANAGEBOOKS_Font[0], "...", 20, 2).x;
-            FindBarTextPos.x += w + 2;
-            DrawTextEx (MANAGEBOOKS_Font[0], FindBar -> textLimit, FindBarTextPos, 20, 2, BLACK);
+        float dx = ((w - FindBarTextPos.width) > 0) ? w - FindBarTextPos.width : 0;
+        Vector2 position = {
+            FindBarTextPos.x - dx,
+            FindBarTextPos.y
+        };
+
+        DrawTextEx (
+            MANAGEBOOKS_Font[0], 
+            FindBar->text, 
+            position, 
+            20, 
+            2, 
+            GRAY
+        );
+
+        if ((int)(GetTime() * 2) % 2 == 0){
+            DrawRectangle(
+                FindBarTextPos.x + w - dx + 2,
+                FindBarTextPos.y,
+                2,
+                20,
+                BLACK
+            );
         }
+        EndScissorMode();
     }
     else {
-        DrawTextEx (MANAGEBOOKS_Font[0], MANAGEBOOKS_Func_5, FindBarTextPos, 20, 2, GRAY);
+        DrawText(
+            "FIND TRUYEN", 
+            FindBarTextPos.x, 
+            FindBarTextPos.y, 
+            20, 
+            BLACK
+        );
     }
+
+    roundness = FindRoundness (
+        0.05f * FindBar->box.width, 
+        IconFindBox.width, 
+        IconFindBox.height
+    );
+
+    DrawRectangleRounded(
+        IconFindBox,
+        roundness,
+        10,
+        BRIGHTGRAY
+    );
 
     DrawIcon(IconFindBox, Icon_Find);
     if (CheckCollisionPointRec(MANAGEBOOKS_Mouse, IconFindBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && FindBar -> length > 0)
@@ -437,28 +515,6 @@ BookList *Loadbooks(const char *filename){
         return NULL;
     }
 
-    Book A;
-    for (int i = 0; i < bookList -> count; i++)
-    {
-        A = bookList -> theArray[i];
-
-        printf ("| %-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %-*d | %-*d | %-*d | %-*d | %-*d |\n",
-            UTF8Width(A.CodeBook, CODE_BOOKS_LENGTH)            - 2, A.CodeBook,
-            UTF8Width(A.NormNameBook, NORMNAME_BOOKS_LENGTH)    - 2, A.NormNameBook,
-            UTF8Width(A.NameBook, NAME_BOOKS_LENGTH)            - 2, A.NameBook,
-            UTF8Width(A.AuthorBook, AUTHOR_BOOKS_LENGTH)        - 2, A.AuthorBook,
-            UTF8Width(A.TypeBook, TYPE_BOOKS_LENGTH)            - 2, A.TypeBook,
-            UTF8Width(A.PublisherBook, PUBLISHER_BOOKS_LENGTH)  - 2, A.PublisherBook,
-
-            YEAR_BOOKS_LENGTH               - 2, A.YearBook,
-            STOCK_BOOKS_LENGTH              - 2, A.StockBook,
-            TOTAL_IMPORT_BOOKS_LENGTH       - 2, A.TotalImportBook,
-            TOTAL_BORROW_BOOKS_LENGTH       - 2, A.TotalBorrowBook,
-            PRICE_BOOKS_LENGTH              - 2, A.PriceBook 
-        );
-    }
-    
-
     fclose(file);
     return bookList;
 }
@@ -497,4 +553,92 @@ bool Savebooks(BookList *Books){
 
     fclose(f);
     return 1;
+}
+
+Author *LoadAuthor(BookList *Books){
+    if (Books == NULL || Books->theArray == NULL || Books->count <= 0)
+        return NULL;
+
+    Author *author;
+
+    author = malloc (sizeof(Author));
+    if (author == NULL)
+        return NULL;
+
+    author->Author = malloc (sizeof(char *) * Books -> count);
+    if (author->Author == NULL){
+        free(author);
+        return NULL;
+    }
+
+    author -> count = 0;
+
+    for (int i = 0; i < Books -> count; i++){
+        int flag = 0;
+
+        for (int j = 0; j < author->count; j++){
+            if (strcmp(author -> Author[j], Books->theArray[i].AuthorBook) == 0){
+                flag = 1;
+                break;
+            }
+        }
+
+        if (!flag){
+            author->Author[author->count] = malloc (sizeof(char) * 32);
+            if (author->Author[author->count] == NULL)
+                continue;
+
+            strcpy(author->Author[author->count], Books->theArray[i].AuthorBook);
+            author->count++;
+        }
+    }
+
+    for (int i = 0; i < author->count; i++){
+        printf ("%s\n", author->Author[i]);
+    }
+    return author;
+}
+Type *LoadType(BookList *Books){
+    if (Books == NULL || Books->theArray == NULL || Books->count <= 0)
+        return NULL;
+
+    Type *type;
+
+    type = malloc (sizeof(Author));
+    if (type == NULL)
+        return NULL;
+
+    type->Type = malloc (sizeof(char *) * Books -> count);
+    if (type->Type == NULL){
+        free(type);
+        return NULL;
+    }
+
+    type->count = 0;
+
+    for (int i = 0; i < Books -> count; i++){
+        int flag = 0;
+
+        for (int j = 0; j < type->count; j++){
+            if (strcmp(type->Type[j], Books->theArray[i].TypeBook) == 0){
+                flag = 1;
+                break;
+            }
+        }
+
+        if (!flag){
+            type->Type[type->count] = malloc (sizeof(char) * 32);
+            if (type->Type[type->count] == NULL)
+                continue;
+
+            strcpy(type->Type[type->count], Books->theArray[i].TypeBook);
+            type->count++;
+        }
+    }
+
+    for (int i = 0; i < type->count; i++){
+        printf ("-%s\n", type->Type[i]);
+    }
+
+    return type;
 }

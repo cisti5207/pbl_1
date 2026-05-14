@@ -51,6 +51,16 @@ typedef struct {
     int totalImportBooks;
 } BookList;
 
+typedef struct {
+    char **Author;
+    int count;
+} Author;
+
+typedef struct {
+    char **Type;
+    int count;
+} Type;
+
 typedef enum {
     MANAGEBOOKS_Dashboard,
     MANAGEBOOKS_Author,
@@ -62,11 +72,15 @@ typedef enum {
 
 void InitManageBooks();
 BookList *Loadbooks(const char *filename);
+Author *LoadAuthor(BookList *Books);
+Type *LoadType(BookList *Books);
 bool Savebooks(BookList *Books);
 
 void MANAGEBOOKS_UpdateSize();
 void MANAGEBOOKS_Title(Texture2D icon);
 
 void MANAGEBOOKS_Func(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find);
+
+
 
 #endif // MANAGE_BOOKS_H
