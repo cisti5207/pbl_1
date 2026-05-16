@@ -4,20 +4,21 @@
 #include <string.h>
 
 
+void LoadSize(Size *FormSize, Vector2 monitor, Vector2 screen, Vector2 scale, Vector2 mouse){
+    if (monitor.x || monitor.y)
+        FormSize->Monitor = monitor;
 
-void GetSize(int *screenWidth, int *screenHeight, int *formX, int *formY, int *formWidth, int *formHeight)
-{
-    *screenWidth = GetScreenWidth();
-    *screenHeight = GetScreenHeight();
+    if (mouse.x || mouse.y)
+        FormSize->Mouse = mouse;
 
-    *formWidth = *screenWidth * 0.7f;
-    *formHeight = *screenHeight * 0.7f;
-
-    *formX = (*screenWidth - *formWidth) * 0.5f;
-    *formY = (*screenHeight - *formHeight) * 0.5f;
+    if (scale.x || scale.y)
+        FormSize->Scale = scale;
+    
+    if (screen.x || screen.y)
+        FormSize->Screen = screen;
 }
 
-int lenStringUTF8(const char *str) {
+int lenStringUTF8(const char *str){
     int len = 0;
     while (*str) {
         if ((*str & 0xC0) != 0x80) { // Kiểm tra nếu không phải là byte tiếp theo của một ký tự UTF-8
@@ -27,7 +28,7 @@ int lenStringUTF8(const char *str) {
     }
     return len;
 }
-void trim(char *str) {
+void trim(char *str){
     // Xóa khoảng trắng ở đầu
     char *start = str;
     while (*start && isspace((unsigned char)*start)) {
@@ -46,8 +47,7 @@ void trim(char *str) {
         memmove(str, start, end - start + 2); // +2 để bao gồm cả ký tự null
     }
 }
-Font SetFontUTF8(const char *_font, int _fontSize)
-{
+Font SetFontUTF8(const char *_font, int _fontSize){
     int codepoints[] = {
     // Basic Latin (ký tự thường)
     32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
@@ -85,52 +85,145 @@ Font SetFontUTF8(const char *_font, int _fontSize)
 
     return finalFont;
 }
-// ===== HÀM PHỤ TRỢ: XÓA KÝ TỰ UTF-8 =====
-void DeleteLastChar(InputBox *input) {
+
+void DeleteLastChar(InputBox *input){
+
     if (input->length > 0) {
+
         input->length--;
-        // Lùi lại để xóa trọn vẹn ký tự UTF-8 (có thể chiếm 2-3 byte)
-        while (input->length > 0 && (input->text[input->length] & 0xC0) == 0x80) {
+
+        // UTF-8 continuation byte
+        while (
+            input->length > 0 &&
+            (input->text[input->length] & 0xC0) == 0x80
+        ) {
             input->length--;
         }
+
         input->text[input->length] = '\0';
     }
 }
-// ===== UPDATE INPUT =====
-void UpdateInputBox(InputBox *input) {
-    // ===== XỬ LÝ XÓA (BACKSPACE) =====
-    // 1. Dùng GetKeyPressed() lấy sạch hàng đợi phím. 
-    // Việc này đảm bảo bắt dính lệnh Backspace tàng hình do Unikey gửi.
-    int keycode = GetKeyPressed();
-    while (keycode > 0) {
-        if (keycode == KEY_BACKSPACE) {
+void DeleteLastWord(InputBox *input){
+
+    if (input->length <= 0) return;
+
+    // Xóa khoảng trắng cuối
+    while (
+        input->length > 0 &&
+        input->text[input->length - 1] == ' '
+    ) {
+        input->length--;
+    }
+
+    // Xóa nguyên từ
+    while (
+        input->length > 0 &&
+        input->text[input->length - 1] != ' '
+    ) {
+
+        input->length--;
+
+        // UTF-8 continuation byte
+        while (
+            input->length > 0 &&
+            (input->text[input->length] & 0xC0) == 0x80
+        ) {
+            input->length--;
+        }
+    }
+
+    input->text[input->length] = '\0';
+}
+void PasteClipboard(InputBox *input){
+
+    const char *clip = GetClipboardText();
+
+    if (!clip) return;
+
+    int len = strlen(clip);
+
+    if (input->length + len >= MAX_INPUT) {
+        len = MAX_INPUT - input->length - 1;
+    }
+
+    if (len > 0) {
+
+        memcpy(
+            &input->text[input->length],
+            clip,
+            len
+        );
+
+        input->length += len;
+
+        input->text[input->length] = '\0';
+    }
+}
+void UpdateInputBox(InputBox *input){
+
+    bool ctrl =
+        IsKeyDown(KEY_LEFT_CONTROL) ||
+        IsKeyDown(KEY_RIGHT_CONTROL);
+
+    // ===== CTRL + V =====
+    if (ctrl && IsKeyPressed(KEY_V)) {
+        PasteClipboard(input);
+    }
+
+    // ===== CTRL + BACKSPACE =====
+    if (ctrl && IsKeyPressed(KEY_BACKSPACE)) {
+        DeleteLastWord(input);
+    }
+    else {
+
+        // ===== BACKSPACE =====
+        int keycode = GetKeyPressed();
+
+        while (keycode > 0) {
+
+            if (keycode == KEY_BACKSPACE) {
+                DeleteLastChar(input);
+            }
+
+            keycode = GetKeyPressed();
+        }
+
+        if (IsKeyPressedRepeat(KEY_BACKSPACE)) {
             DeleteLastChar(input);
         }
-        keycode = GetKeyPressed(); // Lấy phím tiếp theo trong hàng đợi
     }
 
-    // 2. Vẫn giữ IsKeyPressedRepeat để người dùng có thể đè phím xóa liên tục
-    if (IsKeyPressedRepeat(KEY_BACKSPACE)) {
-        DeleteLastChar(input);
-    }
-
-    // ===== XỬ LÝ NHẬP CHỮ UTF-8 =====
+    // ===== INPUT UTF-8 =====
     int charKey = GetCharPressed();
+
     while (charKey > 0) {
+
         int size = 0;
-        const char *utf8 = CodepointToUTF8(charKey, &size);
+
+        const char *utf8 =
+            CodepointToUTF8(charKey, &size);
 
         if (input->length + size < MAX_INPUT) {
-            memcpy(&input->text[input->length], utf8, size);
+
+            memcpy(
+                &input->text[input->length],
+                utf8,
+                size
+            );
+
             input->length += size;
+
             input->text[input->length] = '\0';
         }
-        
+
         charKey = GetCharPressed();
     }
 }
+int UTF8Width(const char *s, int width){
+    return width + ((int)strlen(s) - lenStringUTF8(s));
+}
 
-void DrawIcon(Rectangle box, Texture2D icon) {
+void DrawIcon(Rectangle box, Texture2D icon){
     float scaleX = box.width / icon.width;
     float scaleY = box.height / icon.height;
     float scale = (scaleX < scaleY) ? scaleX : scaleY;
@@ -147,5 +240,8 @@ void DrawIcon(Rectangle box, Texture2D icon) {
     DrawTexturePro(icon, source, dest, origin, 0.0f, WHITE);
 }
 
+float FindRoundness(float len, float width, float height){
+    float min = (width > height) ? height : width;
 
-
+    return len / min;
+}

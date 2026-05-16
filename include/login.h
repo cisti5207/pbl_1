@@ -4,12 +4,12 @@
 #include "raylib.h"
 #include "libmanage.h"
 
-#define MAX_USERNAME_LENGTH 256
-#define MAX_PASSWORD_LENGTH 256
-#define MAX_REALNAME_LENGTH 256
-#define MAX_CCCD_LENGTH 256
-#define MAX_DOB_LENGTH 256
-#define MAX_ROLE_LENGTH 256
+#define MAX_LOGIN_USERNAME_LENGTH 256
+#define MAX_LOGIN_PASSWORD_LENGTH 256
+#define MAX_LOGIN_REALNAME_LENGTH 256
+#define MAX_LOGIN_CCCD_LENGTH 256
+#define MAX_LOGIN_DOB_LENGTH 256
+#define MAX_LOGIN_ROLE_LENGTH 256
 
 #define LEN_SHOW_USERNAME 29
 #define LEN_SHOW_PASSWORD 49
@@ -18,21 +18,7 @@
 #define LEN_SHOW_DOB 21
 #define LEN_SHOW_ROLE 13
 
-
-
-#define QUANTITY_FONT 100
-#define FONT_SIZE 18
-#define Arial "font/arial/arial.ttf"
-#define ArialBold "font/arial/arialbd.ttf"
-#define Cooper "font/cooper/COOPBL.ttf"
-#define Times "font/times/times.ttf"
-#define Impact "font/impact/impact.ttf"
-#define Roboto "font/roboto/Roboto-Regular.ttf"
-#define Roboto_Semibold "font/roboto/Roboto-Semibold.ttf"
-#define Gill "font/gill/gillubcd.ttf"
-
-
-#define BACKGROUND_IMG "img/image2.png"
+#define LOGIN_BACKGROUND_IMG "img/image2.png"
 #define FORM_LOGIN_IMG "img/image4.png"
 #define WELCOME_TEXT "Welcome to HoanHoangLIB_DUT!"
 
@@ -50,18 +36,15 @@
 #define ICON_PASSWORD "img/icon2.png"
 #define SHOW_PASSWORD "img/icon3.png"
 
-#define REGISTER_TEXT "REGISTER"
-#define FORGOT_PASSWORD_TEXT "FORGOT PASSWORD"
 
-int InitLogin();
 
 typedef struct Account {
-    char username[MAX_USERNAME_LENGTH];
-    char password[MAX_PASSWORD_LENGTH];
-    char realName[MAX_REALNAME_LENGTH];
-    char cccd[MAX_CCCD_LENGTH];
-    char dateOfBirth[MAX_DOB_LENGTH];
-    char role[MAX_ROLE_LENGTH];
+    char username[MAX_LOGIN_USERNAME_LENGTH];
+    char password[MAX_LOGIN_PASSWORD_LENGTH];
+    char realName[MAX_LOGIN_REALNAME_LENGTH];
+    char cccd[MAX_LOGIN_CCCD_LENGTH];
+    char dateOfBirth[MAX_LOGIN_DOB_LENGTH];
+    char role[MAX_LOGIN_ROLE_LENGTH];
 } Account;
 
 typedef struct Node {
@@ -74,46 +57,25 @@ typedef struct Node *AccountList;
 typedef struct Node *AccountPosition;
 
 typedef enum {
-    LOGIN,
-    REGISTER,
-    FORGOT_PASSWORD
-} LoginState;
-
-typedef enum {
     LOGIN_IDLE,
     LOGIN_SUCCESS,
     LOGIN_EMPTY,
     LOGIN_FAILED
 } LoginResult;
 
-typedef enum {
-    FORGOT_PASSWORD_IDLE,
-    FORGOT_PASSWORD_SUCCESS,
-    FORGOT_PASSWORD_EMPTY,
-    FORGOT_PASSWORD_INVALID
-} ForgotPasswordResult;
+int InitLogin(Account *account_return);
 
-typedef enum{
-    IDLE = 0,
-    TRUE,
-    FALSE,
-    NOT_FOUND,
-    FOUND,
-    FAILED
-} CheckResult;
-
-
-void DrawBackground();
-void DrawForm();
-void DrawLoginForm(InputBox *loginBox, InputBox *passwordBox, AccountList accounts, int accountCount, Texture2D IconUsername, Texture2D IconPassword, Texture2D ShowPasswordIcon);
-void DrawLoginUsername(InputBox *LoginBox, Texture2D IconUsername);
-void DrawLoginPassword(InputBox *PasswordBox, Texture2D IconPassword, Texture2D ShowPasswordIcon);
-
+void LoginDrawBackground(Size LoginSize, Texture2D Img_Bg);
+void LoginDrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font);
+void LoginDrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT);
+void LoginDrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font);
+void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse);
 LoginResult CheckLogin(AccountList accounts, const char *username, const char *password);
 
 int InsertAccount(AccountList pL, Account *e, AccountPosition p);
 AccountList CreateHeaderNode();
-int GetAccountData(const char *filename, AccountList accounts, int *accountCount);
-int SaveAccountData(const char *filename, AccountList accounts, int accountCount);
+int LoginGetAccountData(const char *filename, AccountList accounts, int *accountCount);
+int LoginSaveAccountData(const char *filename, AccountList accounts, int accountCount);
+CheckResult Get_account_return(AccountList _account, Account *account, const char *username);
 
 #endif // LOGIN

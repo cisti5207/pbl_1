@@ -17,7 +17,7 @@ typedef struct {
     char text[256];
     int letterCount;
     bool isFocused;
-    float backspaceCounter; // Biến đếm thời gian để xử lý đè phím
+    float backspaceCounter; 
 } InputBox_BD;
 
 typedef struct {
