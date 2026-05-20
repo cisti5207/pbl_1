@@ -5,11 +5,11 @@
 
 #define MAX_INPUT 256
 
-#define BRIGHTWHITE     (Color) {255, 255, 255, 255}
-#define BRIGHTGRAY      (Color) {209, 209, 209, 255}
-#define WHITESMOKE      (Color) {242, 242, 242, 255}
-#define TEALBLUE        (Color) {21, 96, 130, 255}
-#define SILVERGRAY      (Color) {191, 191, 191, 255}
+#define BRIGHTWHITE     (Color){255, 255, 255, 255}
+#define BRIGHTGRAY      (Color){209, 209, 209, 255}
+#define WHITESMOKE      (Color){242, 242, 242, 255}
+#define TEALBLUE        (Color){21, 96, 130, 255}
+#define SILVERGRAY      (Color){191, 191, 191, 255}
 #define NAVYBLUE        (Color){0, 0, 128, 255}
 #define RICHBLACK       (Color){13, 17, 23, 255}
 #define DARKNAVY        (Color){22, 27, 34, 255}
@@ -28,7 +28,7 @@
 #define DARKBLUE1       (Color){0, 14, 46, 255}
 
 #define QuantityFont 32
-#define FONT_SIZE 18
+#define FONT_SIZE 20
 
 #define Arial "font/arial/arial.ttf"
 #define ArialBold "font/arial/arialbd.ttf"
@@ -114,5 +114,7 @@ void DrawIcon(Rectangle box, Texture2D icon);
 float FindRoundness(float len, float width, float height);
 // Tính tỉ lệ roundness của rounded hay circle, ví dụ dùng rounded thì cần cấp giá trị float roundness, nhưng t sẽ dùng hàm này để điều khiển tỉ lệ đó bo tròn theo ý thích
 
+int FindFontSize(float Width, Font font, int space, const char *str);
+// Tính FONT_SIZE cần thiết để đưa vào khung
 
 #endif // LIBMANAGE_H

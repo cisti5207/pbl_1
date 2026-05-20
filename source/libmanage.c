@@ -243,5 +243,10 @@ void DrawIcon(Rectangle box, Texture2D icon){
 float FindRoundness(float len, float width, float height){
     float min = (width > height) ? height : width;
 
-    return len / min;
+    return len / (min / 2);
+}
+int FindFontSize(float Width, Font font, int space, const char *str){
+    float TextWidth = MeasureTextEx (font, str, FONT_SIZE, space).x;
+
+    return Width / TextWidth * FONT_SIZE;
 }

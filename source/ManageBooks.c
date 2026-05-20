@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-void InitManageBooks(){
+void InitManageBooks(Role _role){
     Size ManageBooksSize;
     LoadSize(
         &ManageBooksSize,
@@ -19,8 +19,8 @@ void InitManageBooks(){
             GetScreenHeight()
         },
         (Vector2) {
-            GetScreenWidth() / GetMonitorWidth(0),
-            GetScreenHeight() / GetMonitorHeight(0)
+            (float)GetScreenWidth() / GetMonitorWidth(0),
+            (float)GetScreenHeight() / GetMonitorHeight(0)
         },
         GetMousePosition()
     );
@@ -33,18 +33,22 @@ void InitManageBooks(){
 
     MANAGEBOOKS_STATE State = MANAGEBOOKS_Dashboard;
 
-    Font _Font[2];
-    _Font[0] = SetFontUTF8 (ArialBold, 50);
+    Font _Font[10];
+    _Font[0] = SetFontUTF8 (ArialBold, 100);
+    _Font[1] = SetFontUTF8 (Cooper, 50);
+    _Font[2] = SetFontUTF8 (Gill, 50);
+    _Font[3] = SetFontUTF8 (Roboto_Semibold, 50);
 
     BookList* Books = Loadbooks(BOOKS_FILE);
-    Author* Authors = LoadAuthor(Books);
+    AuthorList* Authors = LoadAuthor(AUTHORS_FILE);
     Type* Types = LoadType(Books);
 
-    if (Books == NULL || Authors == NULL || Types == NULL){
-        printf ("Failed!!! Can not load dataTruyen.txt!!!");
-        State = MANAGEBOOKS_Main;
-        return;
-    }
+    if (Books == NULL)
+        printf ("FAILED!! Cann't load dataTruyen.txt");
+    if (Authors == NULL)
+        printf ("FAILED!! Cann't load author.txt");
+    if (Types == NULL)
+        printf ("FAILED!! Cann't load Type from Books");
 
     InputBox FindBar = {0};
 
@@ -52,9 +56,7 @@ void InitManageBooks(){
     Texture2D Icon_Find = LoadTexture (Icon_Find_lnk);
 
 
-    while (!WindowShouldClose())
-    {
-
+    while (!WindowShouldClose()){
         if (IsWindowResized()){
             LoadSize(
                 &ManageBooksSize,
@@ -64,8 +66,8 @@ void InitManageBooks(){
                     GetScreenHeight()
                 },
                 (Vector2) {
-                    GetScreenWidth() / GetMonitorWidth(0),
-                    GetScreenHeight() / GetMonitorHeight(0)
+                    (float)GetScreenWidth() / GetMonitorWidth(0),
+                    (float)GetScreenHeight() / GetMonitorHeight(0)
                 },
                 (Vector2) {0}
             );
@@ -82,19 +84,124 @@ void InitManageBooks(){
 
         ManageBooksTitle(Avatar, customUI);
 
-        ManageBooksFunc(&State, &FindBar, Icon_Find, customUI, ManageBooksSize, _Font);
+        if (ManageBooksFunc(&State, &FindBar, Icon_Find, customUI, ManageBooksSize, _Font) == 1)
+            Books->page = 1;
+        
 
         switch(State)
         {
+            Vector2 TextWidth;
+            Rectangle HeaderBox;
             case MANAGEBOOKS_Dashboard:
+                ShowBooks_Panel(ManageBooksSize, customUI, _Font, *Books, NULL, NULL);
                 break;
             case MANAGEBOOKS_Author:
+                TextWidth = MeasureTextEx (
+                    _Font[0],
+                    MANAGEBOOKS_Func_1,
+                    customUI.HeaderBox.height * 0.8f,
+                    2
+                );
+
+                HeaderBox = (Rectangle) {
+                    customUI.HeaderBox.x + (customUI.HeaderBox.width - TextWidth.x) * 0.5f,
+                    customUI.HeaderBox.y + customUI.HeaderBox.height * 0.1f,
+                    TextWidth.x,
+                    TextWidth.y
+                };
+
+                DrawTextEx(
+                    _Font[0], 
+                    MANAGEBOOKS_Func_1,
+                    (Vector2) {
+                        HeaderBox.x,
+                        HeaderBox.y
+                    },
+                    HeaderBox.height,
+                    2,
+                    BLACK
+                );
                 break;
             case MANAGEBOOKS_Publisher:
+                 TextWidth = MeasureTextEx (
+                    _Font[0],
+                    MANAGEBOOKS_Func_2,
+                    customUI.HeaderBox.height * 0.8f,
+                    2
+                );
+
+                HeaderBox = (Rectangle) {
+                    customUI.HeaderBox.x + (customUI.HeaderBox.width - TextWidth.x) * 0.5f,
+                    customUI.HeaderBox.y + customUI.HeaderBox.height * 0.1f,
+                    TextWidth.x,
+                    TextWidth.y
+                };
+
+                DrawTextEx(
+                    _Font[0], 
+                    MANAGEBOOKS_Func_2,
+                    (Vector2) {
+                        HeaderBox.x,
+                        HeaderBox.y
+                    },
+                    HeaderBox.height,
+                    2,
+                    BLACK
+                );
                 break;
             case MANAGEBOOKS_Type:
+                 TextWidth = MeasureTextEx (
+                    _Font[0],
+                    MANAGEBOOKS_Func_3,
+                    customUI.HeaderBox.height * 0.8f,
+                    2
+                );
+
+                HeaderBox = (Rectangle) {
+                    customUI.HeaderBox.x + (customUI.HeaderBox.width - TextWidth.x) * 0.5f,
+                    customUI.HeaderBox.y + customUI.HeaderBox.height * 0.1f,
+                    TextWidth.x,
+                    TextWidth.y
+                };
+
+                DrawTextEx(
+                    _Font[0], 
+                    MANAGEBOOKS_Func_3,
+                    (Vector2) {
+                        HeaderBox.x,
+                        HeaderBox.y
+                    },
+                    HeaderBox.height,
+                    2,
+                    BLACK
+                );
                 break;
             case MANAGEBOOKS_Find:
+                 TextWidth = MeasureTextEx (
+                    _Font[0],
+                    MANAGEBOOKS_Func_5,
+                    customUI.HeaderBox.height * 0.8f,
+                    2
+                );
+
+                HeaderBox = (Rectangle) {
+                    customUI.HeaderBox.x + (customUI.HeaderBox.width - TextWidth.x) * 0.5f,
+                    customUI.HeaderBox.y + customUI.HeaderBox.height * 0.1f,
+                    TextWidth.x,
+                    TextWidth.y
+                };
+
+                DrawTextEx(
+                    _Font[0], 
+                    MANAGEBOOKS_Func_5,
+                    (Vector2) {
+                        HeaderBox.x,
+                        HeaderBox.y
+                    },
+                    HeaderBox.height,
+                    2,
+                    BLACK
+                );
                 break;
             case MANAGEBOOKS_Main:
                 break;
@@ -111,7 +218,7 @@ void InitManageBooks(){
     UnloadTexture(Avatar);
     UnloadTexture(Icon_Find);
 
-    Savebooks(Books);
+    Savebooks(*Books);/**/
     free(Books);
     return;
 }
@@ -138,7 +245,6 @@ void LoadManageBooksUI (ManageBooksUI *UI, Size size){
         size.Screen.y - (UI->HeaderBox.height + UI->TitleBox.height)
     };
 }
-
 void ManageBooksTitle(Texture2D icon, ManageBooksUI UI){
     Rectangle IconBox = {
         UI.TitleBox.width * 0.02f,
@@ -168,7 +274,123 @@ void ManageBooksTitle(Texture2D icon, ManageBooksUI UI){
     );
 }
 
-void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font){
+void ShowBooks_Panel(Size size, ManageBooksUI UI, Font *_Font, BookList Books, char *author, char *type) {
+    Rectangle hitbox = {
+        UI.Panel.x + UI.Panel.width * 0.08f,
+        UI.Panel.y + DISTANCE_BOOKS,
+        UI.Panel.width * 0.8f,
+        UI.Panel.height * 0.06f * (pow (0.3, size.Scale.x) + 0.6)
+    };
+
+    BeginScissorMode(
+        UI.Panel.x,
+        UI.Panel.y,
+        UI.Panel.width,
+        UI.Panel.height
+    );
+
+    float Distance_Books = DISTANCE_BOOKS;
+    float ScrollBar = UI.Panel.height * 0.1f + UI.Panel.height * 0.05f + (hitbox.height + Distance_Books) * Books.QuantityForOnePage;
+
+
+    int i = (Books.page - 1) * Books.QuantityForOnePage;
+    int count = 0;
+    int flag = 0;
+    while (count < Books.QuantityForOnePage && i != Books.count){
+        if (author != NULL){
+            if (strcmp(author, Books.theArray[i].AuthorBook) == 0) 
+                flag = 1;
+        }
+        else if (author != NULL){
+            if(strcmp(type, Books.theArray[i].TypeBook) == 0)
+                flag = 1;
+        }
+        else 
+            flag = 1;
+
+        if (flag == 1){
+            float radius;
+            int FontSize;
+            float TextWidth;
+
+            hitbox = (Rectangle) {
+                hitbox.x,
+                hitbox.y + (hitbox.height + Distance_Books) * (bool) count,
+                hitbox.width,
+                hitbox.height
+            };
+
+            radius = FindRoundness(hitbox.width * 0.005f, hitbox.width, hitbox.height);
+            DrawRectangleRounded (
+                hitbox,
+                radius,
+                50,
+                BLACK    
+            );
+
+            Rectangle code_hitbox = {
+                hitbox.x,
+                hitbox.y,
+                hitbox.width * 0.1f / (1/(pow(0.2, size.Scale.x) - 1.5) + 1.77),
+                hitbox.height
+            };
+
+            radius = FindRoundness(hitbox.width * 0.005f, code_hitbox.width, code_hitbox.height);
+            DrawRectangleRounded(
+                code_hitbox,
+                radius,
+                50,
+                WHITE
+            );
+
+            FontSize = FindFontSize(code_hitbox.width * 0.8f, _Font[0], 1, Books.theArray[i].CodeBook);
+
+            DrawTextEx (
+                _Font[0],
+                Books.theArray[i].CodeBook,
+                (Vector2) {
+                    code_hitbox.x + code_hitbox.width * 0.1f,
+                    code_hitbox.y + (code_hitbox.height - FontSize) / 2
+                },
+                FontSize,
+                1,
+                BLACK
+            );
+
+            TextWidth = MeasureTextEx (
+                _Font[0],
+                Books.theArray[i].NameBook,
+                code_hitbox.height * 0.6f,
+                1
+            ).x;
+
+            Rectangle name_hitbox = {
+                code_hitbox.x + hitbox.width,
+                code_hitbox.y + code_hitbox.height * 0.1f,
+                TextWidth + code_hitbox.width * 0.1f,
+                code_hitbox.height * 0.8f
+            };
+
+            radius = FindRoundness (name_hitbox.height * 0.1f, name_hitbox.width, name_hitbox.height);
+            DrawRectangleRounded (
+                name_hitbox,
+                radius,
+                10,
+                SOFTWHITE
+            );
+            
+            count++;
+        }
+        i++;
+    }   
+    if (author == NULL && type == NULL)
+        Books.page++;
+
+    EndScissorMode();    
+}
+
+bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font){
+    int _return = 0;
     // khởi tạo hitbox cho Avatar
     Rectangle IconBox = {
         UI.TitleBox.width * 0.02f,
@@ -187,8 +409,10 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
         );
         
         // Nếu mà bấm vào avatar thì *State -> Dashboard, hay quay lại màn hình chính cuả ManageBooks
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Dashboard;
+            _return = 1;
+        }
     }
     
     // Khởi tạo biến TextWidth để lấy độ rộng (x, y) của Text sau khi in
@@ -243,6 +467,7 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
         //Nếu bấm chọn chức năng này thì State -> Author, trang ứng dụng sẽ chuyển sang Tác giả
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Author;
+            _return = 1;
         }
     }
     else {
@@ -316,6 +541,7 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
         
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Publisher;
+            _return = 1;
         }
     }
     else {
@@ -387,6 +613,7 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
         );
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Type;
+            _return = 1;
         }
     }
     else {
@@ -459,6 +686,7 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             *State = MANAGEBOOKS_Main;
+            _return = 1;
         }
     }
     else {
@@ -565,7 +793,7 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
             2
         ).x;
 
-        float dx = ((w - FindBarTextPos.width) > 0) ? w - FindBarTextPos.width : 0;
+        float dx = ((w - (FindBarTextPos.width - 5)) > 0) ? w - (FindBarTextPos.width - 5) : 0;
         Vector2 position = {
             FindBarTextPos.x - dx,
             FindBarTextPos.y
@@ -593,6 +821,7 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
 
         if (IsKeyPressed(KEY_ENTER)){
             *State = MANAGEBOOKS_Find;
+            _return = 1;
         }
     }
     else if (FindBar->length > 0){
@@ -666,8 +895,12 @@ void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
     );
 
     DrawIcon(IconFindBox, Icon_Find);
-    if (CheckCollisionPointRec(size.Mouse, IconFindBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && FindBar -> length > 0)
+    if (CheckCollisionPointRec(size.Mouse, IconFindBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && FindBar -> length > 0){
         *State = MANAGEBOOKS_Find;
+        _return = 1;
+    }
+
+    return _return;
 }
 
 BookList *Loadbooks(const char *filename){
@@ -697,6 +930,9 @@ BookList *Loadbooks(const char *filename){
     fscanf(file, "Số quyển truyện: %d\n", &(bookList->count));
     fscanf(file, "Số lượng truyện hiện tại: %d\n", &(bookList->stockBooks));
     fscanf(file, "Số lượng truyện gốc: %d\n", &(bookList->totalImportBooks));
+
+    bookList->page = 1;
+    bookList->QuantityForOnePage = QUANTITYFORONEPAGE;
 
     Book book;
 
@@ -735,7 +971,7 @@ BookList *Loadbooks(const char *filename){
     fclose(file);
     return bookList;
 }
-bool Savebooks(BookList *Books){
+bool Savebooks(BookList Books){
     FILE *f = fopen (BOOKS_FILE, "w");
 
     if (f == NULL){
@@ -743,14 +979,14 @@ bool Savebooks(BookList *Books){
         return 0;
     }
 
-    fprintf (f, "Số quyển truyện: %d\n", Books -> count);
-    fprintf (f, "Số lượng truyện hiện tại: %d\n", Books -> stockBooks);
-    fprintf (f, "Số lượng truyện gốc: %d\n", Books -> totalImportBooks);
+    fprintf (f, "Số quyển truyện: %d\n", Books.count);
+    fprintf (f, "Số lượng truyện hiện tại: %d\n", Books.stockBooks);
+    fprintf (f, "Số lượng truyện gốc: %d\n", Books.totalImportBooks);
 
     Book A;
-    for (int i = 0; i < Books -> count; i++)
+    for (int i = 0; i < Books.count; i++)
     {
-        A = Books -> theArray[i];
+        A = Books.theArray[i];
 
         fprintf (f, "| %-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %-*d | %-*d | %-*d | %-*d | %-*d |\n",
             UTF8Width(A.CodeBook, CODE_BOOKS_LENGTH)            - 2, A.CodeBook,
@@ -772,49 +1008,61 @@ bool Savebooks(BookList *Books){
     return 1;
 }
 
-Author *LoadAuthor(BookList *Books){
-    if (Books == NULL || Books->theArray == NULL || Books->count <= 0)
+AuthorList *LoadAuthor(const char *filename){
+    FILE *f = fopen(filename, "r");
+    if (f == NULL)
         return NULL;
 
-    Author *author;
+    int count;
+    fscanf (f, "Tổng: %d\n", &count);
 
-    author = malloc (sizeof(Author));
-    if (author == NULL)
+
+    AuthorList *A = malloc (sizeof(AuthorList));
+    if (A == NULL) 
         return NULL;
 
-    author->Author = malloc (sizeof(char *) * Books -> count);
-    if (author->Author == NULL){
-        free(author);
+    A->Author = malloc (sizeof(Author) * count);
+    if (A->Author == NULL){
+        free(A);
         return NULL;
     }
-
-    author -> count = 0;
-
-    for (int i = 0; i < Books -> count; i++){
-        int flag = 0;
-
-        for (int j = 0; j < author->count; j++){
-            if (strcmp(author -> Author[j], Books->theArray[i].AuthorBook) == 0){
-                flag = 1;
-                break;
-            }
-        }
-
-        if (!flag){
-            author->Author[author->count] = malloc (sizeof(char) * 32);
-            if (author->Author[author->count] == NULL)
-                continue;
-
-            strcpy(author->Author[author->count], Books->theArray[i].AuthorBook);
-            author->count++;
-        }
+    A->count = 0;
+    while (!(fscanf(f, " | %[^|]| %[^|]|\n", A->Author[A->count].code, A->Author[A->count].name) == 2)) {
+        trim(A->Author[A->count].code);
+        trim(A->Author[A->count].name);
+        A->count++;
     }
 
-    for (int i = 0; i < author->count; i++){
-        printf ("%s\n", author->Author[i]);
+    fclose(f);
+    if (A->count != count){
+        free(A);
+        return NULL;
     }
-    return author;
+    else 
+        return A;
 }
+bool SaveAuthor(AuthorList _Author){
+    FILE *f = fopen(AUTHORS_FILE, "w");
+
+    int i;
+    for (i = 0; i < _Author.count; i++){
+        Author A = _Author.Author[i];
+
+        fprintf (f, "| %*s | %*s |\n",
+            UTF8Width(A.code, AUTHORCODE_AUTHORS_LENGTH), A.code,
+            UTF8Width(A.name, AUTHOR_AUTHORS_LENGTH), A.name
+        );
+    }
+
+    fclose(f);
+
+    if (i != _Author.count) 
+        return false;
+    else 
+        return true;
+
+}
+
 Type *LoadType(BookList *Books){
     if (Books == NULL || Books->theArray == NULL || Books->count <= 0)
         return NULL;
@@ -851,10 +1099,6 @@ Type *LoadType(BookList *Books){
             strcpy(type->Type[type->count], Books->theArray[i].TypeBook);
             type->count++;
         }
-    }
-
-    for (int i = 0; i < type->count; i++){
-        printf ("-%s\n", type->Type[i]);
     }
 
     return type;

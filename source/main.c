@@ -16,7 +16,22 @@ int main()
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowMinSize(1000, 600);
 
+    Account _Account;
+    if (InitLogin(&_Account) == LOGIN_SUCCESS) {
+        APP_STATE = HOME;
+    } else {
+        printf("Login failed.\n");
+        return 1;
+    }
+
+    Role _role;
+    if (strcmp(_Account.role, "Administrator") == 0)
+        _role = ADMINISTRATOR;
+    else 
+        _role = STAFF;
+
     Size MainSize;
+    MainContainers Containers;
     LoadSize(
         &MainSize,
         (Vector2) {
@@ -34,26 +49,15 @@ int main()
         GetMousePosition()
     );
 
-    MainContainers Containers;
+    MainLoadContainers(
+        &Containers,
+        MainSize
+    );
+
+    
     MainInitParticles(MainSize);
-
-
-    Account _Account;
-    if (InitLogin(&_Account) == LOGIN_SUCCESS) {
-        APP_STATE = HOME;
-    } else {
-        printf("Login failed.\n");
-        return 1;
-    }
-    printf ("| %s | %s | %s | %s | %s | %s |\n",
-        _Account.username,
-        _Account.realName,
-        _Account.password,
-        _Account.cccd,
-        _Account.dateOfBirth,
-        _Account.role
-    ); 
-
+    MainUpdateParticlesPosition(MainSize);
+    
     while (!WindowShouldClose()){
         MainUpdateParticlesPosition(MainSize);
         MainSize.Mouse = GetMousePosition();
@@ -122,7 +126,7 @@ int main()
             case MANAGEBOOKS:
                 SetWindowTitle("Manage Books");
                 
-                InitManageBooks();
+                InitManageBooks(_role);
                 
                 APP_STATE = HOME;
                 
@@ -175,7 +179,6 @@ void MainLoadContainers(MainContainers *Containers, Size MainSize){
         (Containers->PanelBox.height + Containers->PanelBox.y - Containers->ShowFuncBox.y) + Containers->PanelBox.width * 0.01f
     };
 }
-
 void MainInitParticles(Size MainSize){
     for (int i = 0; i < MAX_PARTICLE; i++){
         MAIN_Particles[i].Position = (Vector2) {
@@ -192,7 +195,6 @@ void MainInitParticles(Size MainSize){
         MAIN_Particles[i].alpha = 0.1f + GetRandomValue(0, 100) / 200.0f;
     }
 }
-
 void MainUpdateParticlesPosition(Size MainSize){
     for (int i = 0; i < MAX_PARTICLE; i++){
         MAIN_Particles[i].Position.x += MAIN_Particles[i].Velocity.x;
@@ -210,7 +212,6 @@ void MainUpdateParticlesPosition(Size MainSize){
         }
     }
 }
-
 void MainDrawParticle(void){
     for (int i = 0; i < MAX_PARTICLE; i++){
         DrawCircleV(
@@ -220,7 +221,6 @@ void MainDrawParticle(void){
         );
     }
 }
-
 void MainDrawConnection(void){
     for (int i = 0; i < MAX_PARTICLE; i++){
         for (int j = i + 1; j < MAX_PARTICLE; j++)
@@ -243,7 +243,6 @@ void MainDrawConnection(void){
         }
     }
 }
-
 Color MainAnimatedBackground(void){
     float t = GetTime();
 
@@ -253,7 +252,6 @@ Color MainAnimatedBackground(void){
 
     return (Color){ r, g, b, 255 };
 }
-
 void MainDrawPanel(MainContainers Containers){
     float rounded = Containers.PanelBox.width * 0.01f;
 
@@ -301,7 +299,6 @@ void MainDrawPanel(MainContainers Containers){
         BRIGHTWHITE
     );
 }
-
 void MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
     int i = 0;
     float ratioDistance = 0.1f;

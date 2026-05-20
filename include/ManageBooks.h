@@ -10,6 +10,8 @@
 #define NORMNAME_BOOKS_LENGTH 64
 #define NAME_BOOKS_LENGTH 64
 #define TYPE_BOOKS_LENGTH 32
+#define AUTHORCODE_AUTHORS_LENGTH 8
+#define AUTHOR_AUTHORS_LENGTH 32
 #define AUTHOR_BOOKS_LENGTH 32
 #define PUBLISHER_BOOKS_LENGTH 32
 #define YEAR_BOOKS_LENGTH 5
@@ -18,8 +20,12 @@
 #define TOTAL_BORROW_BOOKS_LENGTH 5
 #define PRICE_BOOKS_LENGTH 6
 
+#define QUANTITYFORONEPAGE 10
+#define DISTANCE_BOOKS 50
+
 #define MAX_BOOKS 1000
-#define BOOKS_FILE "data/dataTruyen.txt"
+#define BOOKS_FILE "data/ManageBooks/dataTruyen.txt"
+#define AUTHORS_FILE "data/ManageBooks/author.txt"
 
 #define MANAGEBOOKS_Func_1 "Tác Giả"
 #define MANAGEBOOKS_Func_2 "Nhà Xuất Bản"
@@ -34,6 +40,7 @@ typedef struct {
     Rectangle HeaderBox;
     Rectangle Panel;
 } ManageBooksUI;
+
 typedef struct {
     char CodeBook[256];
     char NormNameBook[256];
@@ -54,12 +61,19 @@ typedef struct {
     int count;
     int stockBooks;
     int totalImportBooks;
+    int page;
+    int QuantityForOnePage;
 } BookList;
 
 typedef struct {
-    char **Author;
-    int count;
+    char name[256];
+    char code[32];
 } Author;
+
+typedef struct {
+    Author *Author;
+    int count;
+} AuthorList;
 
 typedef struct {
     char **Type;
@@ -75,16 +89,20 @@ typedef enum {
     MANAGEBOOKS_Main
 } MANAGEBOOKS_STATE;
 
-void InitManageBooks();
-BookList *Loadbooks(const char *filename);
-Author *LoadAuthor(BookList *Books);
-Type *LoadType(BookList *Books);
-bool Savebooks(BookList *Books);
+void InitManageBooks(Role _role);
 
 void LoadManageBooksUI (ManageBooksUI *UI, Size size);
 void ManageBooksTitle(Texture2D icon, ManageBooksUI UI);
+bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);
+void ShowBooks_Panel(Size size, ManageBooksUI UI, Font *Font, BookList Books, char *author, char *type);
 
-void ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);
+BookList *Loadbooks(const char *filename);
+bool Savebooks(BookList Books);
+
+AuthorList *LoadAuthor(const char *filename);
+bool SaveAuthor(AuthorList _Author);
+
+Type *LoadType(BookList *Books);
 
 
 

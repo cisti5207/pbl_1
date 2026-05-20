@@ -470,11 +470,6 @@ void LoginDrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectan
         _LoginBox->box.height
     };
 
-    Vector2 _Text = {
-        _LoginBox->box.x + IconBox_Username.width + 10,
-        _LoginBox->box.y + (_LoginBox->box.height - MeasureTextEx(_Font[0], "a", FONT_SIZE, 1).y) / 2
-    };
-
     DrawRectangleRounded(
         _LoginBox->box, 
         0.1f, 
@@ -520,45 +515,79 @@ void LoginDrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectan
         _LoginBox->isFocused = false;
     }
 
+    Rectangle _Text = {
+        _LoginBox->box.x + IconBox_Username.width + 5,
+        _LoginBox->box.y,
+        _LoginBox->box.width - IconBox_Username.width - 10,
+        _LoginBox->box.height
+    };
+
+    BeginScissorMode(
+        _Text.x,
+        _Text.y,
+        _Text.width,
+        _Text.height
+    );
+
     if (_LoginBox->isFocused) {
         UpdateInputBox(_LoginBox);
+
+        float w = MeasureTextEx (
+            _Font[0],
+            _LoginBox->text,
+            20,
+            1
+        ).x;
+
+        float dx = (w - _Text.width + 5) >= 0 ? (w - _Text.width + 5) : 0;
+        Vector2 pos = {
+            _Text.x - dx,
+            _Text.y + (_Text.height - 20) / 2
+        };
 
         DrawTextEx(
             _Font[0], 
             _LoginBox->text, 
-            _Text, 
-            FONT_SIZE, 
+            pos,
+            20, 
             1, 
             BLACK
         );
 
-        float w = MeasureTextEx(
-            _Font[0], 
-            _LoginBox->text,
-            FONT_SIZE, 
-            1
-        ).x;
-
         if ((int)(GetTime()*2) % 2 == 0) {
             DrawRectangle(
-                _Text.x + w + 2, 
-                _Text.y, 
+                pos.x + w + 1, 
+                pos.y, 
                 2,
-                FONT_SIZE, 
+                20, 
                 BLACK
             );
         }
     }
     else if (_LoginBox -> length > 0) {
+        float w = MeasureTextEx (
+            _Font[0],
+            _LoginBox->text,
+            20,
+            1
+        ).x;
+
+        float dx = (w - _Text.width - 5) >= 0 ? (w - _Text.width - 5) : 0;
+        Vector2 pos = {
+            _Text.x - dx,
+            _Text.y + (_Text.height - 20) / 2
+        };
+
         DrawTextEx(
             _Font[0], 
             _LoginBox->text, 
-            _Text,
-            FONT_SIZE, 
+            pos,
+            20, 
             1, 
             BLACK
         );
     }
+    EndScissorMode();
 }
 void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse) {
     _PasswordBox->box = (Rectangle){
@@ -579,11 +608,6 @@ void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Tex
         _PasswordBox->box.y,
         IconBox_Password.width,
         IconBox_Password.height
-    };
-
-    Vector2 _Text = {
-        _PasswordBox->box.x + IconBox_Password.width + 10,
-        _PasswordBox->box.y + (_PasswordBox->box.height - MeasureTextEx(_Font[0], "a", FONT_SIZE, 1).y) / 2
     };
 
     DrawRectangleRounded(
@@ -635,99 +659,160 @@ void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Tex
         _PasswordBox->isFocused = false;
     }
 
+    Rectangle _Text = {
+        _PasswordBox->box.x + IconBox_Password.width + 5,
+        _PasswordBox->box.y,
+        _PasswordBox->box.width - (IconBox_Password.width + Show_PasswordBox.width + 10),
+        _PasswordBox->box.height
+    };
+
+    BeginScissorMode(
+        _Text.x,
+        _Text.y,
+        _Text.width,
+        _Text.height
+    );
+
     if (_PasswordBox->isFocused) {
         UpdateInputBox(_PasswordBox);
 
-        char maskedText[MAX_INPUT];
-        float w = MeasureTextEx(
-            _Font[0], 
-            _PasswordBox->text, 
-            FONT_SIZE, 
-            1
-        ).x;
-        
-        memset(
-            maskedText, 
-            '*', 
-            _PasswordBox->length
-        );
-
-        maskedText[_PasswordBox->length] = '\0';
-
-        if (CheckCollisionPointRec(mouse, Show_PasswordBox) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-            DrawTextEx(
+        if (CheckCollisionPointRec(mouse, _PasswordBox->box) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
+            float w = MeasureTextEx(
                 _Font[0], 
                 _PasswordBox->text, 
-                _Text, 
-                FONT_SIZE, 
-                1, 
+                20, 
+                1
+            ).x;
+
+            float dx = (w - (_Text.width - 5)) > 0 ? (w - (_Text.width - 5)) : 0;
+            Vector2 pos = {
+                _Text.x - dx,
+                _Text.y + (_Text.height - 20) * 0.5f
+            };
+
+            DrawTextEx(
+                _Font[0],
+                _PasswordBox->text,
+                pos,
+                20,
+                1,
                 BLACK
             );
 
-            w = MeasureTextEx(
-                _Font[0], 
-                _PasswordBox->text,
-                FONT_SIZE, 
-                1
-            ).x;
-            
-            if ((int)(GetTime()*2) % 2 == 0) {
+            if ((int)(GetTime() * 2) % 2 == 0){
                 DrawRectangle(
-                    _Text.x + w + 2, 
-                    _Text.y, 
+                    pos.x + w + 2,
+                    pos.y,
                     2,
-                    FONT_SIZE, 
-                    BLACK
+                    20,
+                    BLACK           
                 );
             }
         }
         else {
-            DrawTextEx(
+            char maskedText[MAX_INPUT];
+        
+            memset(
+                maskedText, 
+                '*', 
+                _PasswordBox->length
+            );
+
+            maskedText[_PasswordBox->length] = '\0';
+
+            float w = MeasureTextEx(
                 _Font[0], 
                 maskedText, 
-                _Text, 
-                FONT_SIZE, 
-                1, 
+                20, 
+                1
+            ).x;
+
+            float dx = (w - (_Text.width - 5)) > 0 ? (w - (_Text.width - 5)) : 0;
+            Vector2 pos = {
+                _Text.x - dx,
+                _Text.y + (_Text.height - 20) * 0.5f
+            };
+
+            DrawTextEx(
+                _Font[0],
+                maskedText,
+                pos,
+                20,
+                1,
                 BLACK
             );
 
-            w = MeasureTextEx(
-                _Font[0], 
-                maskedText, 
-                FONT_SIZE, 
-                1
-            ).x;
-            
-            if ((int)(GetTime()*2) % 2 == 0) {
+            if ((int)(GetTime() * 2) % 2 == 0){
                 DrawRectangle(
-                    _Text.x + w + 2, 
-                    _Text.y, 
-                    2, 
-                    FONT_SIZE, 
-                    BLACK
+                    pos.x + w + 2,
+                    pos.y,
+                    2,
+                    20,
+                    BLACK           
                 );
             }
         }
     }
 
     else if (_PasswordBox -> length > 0) {
-        char maskedText[MAX_INPUT];
-        memset(
-            maskedText, 
-            '*', 
-            _PasswordBox->length
-        );
-        maskedText[_PasswordBox->length] = '\0';
+        if (CheckCollisionPointRec(mouse, _PasswordBox->box) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
+            float w = MeasureTextEx(
+                _Font[0], 
+                _PasswordBox->text, 
+                20, 
+                1
+            ).x;
 
-        DrawTextEx(
-            _Font[0], 
-            (CheckCollisionPointRec(mouse, _PasswordBox->box) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) ? _PasswordBox->text : maskedText, 
-            _Text, 
-            FONT_SIZE, 
-            1, 
-            BLACK
-        );
+            float dx = (w - (_Text.width - 5)) > 0 ? (w - (_Text.width - 5)) : 0;
+            Vector2 pos = {
+                _Text.x - dx,
+                _Text.y + (_Text.height - 20) * 0.5f
+            };
+
+            DrawTextEx(
+                _Font[0],
+                _PasswordBox->text,
+                pos,
+                20,
+                1,
+                BLACK
+            );
+        }
+        else {
+            char maskedText[MAX_INPUT];
+        
+            memset(
+                maskedText, 
+                '*', 
+                _PasswordBox->length
+            );
+
+            maskedText[_PasswordBox->length] = '\0';
+
+            float w = MeasureTextEx(
+                _Font[0], 
+                maskedText, 
+                20, 
+                1
+            ).x;
+
+            float dx = (w - (_Text.width - 5)) > 0 ? (w - (_Text.width - 5)) : 0;
+            Vector2 pos = {
+                _Text.x - dx,
+                _Text.y + (_Text.height - 20) * 0.5f
+            };
+
+            DrawTextEx(
+                _Font[0],
+                maskedText,
+                pos,
+                20,
+                1,
+                BLACK
+            );
+        }
     }
+    EndScissorMode();
 }
 
 LoginResult CheckLogin(AccountList accounts, const char *username, const char *password) {
