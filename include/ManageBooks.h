@@ -20,7 +20,7 @@
 #define TOTAL_BORROW_BOOKS_LENGTH 5
 #define PRICE_BOOKS_LENGTH 6
 
-#define QUANTITYFORONEPAGE 10
+#define QUANTITYFORONEPAGE 15
 #define DISTANCE_BOOKS 50
 
 #define MAX_BOOKS 1000
@@ -55,13 +55,25 @@ typedef struct {
     int PriceBook;
 } Book;
 
+typedef enum {
+    IDLE_STATEFINDBOOK,
+    CODE,
+    NAME,
+    AUTHOR,
+    TYPE,
+    PUBLISHER,
+    YEAR,
+    STOCK,
+    PRICE
+} StateFindBook;
+
 typedef struct {
     Book *theArray;
     int capacity;
     int count;
     int stockBooks;
     int totalImportBooks;
-    int page;
+    int pos;
     int QuantityForOnePage;
 } BookList;
 
@@ -94,7 +106,9 @@ void InitManageBooks(Role _role);
 void LoadManageBooksUI (ManageBooksUI *UI, Size size);
 void ManageBooksTitle(Texture2D icon, ManageBooksUI UI);
 bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);
-void ShowBooks_Panel(Size size, ManageBooksUI UI, Font *Font, BookList Books, char *author, char *type);
+
+int CountStrInBooks (BookList Books, const char *Str, StateFindBook state);
+void ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *Font, BookList Books, char *author, char *type, int Quantity);
 
 BookList *Loadbooks(const char *filename);
 bool Savebooks(BookList Books);

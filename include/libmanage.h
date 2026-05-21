@@ -26,6 +26,16 @@
 #define WARNINGORANGE   (Color){243, 156, 18, 255}
 #define ERRORRED        (Color){231, 76, 60, 255}
 #define DARKBLUE1       (Color){0, 14, 46, 255}
+#define GRAY_1          (Color){255, 255, 255, 255}
+#define GRAY_2          (Color){229, 229, 229, 255}
+#define GRAY_3          (Color){204, 204, 204, 255}
+#define GRAY_4          (Color){178, 178, 178, 255}
+#define GRAY_5          (Color){153, 153, 153, 255}
+#define GRAY_6          (Color){127, 127, 127, 255}
+#define GRAY_7          (Color){102, 102, 102, 255}
+#define GRAY_8          (Color){ 76,  76,  76, 255}
+#define GRAY_9          (Color){ 51,  51,  51, 255}
+#define GRAY_10         (Color){  0,   0,   0, 255}
 
 #define QuantityFont 32
 #define FONT_SIZE 20

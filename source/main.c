@@ -61,22 +61,20 @@ int main()
     while (!WindowShouldClose()){
         MainUpdateParticlesPosition(MainSize);
         MainSize.Mouse = GetMousePosition();
-        if (IsWindowResized()){
-            LoadSize(
-                &MainSize,
-                (Vector2) {0},
-                (Vector2) {
-                    GetScreenWidth(),
-                    GetScreenHeight()
-                },
-                (Vector2) {
-                    GetScreenWidth() / GetMonitorWidth(0),
-                    GetScreenHeight() / GetMonitorHeight(0)
-                },
-                (Vector2) {0}
-            );
-        }
-        
+        LoadSize(
+            &MainSize,
+            (Vector2) {0},
+            (Vector2) {
+                GetScreenWidth(),
+                GetScreenHeight()
+            },
+            (Vector2) {
+                GetScreenWidth() / GetMonitorWidth(0),
+                GetScreenHeight() / GetMonitorHeight(0)
+            },
+            (Vector2) {0}
+        );
+    
         MainLoadContainers(
             &Containers,
             MainSize
@@ -299,7 +297,7 @@ void MainDrawPanel(MainContainers Containers){
         BRIGHTWHITE
     );
 }
-void MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
+bool MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
     int i = 0;
     float ratioDistance = 0.1f;
     float widthScissor = ShowFuncBox.width - ShowFuncBox.width/4 * ratioDistance;
@@ -376,23 +374,23 @@ void MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
 
     if (CheckCollisionPointRec(Mouse, ManageBooksBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = MANAGEBOOKS;
-        return;
+        return 1;
     }
     
     if (CheckCollisionPointRec(Mouse, ManageUserBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = MANAGEUSER;
-        return;
+        return 1;
     }
 
     if (CheckCollisionPointRec(Mouse, ManageBorrowBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = MANAGEBORROWING;
-        return;
+        return 1;
     }
     
     if (CheckCollisionPointRec(Mouse, Login) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = LOGINAPP;
-        return;
+        return 1;
     }
 
-    return;
+    return 0;
 }

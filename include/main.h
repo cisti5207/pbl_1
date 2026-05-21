@@ -28,7 +28,7 @@ void MainDrawParticle(void);
 void MainDrawConnection(void);
 Color MainAnimatedBackground(void);
 void MainDrawPanel(MainContainers Containers);
-void MainFunc(Rectangle ShowFuncBox, Vector2 Mouse);
+bool MainFunc(Rectangle ShowFuncBox, Vector2 Mouse);
 
 
 #endif // MAIN_H

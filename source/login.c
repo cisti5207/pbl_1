@@ -676,7 +676,7 @@ void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Tex
     if (_PasswordBox->isFocused) {
         UpdateInputBox(_PasswordBox);
 
-        if (CheckCollisionPointRec(mouse, _PasswordBox->box) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
+        if (CheckCollisionPointRec(mouse, Show_PasswordBox) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
             float w = MeasureTextEx(
                 _Font[0], 
                 _PasswordBox->text, 
@@ -755,7 +755,7 @@ void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Tex
     }
 
     else if (_PasswordBox -> length > 0) {
-        if (CheckCollisionPointRec(mouse, _PasswordBox->box) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
+        if (CheckCollisionPointRec(mouse, Show_PasswordBox) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
             float w = MeasureTextEx(
                 _Font[0], 
                 _PasswordBox->text, 

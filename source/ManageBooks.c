@@ -55,6 +55,7 @@ void InitManageBooks(Role _role){
     Texture2D Avatar = LoadTexture (MANAGEBOOKS_Avatar);
     Texture2D Icon_Find = LoadTexture (Icon_Find_lnk);
 
+    float wheel = 0;
 
     while (!WindowShouldClose()){
         if (IsWindowResized()){
@@ -84,16 +85,19 @@ void InitManageBooks(Role _role){
 
         ManageBooksTitle(Avatar, customUI);
 
-        if (ManageBooksFunc(&State, &FindBar, Icon_Find, customUI, ManageBooksSize, _Font) == 1)
-            Books->page = 1;
+        if (ManageBooksFunc(&State, &FindBar, Icon_Find, customUI, ManageBooksSize, _Font) == 1){
+            Books->pos = 0;
+            wheel = 0;
+        }
         
-
         switch(State)
         {
             Vector2 TextWidth;
             Rectangle HeaderBox;
+            int count;
             case MANAGEBOOKS_Dashboard:
-                ShowBooks_Panel(ManageBooksSize, customUI, _Font, *Books, NULL, NULL);
+                count = CountStrInBooks(*Books, NULL, IDLE_STATEFINDBOOK);
+                ShowBooks_Panel(ManageBooksSize, customUI, &wheel, _Font, *Books, NULL, NULL, count);
                 break;
             case MANAGEBOOKS_Author:
                 TextWidth = MeasureTextEx (
@@ -274,10 +278,35 @@ void ManageBooksTitle(Texture2D icon, ManageBooksUI UI){
     );
 }
 
-void ShowBooks_Panel(Size size, ManageBooksUI UI, Font *_Font, BookList Books, char *author, char *type) {
+int CountStrInBooks (BookList Books, const char *Str, StateFindBook state){
+    int count = 0;
+    for (int i = Books.pos; i < Books.count && count <= Books.QuantityForOnePage; i++){
+        switch (state){
+            case CODE:
+                if (strcmp(Books.theArray[i].CodeBook, Str) == 0)
+                    count++;
+            case NAME:
+                if (strcmp(Books.theArray[i].NameBook, Str) == 0)
+                    count++;
+            case AUTHOR:
+                if (strcmp(Books.theArray[i].AuthorBook, Str) == 0)
+                    count++;
+            case TYPE:
+                if (strcmp(Books.theArray[i].TypeBook, Str) == 0)
+                    count++;
+            case PUBLISHER:
+                if (strcmp(Books.theArray[i].PublisherBook, Str) == 0)
+                    count++;
+            default:
+                count++;
+        }
+    }
+    return count - 1;
+}
+void ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, BookList Books, char *author, char *type, int Quantity) {
     Rectangle hitbox = {
         UI.Panel.x + UI.Panel.width * 0.08f,
-        UI.Panel.y + DISTANCE_BOOKS,
+        *wheel + UI.Panel.y + UI.Panel.height * 0.03f,
         UI.Panel.width * 0.8f,
         UI.Panel.height * 0.06f * (pow (0.3, size.Scale.x) + 0.6)
     };
@@ -290,13 +319,22 @@ void ShowBooks_Panel(Size size, ManageBooksUI UI, Font *_Font, BookList Books, c
     );
 
     float Distance_Books = DISTANCE_BOOKS;
-    float ScrollBar = UI.Panel.height * 0.1f + UI.Panel.height * 0.05f + (hitbox.height + Distance_Books) * Books.QuantityForOnePage;
+    float ScrollBar = UI.Panel.height * 0.03f + UI.Panel.height * 0.05f + (hitbox.height + Distance_Books) * Quantity;
 
+    if (GetMouseWheelMove() == 1)
+        *wheel += UI.Panel.height * 0.03f;
+    else if (GetMouseWheelMove() == -1)
+        *wheel -= UI.Panel.height * 0.03f;
 
-    int i = (Books.page - 1) * Books.QuantityForOnePage;
+    if (*wheel > 0) 
+        *wheel = 0;
+    else if (*wheel < UI.Panel.height - ScrollBar)
+        *wheel = UI.Panel.height - ScrollBar;
+
+    int i = Books.pos;
     int count = 0;
     int flag = 0;
-    while (count < Books.QuantityForOnePage && i != Books.count){
+    while (count < Quantity && i != Books.count){
         if (author != NULL){
             if (strcmp(author, Books.theArray[i].AuthorBook) == 0) 
                 flag = 1;
@@ -311,7 +349,6 @@ void ShowBooks_Panel(Size size, ManageBooksUI UI, Font *_Font, BookList Books, c
         if (flag == 1){
             float radius;
             int FontSize;
-            float TextWidth;
 
             hitbox = (Rectangle) {
                 hitbox.x,
@@ -356,35 +393,21 @@ void ShowBooks_Panel(Size size, ManageBooksUI UI, Font *_Font, BookList Books, c
                 1,
                 BLACK
             );
-
-            TextWidth = MeasureTextEx (
+            
+            FontSize = hitbox.height * 0.8f;
+            DrawTextEx (
                 _Font[0],
                 Books.theArray[i].NameBook,
-                code_hitbox.height * 0.6f,
-                1
-            ).x;
+                (Vector2) {
 
-            Rectangle name_hitbox = {
-                code_hitbox.x + hitbox.width,
-                code_hitbox.y + code_hitbox.height * 0.1f,
-                TextWidth + code_hitbox.width * 0.1f,
-                code_hitbox.height * 0.8f
-            };
-
-            radius = FindRoundness (name_hitbox.height * 0.1f, name_hitbox.width, name_hitbox.height);
-            DrawRectangleRounded (
-                name_hitbox,
-                radius,
-                10,
-                SOFTWHITE
-            );
-            
+                }
+            )
             count++;
         }
         i++;
-    }   
-    if (author == NULL && type == NULL)
-        Books.page++;
+    }
+
+    Books.pos = i - 1;
 
     EndScissorMode();    
 }
@@ -931,7 +954,7 @@ BookList *Loadbooks(const char *filename){
     fscanf(file, "Số lượng truyện hiện tại: %d\n", &(bookList->stockBooks));
     fscanf(file, "Số lượng truyện gốc: %d\n", &(bookList->totalImportBooks));
 
-    bookList->page = 1;
+    bookList->pos = 0;
     bookList->QuantityForOnePage = QUANTITYFORONEPAGE;
 
     Book book;
@@ -1016,7 +1039,6 @@ AuthorList *LoadAuthor(const char *filename){
     int count;
     fscanf (f, "Tổng: %d\n", &count);
 
-
     AuthorList *A = malloc (sizeof(AuthorList));
     if (A == NULL) 
         return NULL;
@@ -1027,7 +1049,7 @@ AuthorList *LoadAuthor(const char *filename){
         return NULL;
     }
     A->count = 0;
-    while (!(fscanf(f, " | %[^|]| %[^|]|\n", A->Author[A->count].code, A->Author[A->count].name) == 2)) {
+    while ((fscanf(f, " | %[^|]| %[^|]|\n", A->Author[A->count].code, A->Author[A->count].name) == 2)) {
         trim(A->Author[A->count].code);
         trim(A->Author[A->count].name);
         A->count++;
@@ -1035,6 +1057,7 @@ AuthorList *LoadAuthor(const char *filename){
 
     fclose(f);
     if (A->count != count){
+        printf ("%d\n", A->count);
         free(A);
         return NULL;
     }
