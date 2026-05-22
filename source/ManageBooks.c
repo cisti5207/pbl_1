@@ -88,7 +88,12 @@ void InitManageBooks(Role _role){
         // =======================================================
         // VẼ CÁC NÚT ĐIỀU HƯỚNG TẠI KHU VỰC HEADERBOX
         // =======================================================
-        if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail) {
+        bool isFiltering = (State == MANAGEBOOKS_Author && selectedAuthor[0] != '\0') ||
+                           (State == MANAGEBOOKS_Publisher && selectedPublisher[0] != '\0') ||
+                           (State == MANAGEBOOKS_Type && selectedType[0] != '\0') ||
+                           (State == MANAGEBOOKS_Find && FindBar.text[0] != '\0');
+
+        if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail || isFiltering) {
             // Nút Back nằm bên trái HeaderBox
             Rectangle btnBackHeader = {
                 customUI.HeaderBox.x + 20,
@@ -102,10 +107,26 @@ void InitManageBooks(Role _role){
             DrawTextEx(_Font[0], "<- Back", (Vector2){btnBackHeader.x + 12, btnBackHeader.y + 10}, 20, 1, WHITE);
             
             if (hoverBack && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                State = prevState;
+                if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail) {
+                    State = prevState;
+                } else {
+                    // Xóa trạng thái filter để quay về danh sách cha
+                    if (State == MANAGEBOOKS_Author) selectedAuthor[0] = '\0';
+                    else if (State == MANAGEBOOKS_Publisher) selectedPublisher[0] = '\0';
+                    else if (State == MANAGEBOOKS_Type) selectedType[0] = '\0';
+                    else if (State == MANAGEBOOKS_Find) {
+                        FindBar.text[0] = '\0';
+                        FindBar.length = 0;
+                        State = MANAGEBOOKS_Dashboard;
+                    }
+                    wheel = 0;
+                    Books->currentPage = 1;
+                }
             }
-            
-        } else if (_role == ADMINISTRATOR) {
+        }
+        
+        // Độc lập logic: Nút thêm truyện luôn hiện nếu là ADMIN và không ở trong giao diện Add/Detail
+        if (_role == ADMINISTRATOR && State != MANAGEBOOKS_Add && State != MANAGEBOOKS_Detail) {
             // Nút Thêm Truyện nằm bên phải HeaderBox
             Rectangle btnAddHeader = {
                 customUI.HeaderBox.x + customUI.HeaderBox.width - 180,
@@ -176,7 +197,7 @@ void InitManageBooks(Role _role){
                         State = MANAGEBOOKS_Detail; 
                     }
 
-                    DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, selectedAuthor, showPagination);
+                    DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, NULL, showPagination);
                 }
                 break;
 
@@ -194,7 +215,7 @@ void InitManageBooks(Role _role){
                         prevState = State; 
                         State = MANAGEBOOKS_Detail; 
                     }
-                    DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, selectedPublisher, showPagination);
+                    DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, NULL, showPagination);
                 }
                 break;
 
@@ -212,7 +233,7 @@ void InitManageBooks(Role _role){
                         prevState = State; 
                         State = MANAGEBOOKS_Detail; 
                     }
-                    DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, selectedType, showPagination);
+                    DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, NULL, showPagination);
                 }
                 break;
 
@@ -266,14 +287,7 @@ void InitManageBooks(Role _role){
                     State = MANAGEBOOKS_Detail; 
                 }
                 
-                char searchBackTarget[2] = "S"; 
-                DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, searchBackTarget, showPagination);
-                
-                if (searchBackTarget[0] == '\0') {
-                    FindBar.text[0] = '\0';
-                    FindBar.length = 0;
-                    State = MANAGEBOOKS_Dashboard;
-                }
+                DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, NULL, showPagination);
                 break;
 
             case MANAGEBOOKS_Main:
@@ -450,25 +464,40 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         "Thể Loại:", 
         "Nhà Xuất Bản:", 
         "Năm Sản Xuất:", 
-        "Giá Bán (VND):",
-        "Mô Tả Truyện:"
+        "Giá Bán (VND):"
     };
     
-    float startX = panelArea.x + 100;
-    float startY = panelArea.y + 100;
-    float spacingY = 60; // Thu hẹp lại để nhét đủ 8 dòng
+    float leftMargin = panelArea.width * 0.05f;
+    float leftColWidth = panelArea.width * 0.45f;   
+    float rightColX = panelArea.x + panelArea.width * 0.52f; 
+    float rightColWidth = panelArea.width * 0.43f;  
+    
+    float startY = panelArea.y + 110;
+    float spacingY = 65; 
+    float labelFixedW = 230.0f; 
 
     bool clickedAnywhere = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 
     for (int i = 0; i < 8; i++) {
-        DrawTextEx(_Font[0], labels[i], (Vector2){startX, startY + i * spacingY + 10}, 25, 1, LIGHTGRAY);
-        
-        inputs[i].box = (Rectangle){ 
-            startX + 250, 
-            startY + i * spacingY, 
-            panelArea.width * 0.5f, 
-            45 
-        };
+        if (i < 7) {
+            DrawTextEx(_Font[0], labels[i], (Vector2){panelArea.x + leftMargin, startY + i * spacingY + 10}, 25, 1, LIGHTGRAY);
+            
+            inputs[i].box = (Rectangle){ 
+                panelArea.x + leftMargin + labelFixedW, 
+                startY + i * spacingY, 
+                leftColWidth - labelFixedW, 
+                45 
+            };
+        } else {
+            DrawTextEx(_Font[0], "Mô Tả Truyện:", (Vector2){rightColX, startY}, 25, 1, ORANGE);
+            
+            inputs[i].box = (Rectangle){
+                rightColX,
+                startY + 35,
+                rightColWidth,
+                (6 * spacingY) + 45 - 35 
+            };
+        }
 
         if (clickedAnywhere) {
             if (CheckCollisionPointRec(size.Mouse, inputs[i].box)) {
@@ -479,6 +508,8 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         }
 
         float roundness = FindRoundness(0.05f * inputs[i].box.width, inputs[i].box.width, inputs[i].box.height);
+        if (i == 7) roundness = 0.05f; 
+
         DrawRectangleRounded(inputs[i].box, roundness, 10, inputs[i].isFocused ? WHITESMOKE : GRAY);
         DrawRectangleRoundedLinesEx(inputs[i].box, roundness, 10, 2.0f, inputs[i].isFocused ? TEALBLUE : DARKGRAY);
 
@@ -491,40 +522,57 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
             }
         }
 
-        BeginScissorMode(
-            (int)inputs[i].box.x + 10, 
-            (int)inputs[i].box.y, 
-            (int)inputs[i].box.width - 20, 
-            (int)inputs[i].box.height
-        );
-        
-        float textW = MeasureTextEx(_Font[3], inputs[i].text, 22, 1).x;
-        float textX = inputs[i].box.x + 10;
-        
-        if (textW > inputs[i].box.width - 30) {
-            textX = inputs[i].box.x + 10 - (textW - (inputs[i].box.width - 30));
+        if (i < 7) {
+            BeginScissorMode((int)inputs[i].box.x + 10, (int)inputs[i].box.y, (int)inputs[i].box.width - 20, (int)inputs[i].box.height);
+            
+            float textW = MeasureTextEx(_Font[3], inputs[i].text, 22, 1).x;
+            float textX = inputs[i].box.x + 10;
+            
+            if (textW > inputs[i].box.width - 30) {
+                textX = inputs[i].box.x + 10 - (textW - (inputs[i].box.width - 30));
+            }
+            
+            DrawTextEx(_Font[3], inputs[i].text, (Vector2){textX, inputs[i].box.y + 12}, 22, 1, BLACK);
+            
+            if (inputs[i].isFocused && ((int)(GetTime() * 2) % 2 == 0)) {
+                DrawRectangle(textX + textW + 2, inputs[i].box.y + 10, 2, 25, BLACK);
+            }
+            EndScissorMode();
+            
+        } else {
+            BeginScissorMode((int)inputs[i].box.x, (int)inputs[i].box.y, (int)inputs[i].box.width, (int)inputs[i].box.height);
+            
+            char tempText[8192]; 
+            strcpy(tempText, inputs[i].text);
+            if (inputs[i].isFocused && ((int)(GetTime() * 2) % 2 == 0)) {
+                strcat(tempText, "|");
+            }
+            
+            Rectangle textHitbox = {
+                inputs[i].box.x + 15,
+                inputs[i].box.y + 15,
+                inputs[i].box.width - 30,
+                inputs[i].box.height - 30
+            };
+            
+            DrawTextAutoWrap(_Font[3], tempText, textHitbox, 22.0f, 1.0f, BLACK);
+            EndScissorMode();
         }
-        
-        DrawTextEx(_Font[3], inputs[i].text, (Vector2){textX, inputs[i].box.y + 12}, 22, 1, BLACK);
-        
-        if (inputs[i].isFocused && ((int)(GetTime() * 2) % 2 == 0)) {
-            DrawRectangle(textX + textW + 2, inputs[i].box.y + 10, 2, 25, BLACK);
-        }
-        EndScissorMode();
     }
 
-    // Nút Lưu nằm ở dưới cùng
-    float btnY = startY + 8 * spacingY + 15;
     Rectangle btnSave = { 
-        startX + 250, 
-        btnY, 
-        150, 
+        panelArea.x + (panelArea.width / 2) - 100, 
+        panelArea.y + panelArea.height - 70, 
+        200, 
         50 
     };
 
     bool hoverSave = CheckCollisionPointRec(size.Mouse, btnSave);
     DrawRectangleRounded(btnSave, 0.2f, 10, hoverSave ? LIME : SUCCESSGREEN);
-    DrawTextEx(_Font[0], "LƯU TRUYỆN", (Vector2){btnSave.x + 15, btnSave.y + 15}, 20, 1, WHITE);
+    
+    float wSave = MeasureTextEx(_Font[0], "LƯU TRUYỆN", 22, 1).x;
+    DrawTextEx(_Font[0], "LƯU TRUYỆN", (Vector2){btnSave.x + (btnSave.width - wSave)/2, btnSave.y + 14}, 22, 1, WHITE);
+    
     if (hoverSave && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         result = 1;
     }
@@ -534,6 +582,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
 
 int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, BookList *Books, int filterMode, const char *filterValue, Role _role, bool *showPagination, int *requestDeleteIndex) {
     int clickedIndex = -1;
+    bool isMouseInPanel = CheckCollisionPointRec(size.Mouse, UI.Panel);
     
     Rectangle hitbox = { 
         UI.Panel.x + UI.Panel.width * 0.05f, 
@@ -603,7 +652,7 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
         int i = renderList[idx];
         hitbox.y = *wheel + UI.Panel.y + UI.Panel.height * 0.03f + (hitbox.height + Distance_Books) * idx;
 
-        bool isHoveredBook = CheckCollisionPointRec(size.Mouse, hitbox);
+        bool isHoveredBook = CheckCollisionPointRec(size.Mouse, hitbox) && isMouseInPanel;
         float radius = FindRoundness(hitbox.width * 0.005f, hitbox.width, hitbox.height);
         
         DrawRectangleRounded(hitbox, radius, 50, isHoveredBook ? Fade(BLACK, 0.8f) : BLACK);
@@ -621,7 +670,7 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
                 trashSize 
             };
             
-            if (CheckCollisionPointRec(size.Mouse, trashBox)) {
+            if (CheckCollisionPointRec(size.Mouse, trashBox) && isMouseInPanel) {
                 clickedTrash = true;
                 DrawRectangleRounded(trashBox, 0.2f, 10, MAROON);
                 if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -694,7 +743,7 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
     }
 
     if (TotalContentHeight > UI.Panel.height) {
-        float scrollTrackWidth = 10.0f;
+        float scrollTrackWidth = 12.0f; // Tăng độ rộng chút xíu cho dễ nắm
         Rectangle scrollTrack = { 
             UI.Panel.x + UI.Panel.width - scrollTrackWidth - 5, 
             UI.Panel.y + 5, 
@@ -706,7 +755,8 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
         float handleHeight = (UI.Panel.height / TotalContentHeight) * scrollTrack.height;
         if (handleHeight < 30.0f) handleHeight = 30.0f; 
         
-        float scrollRatio = -(*wheel) / (TotalContentHeight - UI.Panel.height);
+        float scrollableWheel = TotalContentHeight - UI.Panel.height;
+        float scrollRatio = -(*wheel) / scrollableWheel;
         float handleY = scrollTrack.y + scrollRatio * (scrollTrack.height - handleHeight);
         
         Rectangle scrollHandle = { 
@@ -715,7 +765,33 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
             scrollTrackWidth, 
             handleHeight 
         };
-        DrawRectangleRounded(scrollHandle, 1.0f, 10, Fade(DARKGRAY, 0.8f));
+
+        // --- DRAG LOGIC ---
+        static bool isDraggingBooks = false;
+        static float dragOffsetBooksY = 0.0f;
+        
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(size.Mouse, scrollHandle)) {
+            isDraggingBooks = true;
+            dragOffsetBooksY = size.Mouse.y - scrollHandle.y;
+        }
+        
+        if (isDraggingBooks) {
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+                float newHandleY = size.Mouse.y - dragOffsetBooksY;
+                if (newHandleY < scrollTrack.y) newHandleY = scrollTrack.y;
+                if (newHandleY > scrollTrack.y + scrollTrack.height - handleHeight) 
+                    newHandleY = scrollTrack.y + scrollTrack.height - handleHeight;
+                
+                float newRatio = (newHandleY - scrollTrack.y) / (scrollTrack.height - handleHeight);
+                *wheel = -(newRatio * scrollableWheel);
+                scrollHandle.y = newHandleY; // Hiệu ứng kéo mượt tức thời
+            } else {
+                isDraggingBooks = false;
+            }
+        }
+        
+        bool isHoveredScroll = CheckCollisionPointRec(size.Mouse, scrollHandle) || isDraggingBooks;
+        DrawRectangleRounded(scrollHandle, 1.0f, 10, isHoveredScroll ? GRAY : Fade(DARKGRAY, 0.8f));
     }
 
     EndScissorMode();
@@ -724,6 +800,7 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
 }
 
 void ShowAuthor_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, AuthorList *Authors, char *selectedAuthor, BookList *Books) {
+    bool isMouseInPanel = CheckCollisionPointRec(size.Mouse, UI.Panel);
     float itemHeight = 60.0f;
     float distance = 15.0f;
     int displayCount = Authors->count;
@@ -749,7 +826,7 @@ void ShowAuthor_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Au
             itemHeight 
         };
 
-        bool isHovered = CheckCollisionPointRec(size.Mouse, hitbox);
+        bool isHovered = CheckCollisionPointRec(size.Mouse, hitbox) && isMouseInPanel;
         DrawRectangleRounded(hitbox, 0.2f, 20, isHovered ? Fade(TEALBLUE, 0.8f) : Fade(BLACK, 0.7f));
 
         DrawTextEx(_Font[0], Authors->Author[i].code, (Vector2){hitbox.x + 20, hitbox.y + 15}, 30, 1, isHovered ? GOLDACCENT : LIGHTGRAY);
@@ -768,7 +845,7 @@ void ShowAuthor_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Au
     }
 
     if (TotalContentHeight > UI.Panel.height) {
-        float scrollTrackWidth = 10.0f;
+        float scrollTrackWidth = 12.0f;
         Rectangle scrollTrack = { 
             UI.Panel.x + UI.Panel.width - scrollTrackWidth - 5, 
             UI.Panel.y + 5, 
@@ -776,21 +853,53 @@ void ShowAuthor_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Au
             UI.Panel.height - 10 
         };
         DrawRectangleRounded(scrollTrack, 1.0f, 10, Fade(GRAY, 0.3f));
+        
         float handleHeight = (UI.Panel.height / TotalContentHeight) * scrollTrack.height;
         if (handleHeight < 30.0f) handleHeight = 30.0f; 
-        float scrollRatio = -(*wheel) / (TotalContentHeight + distance - UI.Panel.height);
+        
+        float scrollableWheel = TotalContentHeight + distance - UI.Panel.height;
+        float scrollRatio = -(*wheel) / scrollableWheel;
+        float handleY = scrollTrack.y + scrollRatio * (scrollTrack.height - handleHeight);
+        
         Rectangle scrollHandle = { 
             scrollTrack.x, 
-            scrollTrack.y + scrollRatio * (scrollTrack.height - handleHeight), 
+            handleY, 
             scrollTrackWidth, 
             handleHeight 
         };
-        DrawRectangleRounded(scrollHandle, 1.0f, 10, Fade(DARKGRAY, 0.8f));
+
+        // --- DRAG LOGIC ---
+        static bool isDraggingAuthors = false;
+        static float dragOffsetAuthorsY = 0.0f;
+        
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(size.Mouse, scrollHandle)) {
+            isDraggingAuthors = true;
+            dragOffsetAuthorsY = size.Mouse.y - scrollHandle.y;
+        }
+        
+        if (isDraggingAuthors) {
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+                float newHandleY = size.Mouse.y - dragOffsetAuthorsY;
+                if (newHandleY < scrollTrack.y) newHandleY = scrollTrack.y;
+                if (newHandleY > scrollTrack.y + scrollTrack.height - handleHeight) 
+                    newHandleY = scrollTrack.y + scrollTrack.height - handleHeight;
+                
+                float newRatio = (newHandleY - scrollTrack.y) / (scrollTrack.height - handleHeight);
+                *wheel = -(newRatio * scrollableWheel);
+                scrollHandle.y = newHandleY; 
+            } else {
+                isDraggingAuthors = false;
+            }
+        }
+        
+        bool isHoveredScroll = CheckCollisionPointRec(size.Mouse, scrollHandle) || isDraggingAuthors;
+        DrawRectangleRounded(scrollHandle, 1.0f, 10, isHoveredScroll ? GRAY : Fade(DARKGRAY, 0.8f));
     }
     EndScissorMode();
 }
 
 void ShowPublisher_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, PublisherList *Publishers, char *selectedPublisher, BookList *Books) {
+    bool isMouseInPanel = CheckCollisionPointRec(size.Mouse, UI.Panel);
     float itemHeight = 60.0f;
     float distance = 15.0f;
     int displayCount = Publishers->count;
@@ -813,7 +922,7 @@ void ShowPublisher_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font,
             itemHeight 
         };
         
-        bool isHovered = CheckCollisionPointRec(size.Mouse, hitbox);
+        bool isHovered = CheckCollisionPointRec(size.Mouse, hitbox) && isMouseInPanel;
         DrawRectangleRounded(hitbox, 0.2f, 20, isHovered ? Fade(TEALBLUE, 0.8f) : Fade(BLACK, 0.7f));
 
         DrawTextEx(_Font[0], Publishers->Publisher[i], (Vector2){hitbox.x + 30, hitbox.y + 15}, 30, 1, isHovered ? GOLDACCENT : WHITE);
@@ -828,10 +937,63 @@ void ShowPublisher_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font,
             *wheel = 0; Books->currentPage = 1;
         }
     }
+
+    if (TotalContentHeight > UI.Panel.height) {
+        float scrollTrackWidth = 12.0f;
+        Rectangle scrollTrack = { 
+            UI.Panel.x + UI.Panel.width - scrollTrackWidth - 5, 
+            UI.Panel.y + 5, 
+            scrollTrackWidth, 
+            UI.Panel.height - 10 
+        };
+        DrawRectangleRounded(scrollTrack, 1.0f, 10, Fade(GRAY, 0.3f));
+        
+        float handleHeight = (UI.Panel.height / TotalContentHeight) * scrollTrack.height;
+        if (handleHeight < 30.0f) handleHeight = 30.0f; 
+        
+        float scrollableWheel = TotalContentHeight + distance - UI.Panel.height;
+        float scrollRatio = -(*wheel) / scrollableWheel;
+        float handleY = scrollTrack.y + scrollRatio * (scrollTrack.height - handleHeight);
+        
+        Rectangle scrollHandle = { 
+            scrollTrack.x, 
+            handleY, 
+            scrollTrackWidth, 
+            handleHeight 
+        };
+
+        // --- DRAG LOGIC ---
+        static bool isDraggingPubs = false;
+        static float dragOffsetPubsY = 0.0f;
+        
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(size.Mouse, scrollHandle)) {
+            isDraggingPubs = true;
+            dragOffsetPubsY = size.Mouse.y - scrollHandle.y;
+        }
+        
+        if (isDraggingPubs) {
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+                float newHandleY = size.Mouse.y - dragOffsetPubsY;
+                if (newHandleY < scrollTrack.y) newHandleY = scrollTrack.y;
+                if (newHandleY > scrollTrack.y + scrollTrack.height - handleHeight) 
+                    newHandleY = scrollTrack.y + scrollTrack.height - handleHeight;
+                
+                float newRatio = (newHandleY - scrollTrack.y) / (scrollTrack.height - handleHeight);
+                *wheel = -(newRatio * scrollableWheel);
+                scrollHandle.y = newHandleY; 
+            } else {
+                isDraggingPubs = false;
+            }
+        }
+        
+        bool isHoveredScroll = CheckCollisionPointRec(size.Mouse, scrollHandle) || isDraggingPubs;
+        DrawRectangleRounded(scrollHandle, 1.0f, 10, isHoveredScroll ? GRAY : Fade(DARKGRAY, 0.8f));
+    }
     EndScissorMode();
 }
 
 void ShowType_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Type *Types, char *selectedType, BookList *Books) {
+    bool isMouseInPanel = CheckCollisionPointRec(size.Mouse, UI.Panel);
     float itemHeight = 60.0f;
     float distance = 15.0f;
     int displayCount = Types->count;
@@ -856,7 +1018,7 @@ void ShowType_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Type
             itemHeight 
         };
         
-        bool isHovered = CheckCollisionPointRec(size.Mouse, hitbox);
+        bool isHovered = CheckCollisionPointRec(size.Mouse, hitbox) && isMouseInPanel;
         DrawRectangleRounded(hitbox, 0.2f, 20, isHovered ? Fade(TEALBLUE, 0.8f) : Fade(BLACK, 0.7f));
 
         DrawTextEx(_Font[0], Types->Type[i], (Vector2){hitbox.x + 30, hitbox.y + 15}, 30, 1, isHovered ? GOLDACCENT : WHITE);
@@ -874,7 +1036,7 @@ void ShowType_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Type
     }
 
     if (TotalContentHeight > UI.Panel.height) {
-        float scrollTrackWidth = 10.0f;
+        float scrollTrackWidth = 12.0f;
         Rectangle scrollTrack = { 
             UI.Panel.x + UI.Panel.width - scrollTrackWidth - 5, 
             UI.Panel.y + 5, 
@@ -886,14 +1048,43 @@ void ShowType_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Type
         float handleHeight = (UI.Panel.height / TotalContentHeight) * scrollTrack.height;
         if (handleHeight < 30.0f) handleHeight = 30.0f; 
 
-        float scrollRatio = -(*wheel) / (TotalContentHeight + distance - UI.Panel.height);
+        float scrollableWheel = TotalContentHeight + distance - UI.Panel.height;
+        float scrollRatio = -(*wheel) / scrollableWheel;
+        float handleY = scrollTrack.y + scrollRatio * (scrollTrack.height - handleHeight);
+        
         Rectangle scrollHandle = { 
             scrollTrack.x, 
-            scrollTrack.y + scrollRatio * (scrollTrack.height - handleHeight), 
+            handleY, 
             scrollTrackWidth, 
             handleHeight 
         };
-        DrawRectangleRounded(scrollHandle, 1.0f, 10, Fade(DARKGRAY, 0.8f)); 
+
+        // --- DRAG LOGIC ---
+        static bool isDraggingTypes = false;
+        static float dragOffsetTypesY = 0.0f;
+        
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(size.Mouse, scrollHandle)) {
+            isDraggingTypes = true;
+            dragOffsetTypesY = size.Mouse.y - scrollHandle.y;
+        }
+        
+        if (isDraggingTypes) {
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+                float newHandleY = size.Mouse.y - dragOffsetTypesY;
+                if (newHandleY < scrollTrack.y) newHandleY = scrollTrack.y;
+                if (newHandleY > scrollTrack.y + scrollTrack.height - handleHeight) 
+                    newHandleY = scrollTrack.y + scrollTrack.height - handleHeight;
+                
+                float newRatio = (newHandleY - scrollTrack.y) / (scrollTrack.height - handleHeight);
+                *wheel = -(newRatio * scrollableWheel);
+                scrollHandle.y = newHandleY; 
+            } else {
+                isDraggingTypes = false;
+            }
+        }
+        
+        bool isHoveredScroll = CheckCollisionPointRec(size.Mouse, scrollHandle) || isDraggingTypes;
+        DrawRectangleRounded(scrollHandle, 1.0f, 10, isHoveredScroll ? GRAY : Fade(DARKGRAY, 0.8f)); 
     }
 
     EndScissorMode();
@@ -987,29 +1178,9 @@ int CountStrInBooks (BookList *Books, const char *Str, StateFindBook state){
 void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, float *wheel, char *backTarget, bool isVisible) {
     if (!isVisible) return; 
 
-    bool hasBack = (backTarget != NULL && backTarget[0] != '\0');
-    if (Books->totalPages <= 1 && !hasBack) return;
+    if (Books->totalPages <= 1) return;
 
     DrawRectangleRec(UI.PaginationBox, Fade(SILVERGRAY, 0.95f));
-
-    if (hasBack) {
-        Rectangle backBtn = { 
-            UI.PaginationBox.x + 20, 
-            UI.PaginationBox.y + (UI.PaginationBox.height - 40) / 2, 
-            100, 
-            40 
-        };
-        
-        if (CheckCollisionPointRec(size.Mouse, backBtn)) {
-            DrawRectangleRounded(backBtn, 0.2f, 10, Fade(MAROON, 0.6f));
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                backTarget[0] = '\0';
-                *wheel = 0;
-                Books->currentPage = 1;
-            }
-        } else DrawRectangleRounded(backBtn, 0.2f, 10, Fade(ERRORRED, 0.8f));
-        DrawTextEx(_Font[3], "<- Back", (Vector2){backBtn.x + 18, backBtn.y + 10}, 20, 1, WHITE);
-    }
 
     if (Books->totalPages > 1) {
         float btnWidth = 40.0f;
