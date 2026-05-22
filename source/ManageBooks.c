@@ -449,7 +449,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         UI.Panel.x, 
         UI.Panel.y, 
         UI.Panel.width, 
-        UI.Panel.height + UI.PaginationBox.height 
+        UI.Panel.height // Đã bỏ phần cộng thêm PaginationBox gây tràn màn hình
     };
     
     DrawRectangleRec(panelArea, (Color){ 30, 30, 30, 255 });
@@ -560,9 +560,13 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         }
     }
 
+    // ==========================================
+    // NÚT LƯU TRUYỆN 
+    // Đã sửa trục Y để nằm an toàn bên trong màn hình
+    // ==========================================
     Rectangle btnSave = { 
         panelArea.x + (panelArea.width / 2) - 100, 
-        panelArea.y + panelArea.height - 70, 
+        UI.Panel.y + UI.Panel.height - 80, 
         200, 
         50 
     };
