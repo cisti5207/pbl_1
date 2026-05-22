@@ -4,6 +4,7 @@
 #include "raylib.h"
 
 #define MAX_INPUT 256
+#define MAX_PARTICLE 256 // Đã chuyển từ main.h sang đây
 
 #define BRIGHTWHITE     (Color){255, 255, 255, 255}
 #define BRIGHTGRAY      (Color){209, 209, 209, 255}
@@ -59,6 +60,7 @@ typedef enum{
     FOUND,
     FAILED
 } CheckResult;
+
 typedef enum {
     STAFF = 0,
     ADMINISTRATOR
@@ -77,6 +79,7 @@ typedef struct Particle {
     float radius;
     float alpha;
 } Particle;
+
 typedef struct {
     Vector2 Mouse;
     Vector2 Screen;
@@ -84,47 +87,29 @@ typedef struct {
     Vector2 Scale;
 } Size;
 
+// --- CÁC HÀM XỬ LÝ BACKGROUND ĐỘNG ---
+void InitParticles(Size size);
+void UpdateParticlesPosition(Size size);
+void DrawBackgroundParticles(void); 
+Color AnimatedBackground(void);
+
+// --- CÁC HÀM UI ---
 void LoadSize(Size *FormSize, Vector2 monitor, Vector2 screen, Vector2 scale, Vector2 mouse);
-/*
-    Cấp giá trị monitor, screen, scale và mouse cho Size
-    Với (Vector2) {0} thì các giá trị của Vector2 đó không đổi
-*/
-
 Font SetFontUTF8(const char *fontPath, int fontSize);
-/*
-    Dùng hàm này để cấp các font có sẵn trong folder "font"
-*/
-
 int lenStringUTF8(const char *str);
-/*
-    Hàm này sẽ độ dài chữ của UTF8
-*/
 void trim(char *str);
-/*
-    loại bỏ các dấu cách thừa phía trước và sau của chuỗi
-*/
 void DeleteLastWord(InputBox *input);
-// Ctrl + Backspace
-
 void PasteClipboard(InputBox *input);
-// Ctrl + V
-
 void DeleteLastChar(InputBox *input);
-// BackSpace
-
 void UpdateInputBox(InputBox *input);
-// Cập nhật chữ trong InputBox.text
-
 int UTF8Width(const char *s, int width);
-// Hàm này gọi là distance của utf8 sẽ hợp lí hơn, nó sẽ tính chênh lệch độ dài giữa độ dài thực tế và độ dài bit của string
-
 void DrawIcon(Rectangle box, Texture2D icon);
-// Vẽ icon theo khung box
-
 float FindRoundness(float len, float width, float height);
-// Tính tỉ lệ roundness của rounded hay circle, ví dụ dùng rounded thì cần cấp giá trị float roundness, nhưng t sẽ dùng hàm này để điều khiển tỉ lệ đó bo tròn theo ý thích
-
 int FindFontSize(float Width, Font font, int space, const char *str);
-// Tính FONT_SIZE cần thiết để đưa vào khung
+
+void FormatPriceToVND(int price, char *buffer);
+void DrawTextAutoWrap(Font font, const char *text, Rectangle bounds, float fontSize, float spacing, Color color);
+
+bool StringContains(const char *haystack, const char *needle);
 
 #endif // LIBMANAGE_H

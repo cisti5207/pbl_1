@@ -18,8 +18,7 @@
 #define LEN_SHOW_DOB 21
 #define LEN_SHOW_ROLE 13
 
-#define LOGIN_BACKGROUND_IMG "img/image2.png"
-#define FORM_LOGIN_IMG "img/image4.png"
+#define FORM_LOGIN_IMG "img/image9.png"
 #define WELCOME_TEXT "Welcome to HoanHoangLIB_DUT!"
 
 #define LOGIN_TEXT "LOGIN"
@@ -35,8 +34,6 @@
 #define ICON_USERNAME "img/icon1.png"
 #define ICON_PASSWORD "img/icon2.png"
 #define SHOW_PASSWORD "img/icon3.png"
-
-
 
 typedef struct Account {
     char username[MAX_LOGIN_USERNAME_LENGTH];
@@ -78,4 +75,4 @@ int LoginGetAccountData(const char *filename, AccountList accounts, int *account
 int LoginSaveAccountData(const char *filename, AccountList accounts, int accountCount);
 CheckResult Get_account_return(AccountList _account, Account *account, const char *username);
 
-#endif // LOGIN
+#endif // LOGIN_H
