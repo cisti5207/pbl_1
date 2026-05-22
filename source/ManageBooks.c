@@ -93,18 +93,36 @@ void InitManageBooks(Role _role){
                            (State == MANAGEBOOKS_Type && selectedType[0] != '\0') ||
                            (State == MANAGEBOOKS_Find && FindBar.text[0] != '\0');
 
+        // --- Tính toán kích thước động (Dynamic Sizing) ---
+        // Chiều cao nút bằng 60% chiều cao của HeaderBox
+        float btnHeight = customUI.HeaderBox.height * 0.6f; 
+        // Lề cách viền trái/phải bằng 2% chiều rộng HeaderBox
+        float marginX = customUI.HeaderBox.width * 0.02f;   
+        // Kích thước chữ bằng 50% chiều cao nút
+        int fontSizeBtn = (int)(btnHeight * 0.5f);          
+
         if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail || isFiltering) {
-            // Nút Back nằm bên trái HeaderBox
+            // Chiều rộng nút Back tỷ lệ 2.5 lần chiều cao
+            float btnWidthBack = btnHeight * 2.5f; 
+            
             Rectangle btnBackHeader = {
-                customUI.HeaderBox.x + 20,
-                customUI.HeaderBox.y + (customUI.HeaderBox.height - 40) / 2,
-                100,
-                40
+                customUI.HeaderBox.x + marginX,
+                customUI.HeaderBox.y + (customUI.HeaderBox.height - btnHeight) / 2.0f,
+                btnWidthBack,
+                btnHeight
             };
             
             bool hoverBack = CheckCollisionPointRec(ManageBooksSize.Mouse, btnBackHeader);
             DrawRectangleRounded(btnBackHeader, 0.2f, 10, hoverBack ? MAROON : ERRORRED);
-            DrawTextEx(_Font[0], "<- Back", (Vector2){btnBackHeader.x + 12, btnBackHeader.y + 10}, 20, 1, WHITE);
+            
+            // Căn giữa text trong nút Back
+            const char* textBack = "<- Back";
+            Vector2 sizeBack = MeasureTextEx(_Font[0], textBack, fontSizeBtn, 1);
+            Vector2 posBack = {
+                btnBackHeader.x + (btnBackHeader.width - sizeBack.x) / 2.0f,
+                btnBackHeader.y + (btnBackHeader.height - sizeBack.y) / 2.0f
+            };
+            DrawTextEx(_Font[0], textBack, posBack, fontSizeBtn, 1, WHITE);
             
             if (hoverBack && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail) {
@@ -127,17 +145,27 @@ void InitManageBooks(Role _role){
         
         // Độc lập logic: Nút thêm truyện luôn hiện nếu là ADMIN và không ở trong giao diện Add/Detail
         if (_role == ADMINISTRATOR && State != MANAGEBOOKS_Add && State != MANAGEBOOKS_Detail) {
-            // Nút Thêm Truyện nằm bên phải HeaderBox
+            // Chiều rộng nút Thêm Truyện tỷ lệ 4.5 lần chiều cao vì text dài hơn
+            float btnWidthAdd = btnHeight * 4.5f; 
+            
             Rectangle btnAddHeader = {
-                customUI.HeaderBox.x + customUI.HeaderBox.width - 180,
-                customUI.HeaderBox.y + (customUI.HeaderBox.height - 40) / 2,
-                160,
-                40
+                customUI.HeaderBox.x + customUI.HeaderBox.width - btnWidthAdd - marginX,
+                customUI.HeaderBox.y + (customUI.HeaderBox.height - btnHeight) / 2.0f,
+                btnWidthAdd,
+                btnHeight
             };
             
             bool hoverAdd = CheckCollisionPointRec(ManageBooksSize.Mouse, btnAddHeader);
             DrawRectangleRounded(btnAddHeader, 0.2f, 10, hoverAdd ? TEALBLUE : STEELBLUE);
-            DrawTextEx(_Font[3], "+ Thêm Truyện", (Vector2){btnAddHeader.x + 12, btnAddHeader.y + 10}, 20, 1, WHITE);
+            
+            // Căn giữa text trong nút Thêm Truyện
+            const char* textAdd = "+ Thêm Truyện";
+            Vector2 sizeAdd = MeasureTextEx(_Font[3], textAdd, fontSizeBtn, 1);
+            Vector2 posAdd = {
+                btnAddHeader.x + (btnAddHeader.width - sizeAdd.x) / 2.0f,
+                btnAddHeader.y + (btnAddHeader.height - sizeAdd.y) / 2.0f
+            };
+            DrawTextEx(_Font[3], textAdd, posAdd, fontSizeBtn, 1, WHITE);
             
             if (hoverAdd && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 // Làm sạch InputBox khi vào form
@@ -149,7 +177,6 @@ void InitManageBooks(Role _role){
                 prevState = State;
                 State = MANAGEBOOKS_Add;
             }
-        }
         
         // CƠ CHẾ XÓA SÁCH KHỎI MẢNG
         if (requestDeleteIndex != -1) {
@@ -160,6 +187,7 @@ void InitManageBooks(Role _role){
             Savebooks(*Books);
             requestDeleteIndex = -1;
         }
+    }
 
         int totalMatch = 0;
         int clickedBook = -1;
