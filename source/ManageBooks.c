@@ -466,7 +466,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         inputs[i].box = (Rectangle){ 
             startX + 250, 
             startY + i * spacingY, 
-            500, 
+            panelArea.width * 0.5f, 
             45 
         };
 
