@@ -99,7 +99,7 @@ void InitManageBooks(Role _role){
         // Lề cách viền trái/phải bằng 2% chiều rộng HeaderBox
         float marginX = customUI.HeaderBox.width * 0.02f;   
         // Kích thước chữ bằng 50% chiều cao nút
-        int fontSizeBtn = (int)(btnHeight * 0.5f);          
+        int fontSizeBtn = (int)(btnHeight * 0.75f);          
 
         if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail || isFiltering) {
             // Chiều rộng nút Back tỷ lệ 2.5 lần chiều cao
@@ -116,7 +116,7 @@ void InitManageBooks(Role _role){
             DrawRectangleRounded(btnBackHeader, 0.2f, 10, hoverBack ? MAROON : ERRORRED);
             
             // Căn giữa text trong nút Back
-            const char* textBack = "<- Back";
+            const char* textBack = "Back";
             Vector2 sizeBack = MeasureTextEx(_Font[0], textBack, fontSizeBtn, 1);
             Vector2 posBack = {
                 btnBackHeader.x + (btnBackHeader.width - sizeBack.x) / 2.0f,
@@ -159,7 +159,7 @@ void InitManageBooks(Role _role){
             DrawRectangleRounded(btnAddHeader, 0.2f, 10, hoverAdd ? TEALBLUE : STEELBLUE);
             
             // Căn giữa text trong nút Thêm Truyện
-            const char* textAdd = "+ Thêm Truyện";
+            const char* textAdd = "Thêm Truyện";
             Vector2 sizeAdd = MeasureTextEx(_Font[3], textAdd, fontSizeBtn, 1);
             Vector2 posAdd = {
                 btnAddHeader.x + (btnAddHeader.width - sizeAdd.x) / 2.0f,
