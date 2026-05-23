@@ -62,7 +62,6 @@ typedef enum {
 
 int InitLogin(Account *account_return);
 
-void LoginDrawBackground(Size LoginSize, Texture2D Img_Bg);
 void LoginDrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font);
 void LoginDrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT);
 void LoginDrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font);

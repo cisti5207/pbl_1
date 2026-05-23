@@ -7,16 +7,22 @@
 #include <math.h>
 #include <ctype.h>
 
-// =========================================================================
-// HÀM KHỞI TẠO VÀ VÒNG LẶP CHÍNH CỦA QUẢN LÝ SÁCH
-// =========================================================================
 void InitManageBooks(Role _role){
     Size ManageBooksSize;
     LoadSize(
         &ManageBooksSize,
-        (Vector2) { GetMonitorWidth(0), GetMonitorHeight(0) }, 
-        (Vector2) { GetScreenWidth(), GetScreenHeight() },
-        (Vector2) { (float)GetScreenWidth() / GetMonitorWidth(0), (float)GetScreenHeight() / GetMonitorHeight(0) },
+        (Vector2) { 
+            GetMonitorWidth(0), 
+            GetMonitorHeight(0) 
+        }, 
+        (Vector2) { 
+            GetScreenWidth(), 
+            GetScreenHeight() 
+        },
+        (Vector2) { 
+            (float)GetScreenWidth() / GetMonitorWidth(0), 
+            (float)GetScreenHeight() / GetMonitorHeight(0) 
+        },
         GetMousePosition()
     );
 
@@ -37,9 +43,12 @@ void InitManageBooks(Role _role){
     Type* Types = LoadType(Books);
     PublisherList* Publishers = LoadPublisher(Books);
 
-    if (Books == NULL) printf("FAILED!! Cann't load dataTruyen.txt\n");
-    if (Authors == NULL) printf("FAILED!! Cann't load author.txt\n");
-    if (Types == NULL) printf("FAILED!! Cann't load Type from Books\n");
+    if (Books == NULL) 
+        printf("FAILED!! Cann't load dataTruyen.txt\n");
+    if (Authors == NULL) 
+        printf("FAILED!! Cann't load author.txt\n");
+    if (Types == NULL) 
+        printf("FAILED!! Cann't load Type from Books\n");
 
     LoadDescription(Books, DESCRIPTION_FILE);
 
@@ -56,15 +65,25 @@ void InitManageBooks(Role _role){
     int selectedBookIndex = -1; 
     int requestDeleteIndex = -1; 
     
-    // Đổi thành 8 để thêm ô Mô Tả
     InputBox addInputs[8] = {0}; 
 
     while (!WindowShouldClose()){
         UpdateParticlesPosition(ManageBooksSize);
 
         if (IsWindowResized()){
-            LoadSize(&ManageBooksSize, (Vector2){0}, (Vector2){GetScreenWidth(), GetScreenHeight()},
-                (Vector2){(float)GetScreenWidth()/GetMonitorWidth(0), (float)GetScreenHeight()/GetMonitorHeight(0)}, (Vector2){0});
+            LoadSize(
+                &ManageBooksSize, 
+                (Vector2) {0}, 
+                (Vector2) {
+                    GetScreenWidth(), 
+                    GetScreenHeight()
+                },
+                (Vector2) {
+                    (float)GetScreenWidth()/GetMonitorWidth(0), 
+                    (float)GetScreenHeight()/GetMonitorHeight(0)
+                }, 
+                (Vector2) {0}
+            );
             LoadManageBooksUI(&customUI, ManageBooksSize);
         }
         ManageBooksSize.Mouse = GetMousePosition();
@@ -88,21 +107,16 @@ void InitManageBooks(Role _role){
         // =======================================================
         // VẼ CÁC NÚT ĐIỀU HƯỚNG TẠI KHU VỰC HEADERBOX
         // =======================================================
-        bool isFiltering = (State == MANAGEBOOKS_Author && selectedAuthor[0] != '\0') ||
-                           (State == MANAGEBOOKS_Publisher && selectedPublisher[0] != '\0') ||
-                           (State == MANAGEBOOKS_Type && selectedType[0] != '\0') ||
-                           (State == MANAGEBOOKS_Find && FindBar.text[0] != '\0');
+        bool isFiltering = (State == MANAGEBOOKS_Author     && selectedAuthor[0] != '\0') ||
+                           (State == MANAGEBOOKS_Publisher  && selectedPublisher[0] != '\0') ||
+                           (State == MANAGEBOOKS_Type       && selectedType[0] != '\0') ||
+                           (State == MANAGEBOOKS_Find       && FindBar.text[0] != '\0');
 
-        // --- Tính toán kích thước động (Dynamic Sizing) ---
-        // Chiều cao nút bằng 60% chiều cao của HeaderBox
         float btnHeight = customUI.HeaderBox.height * 0.6f; 
-        // Lề cách viền trái/phải bằng 2% chiều rộng HeaderBox
         float marginX = customUI.HeaderBox.width * 0.02f;   
-        // Kích thước chữ bằng 50% chiều cao nút
         int fontSizeBtn = (int)(btnHeight * 0.75f);          
 
         if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail || isFiltering) {
-            // Chiều rộng nút Back tỷ lệ 2.5 lần chiều cao
             float btnWidthBack = btnHeight * 2.5f; 
             
             Rectangle btnBackHeader = {
@@ -113,9 +127,9 @@ void InitManageBooks(Role _role){
             };
             
             bool hoverBack = CheckCollisionPointRec(ManageBooksSize.Mouse, btnBackHeader);
+            
             DrawRectangleRounded(btnBackHeader, 0.2f, 10, hoverBack ? MAROON : ERRORRED);
             
-            // Căn giữa text trong nút Back
             const char* textBack = "Back";
             Vector2 sizeBack = MeasureTextEx(_Font[0], textBack, fontSizeBtn, 1);
             Vector2 posBack = {
@@ -128,7 +142,6 @@ void InitManageBooks(Role _role){
                 if (State == MANAGEBOOKS_Add || State == MANAGEBOOKS_Detail) {
                     State = prevState;
                 } else {
-                    // Xóa trạng thái filter để quay về danh sách cha
                     if (State == MANAGEBOOKS_Author) selectedAuthor[0] = '\0';
                     else if (State == MANAGEBOOKS_Publisher) selectedPublisher[0] = '\0';
                     else if (State == MANAGEBOOKS_Type) selectedType[0] = '\0';
@@ -143,9 +156,62 @@ void InitManageBooks(Role _role){
             }
         }
         
-        // Độc lập logic: Nút thêm truyện luôn hiện nếu là ADMIN và không ở trong giao diện Add/Detail
         if (_role == ADMINISTRATOR && State != MANAGEBOOKS_Add && State != MANAGEBOOKS_Detail) {
-            // Chiều rộng nút Thêm Truyện tỷ lệ 4.5 lần chiều cao vì text dài hơn
+            float btnWidthAdd = btnHeight * 4.5f; 
+            
+            Rectangle btnAddHeader = {
+                customUI.HeaderBox.x + customUI.HeaderBox.width - btnWidthAdd - marginX,
+                customUI.HeaderBox.y + (customUI.HeaderBox.height - btnHeight) / 2.0f,
+                btnWidthAdd,
+                btnHeight
+            };
+            
+            bool hoverAdd = CheckCollisionPointRec(ManageBooksSize.Mouse, btnAddHeader);
+            
+            DrawRectangleRounded(btnAddHeader, 0.2f, 10, hoverAdd ? TEALBLUE : STEELBLUE);
+            
+            const char* textAdd = "Thêm Truyện";
+            Vector2 sizeAdd = MeasureTextEx(_Font[3], textAdd, fontSizeBtn, 1);
+            Vector2 posAdd = {
+                btnAddHeader.x + (btnAddHeader.width - sizeAdd.x) / 2.0f,
+                btnAddHeader.y + (btnAddHeader.height - sizeAdd.y) / 2.0f
+            };
+            DrawTextEx(_Font[3], textAdd, posAdd, fontSizeBtn, 1, WHITE);
+            
+            if (hoverAdd && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                for(int i = 0; i < 8; i++) { 
+                    addInputs[i].text[0] = '\0'; 
+                    addInputs[i].length = 0; 
+                    addInputs[i].isFocused = false; 
+                }
+                
+                // -------------------------------------------------------------
+                // [MỚI] THUẬT TOÁN TỰ ĐỘNG SINH MÃ TRUYỆN (Txxx)
+                // -------------------------------------------------------------
+                int maxId = 0;
+                for (int k = 0; k < Books->count; k++) {
+                    // Kiểm tra nếu mã bắt đầu bằng chữ T
+                    if (Books->theArray[k].CodeBook[0] == 'T' || Books->theArray[k].CodeBook[0] == 't') {
+                        // Cắt lấy phần số phía sau chữ T và chuyển thành số nguyên (int)
+                        int currentId = atoi(&Books->theArray[k].CodeBook[1]);
+                        if (currentId > maxId) {
+                            maxId = currentId;
+                        }
+                    }
+                }
+                // Điền sẵn mã mới vào ô nhập liệu số 0 (Mã Truyện)
+                sprintf(addInputs[0].text, "T%03d", maxId + 1);
+                addInputs[0].length = strlen(addInputs[0].text);
+                // -------------------------------------------------------------
+
+                FindBar.isFocused = false;
+
+                prevState = State;
+                State = MANAGEBOOKS_Add;
+            }
+        }
+        
+        if (_role == ADMINISTRATOR && State != MANAGEBOOKS_Add && State != MANAGEBOOKS_Detail) {
             float btnWidthAdd = btnHeight * 4.5f; 
             
             Rectangle btnAddHeader = {
@@ -158,7 +224,6 @@ void InitManageBooks(Role _role){
             bool hoverAdd = CheckCollisionPointRec(ManageBooksSize.Mouse, btnAddHeader);
             DrawRectangleRounded(btnAddHeader, 0.2f, 10, hoverAdd ? TEALBLUE : STEELBLUE);
             
-            // Căn giữa text trong nút Thêm Truyện
             const char* textAdd = "Thêm Truyện";
             Vector2 sizeAdd = MeasureTextEx(_Font[3], textAdd, fontSizeBtn, 1);
             Vector2 posAdd = {
@@ -168,26 +233,59 @@ void InitManageBooks(Role _role){
             DrawTextEx(_Font[3], textAdd, posAdd, fontSizeBtn, 1, WHITE);
             
             if (hoverAdd && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                // Làm sạch InputBox khi vào form
                 for(int i = 0; i < 8; i++) { 
                     addInputs[i].text[0] = '\0'; 
                     addInputs[i].length = 0; 
                     addInputs[i].isFocused = false; 
                 }
+                
+                FindBar.text[0] = '\0';
+                FindBar.length = 0;
+                FindBar.isFocused = false;
+
                 prevState = State;
                 State = MANAGEBOOKS_Add;
             }
         
-        // CƠ CHẾ XÓA SÁCH KHỎI MẢNG
-        if (requestDeleteIndex != -1) {
-            for (int k = requestDeleteIndex; k < Books->count - 1; k++) {
-                Books->theArray[k] = Books->theArray[k+1];
+            if (requestDeleteIndex != -1) {
+                // 1. Lưu lại tên tác giả của cuốn sách chuẩn bị xóa
+                char authorToCheck[256];
+                strcpy(authorToCheck, Books->theArray[requestDeleteIndex].AuthorBook);
+
+                // 2. Tiến hành dịch mảng để xóa sách
+                for (int k = requestDeleteIndex; k < Books->count - 1; k++) {
+                    Books->theArray[k] = Books->theArray[k+1];
+                }
+                Books->count--;
+                Savebooks(*Books); // Lưu lại file sách
+                requestDeleteIndex = -1;
+
+                // 3. Quét lại toàn bộ kho sách xem tác giả này còn tác phẩm nào không
+                bool hasBooksLeft = false;
+                for (int i = 0; i < Books->count; i++) {
+                    if (strcmp(Books->theArray[i].AuthorBook, authorToCheck) == 0) {
+                        hasBooksLeft = true; // Vẫn còn sách
+                        break;
+                    }
+                }
+
+                // 4. Nếu không còn tác phẩm nào -> Xóa tác giả khỏi file author.txt
+                if (!hasBooksLeft) {
+                    for (int i = 0; i < Authors->count; i++) {
+                        // Tìm đúng tên tác giả trong danh sách
+                        if (strcmp(Authors->Author[i].name, authorToCheck) == 0) {
+                            // Dịch mảng để xóa tác giả
+                            for (int j = i; j < Authors->count - 1; j++) {
+                                Authors->Author[j] = Authors->Author[j+1];
+                            }
+                            Authors->count--;
+                            SaveAuthor(*Authors); // Ghi đè cập nhật lại file author.txt
+                            break;
+                        }
+                    }
+                }
             }
-            Books->count--;
-            Savebooks(*Books);
-            requestDeleteIndex = -1;
         }
-    }
 
         int totalMatch = 0;
         int clickedBook = -1;
@@ -286,7 +384,6 @@ void InitManageBooks(Role _role){
                         newBook.YearBook = atoi(addInputs[5].text);
                         newBook.PriceBook = atoi(addInputs[6].text);
                         
-                        // Copy trường Mô Tả
                         strcpy(newBook.Description, addInputs[7].text);
                         
                         newBook.StockBook = 100;
@@ -451,7 +548,7 @@ void ShowBookDetail_Panel(Size size, ManageBooksUI UI, Font *_Font, Book book, M
     DrawTextEx(_Font[0], buffer, (Vector2){ rightX + 250, currentY }, fontSizeInfo, 1, valueCol);
     currentY += spacingY;
 
-    DrawTextEx(_Font[0], "+ Giá mua (VND/ngày):", (Vector2){ rightX, currentY }, fontSizeInfo, 1, labelCol);
+    DrawTextEx(_Font[0], "+ Giá thuê (VND/ngày):", (Vector2){ rightX, currentY }, fontSizeInfo, 1, labelCol);
     FormatPriceToVND(book.PriceBook, buffer);
     DrawTextEx(_Font[0], buffer, (Vector2){ rightX + 250, currentY }, fontSizeInfo, 1, valueCol);
     currentY += spacingY;
@@ -477,93 +574,141 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         UI.Panel.x, 
         UI.Panel.y, 
         UI.Panel.width, 
-        UI.Panel.height // Đã bỏ phần cộng thêm PaginationBox gây tràn màn hình
+        UI.Panel.height 
     };
     
     DrawRectangleRec(panelArea, (Color){ 30, 30, 30, 255 });
 
-    DrawTextEx(_Font[0], "THÊM TRUYỆN MỚI", (Vector2){panelArea.x + 50, panelArea.y + 30}, 40, 1, GOLDACCENT);
-    DrawLineEx((Vector2){panelArea.x + 50, panelArea.y + 75}, (Vector2){panelArea.x + panelArea.width - 50, panelArea.y + 75}, 3, GRAY);
+    float titleFontSize = panelArea.height * 0.045f;
+    if (titleFontSize < 25.0f) titleFontSize = 25.0f;
+    if (titleFontSize > 45.0f) titleFontSize = 45.0f;
 
+    DrawTextEx(_Font[0], "THÊM TRUYỆN MỚI", (Vector2){panelArea.x + panelArea.width * 0.05f, panelArea.y + panelArea.height * 0.03f}, titleFontSize, 1, GOLDACCENT);
+    DrawLineEx((Vector2){panelArea.x + panelArea.width * 0.05f, panelArea.y + panelArea.height * 0.09f}, 
+               (Vector2){panelArea.x + panelArea.width * 0.95f, panelArea.y + panelArea.height * 0.09f}, 3, GRAY);
+
+    // Đổi nhãn đầu tiên thành Tự động
     const char *labels[] = {
-        "Mã Truyện (Txxx):", 
-        "Tên Truyện:", 
-        "Tác Giả:", 
-        "Thể Loại:", 
-        "Nhà Xuất Bản:", 
-        "Năm Sản Xuất:", 
-        "Giá Bán (VND):"
+        "Mã Truyện (Tự động):", "Tên Truyện:", "Tác Giả:", "Thể Loại:", 
+        "Nhà Xuất Bản:", "Năm Sản Xuất:", "Giá thuê (VND/ngày):"
     };
     
-    float leftMargin = panelArea.width * 0.05f;
-    float leftColWidth = panelArea.width * 0.45f;   
-    float rightColX = panelArea.x + panelArea.width * 0.52f; 
-    float rightColWidth = panelArea.width * 0.43f;  
+    float widthRatio = 0.95f - 0.3f * (panelArea.width / 2500.0f);
+    if (widthRatio < 0.5f) widthRatio = 0.5f;
+    if (widthRatio > 0.9f) widthRatio = 0.9f;
     
-    float startY = panelArea.y + 110;
-    float spacingY = 65; 
-    float labelFixedW = 230.0f; 
+    float contentWidth = panelArea.width * widthRatio;
+    float offsetX = panelArea.x + (panelArea.width - contentWidth) / 2.0f; 
+    
+    float colGap = contentWidth * 0.06f; 
+    float colWidth = (contentWidth - colGap) / 2.0f;
+    
+    float startY = panelArea.y + panelArea.height * 0.13f;
+    float rowSpacing = panelArea.height * 0.11f; 
+    
+    float boxHeight = panelArea.height * 0.055f;
+    if (boxHeight < 35.0f) boxHeight = 35.0f; 
+    if (boxHeight > 55.0f) boxHeight = 55.0f; 
+
+    float labelFontSize = boxHeight * 0.45f;
+    if (labelFontSize < 18.0f) labelFontSize = 18.0f;
+    float inputTextSize = labelFontSize;
 
     bool clickedAnywhere = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 
     for (int i = 0; i < 8; i++) {
         if (i < 7) {
-            DrawTextEx(_Font[0], labels[i], (Vector2){panelArea.x + leftMargin, startY + i * spacingY + 10}, 25, 1, LIGHTGRAY);
+            int row = i / 2;
+            int col = i % 2;
+            float xPos = offsetX + col * (colWidth + colGap);
+            float yPos = startY + row * rowSpacing;
+
+            DrawTextEx(_Font[0], labels[i], (Vector2){xPos, yPos}, labelFontSize, 1, LIGHTGRAY);
             
             inputs[i].box = (Rectangle){ 
-                panelArea.x + leftMargin + labelFixedW, 
-                startY + i * spacingY, 
-                leftColWidth - labelFixedW, 
-                45 
+                xPos, 
+                yPos + labelFontSize + 6.0f, 
+                colWidth, 
+                boxHeight 
             };
         } else {
-            DrawTextEx(_Font[0], "Mô Tả Truyện:", (Vector2){rightColX, startY}, 25, 1, ORANGE);
+            float lastRowBottom = startY + 3 * rowSpacing + labelFontSize + 6.0f + boxHeight;
+            float descY = lastRowBottom + panelArea.height * 0.02f; 
+            float buttonAreaTop = panelArea.y + panelArea.height * 0.88f; 
+            float descBoxHeight = buttonAreaTop - descY - labelFontSize - 20.0f; 
+            
+            if (descBoxHeight < boxHeight * 1.5f) descBoxHeight = boxHeight * 1.5f;
+
+            DrawTextEx(_Font[0], "Mô Tả Truyện:", (Vector2){offsetX, descY}, labelFontSize + 2.0f, 1, ORANGE);
             
             inputs[i].box = (Rectangle){
-                rightColX,
-                startY + 35,
-                rightColWidth,
-                (6 * spacingY) + 45 - 35 
+                offsetX,
+                descY + labelFontSize + 8.0f,
+                contentWidth,
+                descBoxHeight
             };
         }
 
         if (clickedAnywhere) {
-            if (CheckCollisionPointRec(size.Mouse, inputs[i].box)) {
-                inputs[i].isFocused = true;
-            } else {
+            // [MỚI] Khóa click cho ô Mã Truyện (i == 0)
+            if (i == 0) {
                 inputs[i].isFocused = false;
+            } else {
+                inputs[i].isFocused = CheckCollisionPointRec(size.Mouse, inputs[i].box);
             }
         }
 
-        float roundness = FindRoundness(0.05f * inputs[i].box.width, inputs[i].box.width, inputs[i].box.height);
+        float roundness = 0.2f; 
         if (i == 7) roundness = 0.05f; 
 
-        DrawRectangleRounded(inputs[i].box, roundness, 10, inputs[i].isFocused ? WHITESMOKE : GRAY);
-        DrawRectangleRoundedLinesEx(inputs[i].box, roundness, 10, 2.0f, inputs[i].isFocused ? TEALBLUE : DARKGRAY);
+        // ------------------------------------------------------------------
+        // ĐỔI MÀU Ô MÃ TRUYỆN ĐỂ BÁO HIỆU "READ-ONLY"
+        // ------------------------------------------------------------------
+        Color boxBgColor;
+        Color boxOutlineColor;
+        float outlineThick = 2.0f;
 
-        if (inputs[i].isFocused) {
+        if (i == 0) {
+            boxBgColor = Fade(DARKGRAY, 0.4f); // Làm mờ ô Mã truyện
+            boxOutlineColor = GRAY;
+        } else {
+            bool hasText = (strlen(inputs[i].text) > 0);
+            boxBgColor = (inputs[i].isFocused || hasText) ? WHITESMOKE : GRAY;
+            boxOutlineColor = inputs[i].isFocused ? TEALBLUE : DARKGRAY;
+            outlineThick = inputs[i].isFocused ? 3.0f : 2.0f;
+        }
+
+        DrawRectangleRounded(inputs[i].box, roundness, 10, boxBgColor);
+        DrawRectangleRoundedLinesEx(inputs[i].box, roundness, 10, outlineThick, boxOutlineColor);
+
+        if (inputs[i].isFocused && i != 0) {
             UpdateInputBox(&inputs[i]);
             if (IsKeyPressed(KEY_TAB)) {
                 inputs[i].isFocused = false;
+                // [MỚI] Khi bấm Tab từ ô cuối (7), nhảy về ô Tên truyện (1) thay vì Mã Truyện (0)
                 if (i < 7) inputs[i+1].isFocused = true;
-                else inputs[0].isFocused = true;
+                else inputs[1].isFocused = true; 
             }
         }
 
         if (i < 7) {
             BeginScissorMode((int)inputs[i].box.x + 10, (int)inputs[i].box.y, (int)inputs[i].box.width - 20, (int)inputs[i].box.height);
             
-            float textW = MeasureTextEx(_Font[3], inputs[i].text, 22, 1).x;
-            float textX = inputs[i].box.x + 10;
+            float textW = MeasureTextEx(_Font[3], inputs[i].text, inputTextSize, 1).x;
+            float textX = inputs[i].box.x + 12;
             
-            if (textW > inputs[i].box.width - 30) {
-                textX = inputs[i].box.x + 10 - (textW - (inputs[i].box.width - 30));
+            if (textW > inputs[i].box.width - 24) {
+                textX = inputs[i].box.x + 12 - (textW - (inputs[i].box.width - 24));
             }
             
-            DrawTextEx(_Font[3], inputs[i].text, (Vector2){textX, inputs[i].box.y + 12}, 22, 1, BLACK);
+            float textY = inputs[i].box.y + (inputs[i].box.height - inputTextSize) / 2.0f;
+            
+            // Text Mã Truyện có màu Cam nổi bật, các text khác màu Đen
+            Color textColor = (i == 0) ? ORANGE : BLACK;
+            DrawTextEx(_Font[3], inputs[i].text, (Vector2){textX, textY}, inputTextSize, 1, textColor);
             
             if (inputs[i].isFocused && ((int)(GetTime() * 2) % 2 == 0)) {
-                DrawRectangle(textX + textW + 2, inputs[i].box.y + 10, 2, 25, BLACK);
+                DrawRectangle(textX + textW + 2, textY, 2, inputTextSize + 2, BLACK);
             }
             EndScissorMode();
             
@@ -583,27 +728,31 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                 inputs[i].box.height - 30
             };
             
-            DrawTextAutoWrap(_Font[3], tempText, textHitbox, 22.0f, 1.0f, BLACK);
+            DrawTextAutoWrap(_Font[3], tempText, textHitbox, inputTextSize, 1.0f, BLACK);
             EndScissorMode();
         }
     }
 
-    // ==========================================
-    // NÚT LƯU TRUYỆN 
-    // Đã sửa trục Y để nằm an toàn bên trong màn hình
-    // ==========================================
+    float btnHeight = panelArea.height * 0.07f;
+    if (btnHeight < 40.0f) btnHeight = 40.0f;
+    if (btnHeight > 60.0f) btnHeight = 60.0f;
+    
+    float btnWidth = panelArea.width * 0.25f;
+    if (btnWidth < 200.0f) btnWidth = 200.0f;
+    if (btnWidth > 350.0f) btnWidth = 350.0f;
+
     Rectangle btnSave = { 
-        panelArea.x + (panelArea.width / 2) - 100, 
-        UI.Panel.y + UI.Panel.height - 80, 
-        200, 
-        50 
+        panelArea.x + (panelArea.width - btnWidth) / 2.0f, 
+        panelArea.y + panelArea.height - btnHeight - panelArea.height * 0.04f, 
+        btnWidth, 
+        btnHeight 
     };
 
     bool hoverSave = CheckCollisionPointRec(size.Mouse, btnSave);
-    DrawRectangleRounded(btnSave, 0.2f, 10, hoverSave ? LIME : SUCCESSGREEN);
+    DrawRectangleRounded(btnSave, 0.3f, 10, hoverSave ? LIME : SUCCESSGREEN);
     
-    float wSave = MeasureTextEx(_Font[0], "LƯU TRUYỆN", 22, 1).x;
-    DrawTextEx(_Font[0], "LƯU TRUYỆN", (Vector2){btnSave.x + (btnSave.width - wSave)/2, btnSave.y + 14}, 22, 1, WHITE);
+    float wSave = MeasureTextEx(_Font[0], "LƯU TRUYỆN", inputTextSize + 2.0f, 1).x;
+    DrawTextEx(_Font[0], "LƯU TRUYỆN", (Vector2){btnSave.x + (btnSave.width - wSave)/2, btnSave.y + (btnSave.height - (inputTextSize + 2.0f))/2}, inputTextSize + 2.0f, 1, WHITE);
     
     if (hoverSave && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         result = 1;
@@ -775,7 +924,7 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
     }
 
     if (TotalContentHeight > UI.Panel.height) {
-        float scrollTrackWidth = 12.0f; // Tăng độ rộng chút xíu cho dễ nắm
+        float scrollTrackWidth = 12.0f;
         Rectangle scrollTrack = { 
             UI.Panel.x + UI.Panel.width - scrollTrackWidth - 5, 
             UI.Panel.y + 5, 
@@ -798,7 +947,6 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
             handleHeight 
         };
 
-        // --- DRAG LOGIC ---
         static bool isDraggingBooks = false;
         static float dragOffsetBooksY = 0.0f;
         
@@ -816,7 +964,7 @@ int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Book
                 
                 float newRatio = (newHandleY - scrollTrack.y) / (scrollTrack.height - handleHeight);
                 *wheel = -(newRatio * scrollableWheel);
-                scrollHandle.y = newHandleY; // Hiệu ứng kéo mượt tức thời
+                scrollHandle.y = newHandleY; 
             } else {
                 isDraggingBooks = false;
             }
@@ -900,7 +1048,6 @@ void ShowAuthor_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Au
             handleHeight 
         };
 
-        // --- DRAG LOGIC ---
         static bool isDraggingAuthors = false;
         static float dragOffsetAuthorsY = 0.0f;
         
@@ -994,7 +1141,6 @@ void ShowPublisher_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font,
             handleHeight 
         };
 
-        // --- DRAG LOGIC ---
         static bool isDraggingPubs = false;
         static float dragOffsetPubsY = 0.0f;
         
@@ -1091,7 +1237,6 @@ void ShowType_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Type
             handleHeight 
         };
 
-        // --- DRAG LOGIC ---
         static bool isDraggingTypes = false;
         static float dragOffsetTypesY = 0.0f;
         
@@ -1208,9 +1353,11 @@ int CountStrInBooks (BookList *Books, const char *Str, StateFindBook state){
 }
 
 void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, float *wheel, char *backTarget, bool isVisible) {
-    if (!isVisible) return; 
+    if (!isVisible) 
+        return; 
 
-    if (Books->totalPages <= 1) return;
+    if (Books->totalPages <= 1)
+        return;
 
     DrawRectangleRec(UI.PaginationBox, Fade(SILVERGRAY, 0.95f));
 
@@ -1221,12 +1368,15 @@ void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, f
 
         int maxVisible = 5;
         int startPage = Books->currentPage - 2;
-        if (startPage < 1) startPage = 1;
+        if (startPage < 1) 
+            startPage = 1;
+        
         int endPage = startPage + maxVisible - 1;
         if (endPage > Books->totalPages) {
             endPage = Books->totalPages;
             startPage = endPage - maxVisible + 1;
-            if (startPage < 1) startPage = 1;
+            if (startPage < 1) 
+                startPage = 1;
         }
 
         float totalWidth = (endPage - startPage + 1) * (btnWidth + spacing) + 2 * (80.0f + spacing);
@@ -1243,8 +1393,12 @@ void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, f
         if (Books->currentPage > 1) {
             if (CheckCollisionPointRec(size.Mouse, firstBtn)) {
                 DrawRectangleRounded(firstBtn, 0.2f, 10, Fade(TEALBLUE, 0.6f));
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { Books->currentPage = 1; *wheel = 0; }
-            } else DrawRectangleRounded(firstBtn, 0.2f, 10, GRAYBLUE);
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
+                    Books->currentPage = 1; 
+                    *wheel = 0; 
+                }
+            } else 
+                DrawRectangleRounded(firstBtn, 0.2f, 10, GRAYBLUE);
             DrawTextEx(_Font[3], "First", (Vector2){firstBtn.x + 15, firstBtn.y + 10}, 20, 1, WHITE);
         }
         startX += 80.0f + spacing;
@@ -1263,8 +1417,12 @@ void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, f
             } else {
                 if (CheckCollisionPointRec(size.Mouse, pageBtn)) {
                     DrawRectangleRounded(pageBtn, 0.2f, 10, Fade(TEALBLUE, 0.6f));
-                    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { Books->currentPage = p; *wheel = 0; }
-                } else DrawRectangleRounded(pageBtn, 0.2f, 10, GRAYBLUE);
+                    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
+                        Books->currentPage = p; 
+                        *wheel = 0; 
+                    }
+                } else 
+                    DrawRectangleRounded(pageBtn, 0.2f, 10, GRAYBLUE);
                 DrawTextEx(_Font[3], TextFormat("%d", p), (Vector2){pageBtn.x + 13, pageBtn.y + 10}, 20, 1, WHITE);
             }
             startX += btnWidth + spacing;
@@ -1280,8 +1438,12 @@ void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, f
         if (Books->currentPage < Books->totalPages) {
             if (CheckCollisionPointRec(size.Mouse, lastBtn)) {
                 DrawRectangleRounded(lastBtn, 0.2f, 10, Fade(TEALBLUE, 0.6f));
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { Books->currentPage = Books->totalPages; *wheel = 0; }
-            } else DrawRectangleRounded(lastBtn, 0.2f, 10, GRAYBLUE);
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
+                    Books->currentPage = Books->totalPages; 
+                    *wheel = 0; 
+                }
+            } else 
+                DrawRectangleRounded(lastBtn, 0.2f, 10, GRAYBLUE);
             DrawTextEx(_Font[3], "Last", (Vector2){lastBtn.x + 18, lastBtn.y + 10}, 20, 1, WHITE);
         }
     }
@@ -1318,7 +1480,10 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
     if (CheckCollisionPointRec(size.Mouse, AuthorBox)){
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_1, (Vector2) { AuthorBox.x - 8, AuthorBox.y - 4 }, 26, 3, GOLDACCENT);
         DrawLineEx((Vector2) { AuthorBox.x, AuthorBox.y + AuthorBox.height }, (Vector2) { AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height }, 3, BLACK);
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ *State = MANAGEBOOKS_Author; _return = 1; }
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ 
+            *State = MANAGEBOOKS_Author; 
+            _return = 1; 
+        }
     } else {
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_1, (Vector2) { AuthorBox.x, AuthorBox.y }, 24, 2, BLACK);
         DrawLineEx((Vector2) { AuthorBox.x, AuthorBox.y + AuthorBox.height }, (Vector2) { AuthorBox.x + AuthorBox.width, AuthorBox.y + AuthorBox.height }, 3, BLACK);
@@ -1335,7 +1500,10 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
     if (CheckCollisionPointRec(size.Mouse, PublisherBox)){
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_2, (Vector2) { PublisherBox.x - 10, PublisherBox.y - 4 }, 26, 3, GOLDACCENT);
         DrawLineEx((Vector2) { PublisherBox.x, PublisherBox.y + PublisherBox.height }, (Vector2) { PublisherBox.x + PublisherBox.width, PublisherBox.y + PublisherBox.height }, 3, BLACK);
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ *State = MANAGEBOOKS_Publisher; _return = 1; }
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ 
+            *State = MANAGEBOOKS_Publisher; 
+            _return = 1; 
+        }
     } else {
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_2, (Vector2) { PublisherBox.x, PublisherBox.y }, 24, 2, BLACK);
         DrawLineEx((Vector2) { PublisherBox.x, PublisherBox.y + PublisherBox.height }, (Vector2) { PublisherBox.x + PublisherBox.width, PublisherBox.y + PublisherBox.height }, 3, BLACK);
@@ -1352,7 +1520,10 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
     if (CheckCollisionPointRec(size.Mouse, TypeBox)){
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_3, (Vector2) { TypeBox.x - 8, TypeBox.y - 4 }, 26, 3, GOLDACCENT);
         DrawLineEx((Vector2) { TypeBox.x, TypeBox.y + TypeBox.height }, (Vector2) { TypeBox.x + TypeBox.width, TypeBox.y + TypeBox.height }, 3, BLACK);
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ *State = MANAGEBOOKS_Type; _return = 1; }
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ 
+            *State = MANAGEBOOKS_Type; 
+            _return = 1; 
+        }
     } else {
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_3, (Vector2) { TypeBox.x, TypeBox.y }, 24, 2, BLACK);
         DrawLineEx((Vector2) { TypeBox.x, TypeBox.y + TypeBox.height }, (Vector2) { TypeBox.x + TypeBox.width, TypeBox.y + TypeBox.height }, 3, BLACK);
@@ -1369,7 +1540,10 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
     if (CheckCollisionPointRec(size.Mouse, MainBox)){
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_4, (Vector2) { MainBox.x - 8, MainBox.y - 4 }, 26, 3, GOLDACCENT);
         DrawLineEx((Vector2) { MainBox.x, MainBox.y + MainBox.height }, (Vector2) { MainBox.x + MainBox.width, MainBox.y + MainBox.height }, 3, BLACK);
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ *State = MANAGEBOOKS_Main; _return = 1; }
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ 
+            *State = MANAGEBOOKS_Main; 
+            _return = 1; 
+        }
     } else {
         DrawTextEx(_Font[0], MANAGEBOOKS_Func_4, (Vector2) { MainBox.x, MainBox.y }, 24, 2, BLACK);
         DrawLineEx((Vector2) { MainBox.x, MainBox.y + MainBox.height }, (Vector2) { MainBox.x + MainBox.width, MainBox.y + MainBox.height }, 3, BLACK);
@@ -1407,11 +1581,15 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
         20.0f 
     };
 
-    if (CheckCollisionPointRec(size.Mouse, FindBarTextBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) FindBar->isFocused = true;
-    else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) FindBar->isFocused = false;
+    // Chỉ focus vào thanh Input, KHÔNG chuyển state Find
+    if (CheckCollisionPointRec(size.Mouse, FindBarTextBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        FindBar->isFocused = true;
+    }
+    else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        FindBar->isFocused = false;
+    }
 
     float roundness = FindRoundness(0.05f * FindBar->box.width, FindBar->box.width, FindBar->box.height);
-    
     DrawRectangleRoundedLinesEx(FindBar->box, roundness, 10, 2.0f, LIGHTGRAY);
     DrawRectangleRounded(FindBar->box, roundness, 10, GRAY);
 
@@ -1426,9 +1604,11 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
         Vector2 position = { FindBarTextPos.x - dx, FindBarTextPos.y };
 
         DrawTextEx(_Font[0], FindBar->text, position, 20, 2, GRAY);
-        if ((int)(GetTime() * 2) % 2 == 0) DrawRectangle(FindBarTextPos.x + w - dx + 2, FindBarTextPos.y, 2, 20, BLACK);
+        if ((int)(GetTime() * 2) % 2 == 0) 
+            DrawRectangle(FindBarTextPos.x + w - dx + 2, FindBarTextPos.y, 2, 20, BLACK);
         EndScissorMode();
 
+        // CHUYỂN STATE KHI BẤM ENTER
         if (IsKeyPressed(KEY_ENTER)) { *State = MANAGEBOOKS_Find; _return = 1; }
 
     } else if (FindBar->length > 0) {
@@ -1443,7 +1623,7 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
 
     } else {
         BeginScissorMode((int)FindBarTextPos.x, (int)FindBarTextPos.y, (int)FindBarTextPos.width, (int)FindBarTextPos.height);
-        DrawTextEx(_Font[0], "FIND TRUYEN", (Vector2){ FindBarTextPos.x, FindBarTextPos.y }, 20, 2, Fade(BLACK, 0.5f));
+        DrawTextEx(_Font[0], "Search", (Vector2){ FindBarTextPos.x, FindBarTextPos.y }, 20, 2, Fade(BLACK, 0.5f));
         EndScissorMode();
     }
 
@@ -1451,10 +1631,12 @@ bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon
     DrawRectangleRounded(IconFindBox, roundness, 10, BRIGHTGRAY);
     DrawIcon(IconFindBox, Icon_Find);
     
-    if ((CheckCollisionPointRec(size.Mouse, IconFindBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) || FindBar->length > 0) { 
+    // CHUYỂN STATE KHI BẤM VÀO ICON KÍNH LÚP
+    if (CheckCollisionPointRec(size.Mouse, IconFindBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) { 
         *State = MANAGEBOOKS_Find; 
         _return = 1; 
     }
+    
     return _return;
 }
 

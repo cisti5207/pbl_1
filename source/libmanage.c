@@ -2,11 +2,6 @@
 #include "raylib.h"
 #include <ctype.h>
 #include <string.h>
-<<<<<<< HEAD
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-=======
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -81,7 +76,6 @@ Color AnimatedBackground(void) {
 // ==========================================
 // CÁC HÀM TIỆN ÍCH UI & CHUỖI
 // ==========================================
->>>>>>> 381e2b85a73eb32f5adb00643f2275eeaf34bf6f
 
 void LoadSize(Size *FormSize, Vector2 monitor, Vector2 screen, Vector2 scale, Vector2 mouse){
     if (monitor.x || monitor.y) FormSize->Monitor = monitor;
@@ -219,18 +213,6 @@ float FindRoundness(float len, float width, float height){
     return len / (min / 2.0f);
 }
 
-<<<<<<< HEAD
-int TinhSoNgay(const char *ngaymuon, const char *ngaytrathucte) {
-    struct tm tmStart = {0}, tmEnd = {0};
-    sscanf(ngaymuon, "%d/%d/%d", &tmStart.tm_mday, &tmStart.tm_mon, &tmStart.tm_year);
-    sscanf(ngaytrathucte, "%d/%d/%d", &tmEnd.tm_mday, &tmEnd.tm_mon, &tmEnd.tm_year);
-    tmStart.tm_year -= 1900; tmStart.tm_mon -= 1;
-    tmEnd.tm_year -= 1900; tmEnd.tm_mon -= 1;
-    double diff = difftime(mktime(&tmEnd), mktime(&tmStart));
-    return (int)(diff / 86400);
-}
-
-=======
 int FindFontSize(float Width, Font font, int space, const char *str){
     if (!str || str[0] == '\0') return FONT_SIZE;
     float TextWidth = MeasureTextEx(font, str, FONT_SIZE, space).x;
@@ -342,4 +324,3 @@ bool StringContains(const char *haystack, const char *needle) {
     }
     return false;
 }
->>>>>>> 381e2b85a73eb32f5adb00643f2275eeaf34bf6f
