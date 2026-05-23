@@ -74,7 +74,6 @@ void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *ma
 
     for (int i = 0; i < 4; i++) {
         if (boxes[i]->isFocused) {
-            // Xử lý phím Backspace hàng đợi (Fix lỗi Unikey nhân đôi chữ)
             int key = GetKeyPressed();
             while (key > 0) {
                 if (key == KEY_BACKSPACE) {
@@ -85,8 +84,6 @@ void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *ma
                 }
                 key = GetKeyPressed();
             }
-
-            // Xử lý đè phím Backspace
             if (IsKeyDown(KEY_BACKSPACE)) {
                 boxes[i]->backspaceCounter += GetFrameTime();
                 if (boxes[i]->backspaceCounter >= 0.5f) { 
@@ -162,7 +159,7 @@ void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
     DrawTextEx(font, "HoanHoang_DUT library", (Vector2){card.x + 260*scale, card.y + 32*scale}, 36*scale, 1, MAROON);
     DrawTextEx(font, TextFormat("ID: %s", maThe), (Vector2){card.x + 45*scale, card.y + 340*scale}, 24*scale, 1, MAROON); 
 
-    const char* labels[] = {"Họ tên:", "SĐT:", "CCCD:", "Hạn SD:"};
+    const char* labels[] = {"Họ và tên:", "Số điện thoại:", "Căn cước công dân:", "Hạn sử dụng:"};
     InputBox_BD* boxes[] = {&form->hoTen, &form->sdt, &form->cccd, &form->hanSD};
 
     for (int i = 0; i < 4; i++) {
@@ -225,7 +222,7 @@ bool LuuThanhVienVaoFile(char *maThe, Nhap *form) {
         return false;
     }
 
-    fprintf(f, "%s | %-25s | %-12s | %-15s | %-12s\n", 
+    fprintf(f, "%12s | %-25s | %-12s | %-15s | %-12s\n", 
             maThe, form->hoTen.text, form->sdt.text, form->cccd.text, form->hanSD.text);
     
     fflush(f); 
@@ -244,7 +241,8 @@ void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form) {
         newNode->next = *head;
         *head = newNode;
     }
-}
+}   
+
 
 void SinhMaTheTuDong(int currentCount, char *maThe) { sprintf(maThe, "%08d", currentCount + 1); }
 void FreeMemberList(BanDoc *head) { while (head) { BanDoc *t = head; head = head->next; free(t); } }

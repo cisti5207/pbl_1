@@ -1,80 +1,102 @@
+#include "libmanage.h" // Include header chứa các hàm dùng chung
 #include "raylib.h"
+#include "Phieumuon.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-// Đường dẫn tương đối từ folder 'source' lùi ra ngoài để vào folder 'include'
-#include "../include/ManageUser.h" 
+// ============================================================================
+// KHU VỰC CẤU HÌNH HỆ THỐNG - ÔNG THAY ĐỔI ĐƯỜNG DẪN FONT TẠI ĐÂY NHA BRO!
+// ============================================================================
+// Sử dụng đường dẫn tương đối để mang sang máy khác vẫn chạy bình thường nhé bro!
+#define FONT_PATH "font/arial/ARIALBD.TTF"
+#define MAIN_FONT_SIZE 128
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 1100
+#define SCREEN_HEIGHT 750
+
+// KHAI BÁO NGUYÊN MẪU (PROTOTYPE)
+// Chỉ khai báo dòng này để main.c biết hàm tồn tại, KHÔNG định nghĩa lại thân hàm {} ở đây
+// vì thân hàm đã nằm trọn vẹn bên trong file libmanage.c của ông rồi!
+Font SetFontUTF8(const char *_font, int _fontSize);
 
 int main(void) {
-    // Khởi tạo cửa sổ đầu tiên để Raylib nhận diện context đồ họa
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "PROXIMA - QUAN LY BAN DOC");
+    // Cho phép người dùng thu phóng / kéo giãn cửa sổ làm việc tự do
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hệ Thống Quản Lý Thư Viện - PBL1");
     SetTargetFPS(60);
 
-    // Khai báo tài nguyên (Cần khai báo sau InitWindow để đảm bảo an toàn)
-    Font mainFont = GetFontDefault();
+    // Áp dụng đường dẫn và kích thước Font đã định nghĩa ở phần cấu hình đầu file
+    Font mainFont = SetFontUTF8(FONT_PATH, MAIN_FONT_SIZE); 
     
-    // Tạo nền Gradient
-    // Lưu ý: Nếu dòng này vẫn báo lỗi 'int', hãy kiểm tra file ManageUser.h có include raylib.h chưa
-    Image backgroundImage = GenImageGradientV(SCREEN_WIDTH, SCREEN_HEIGHT, (Color){ 35, 35, 50, 255 }, (Color){ 20, 20, 30, 255 });
-    Texture2D bgTexture = LoadTextureFromImage(backgroundImage);
-    UnloadImage(backgroundImage); 
+    Texture2D dummyIcons[5] = { 0 }; 
+    Texture2D dummyBg = { 0 };
 
-    // Quản lý dữ liệu
-    struct BanDoc *memberList = NULL;    
-    Nhap inputForm;               
-    int totalUsers = 0;           
-    char maTheMoi[15] = "";       
+    FormPhieuMuon formPM;
+    InitPhieumuon(&formPM);
 
-    // Khởi tạo trạng thái ban đầu cho form (Hàm định nghĩa trong ManageUser.c)
-    InitForm(&inputForm);
+    PhieuMuonNode *headList = NULL; 
+    int totalSlips = 0;             
+    char maPMHienTai[15] = "";      
+
+    SinhMaPM(totalSlips, maPMHienTai);
 
     while (!WindowShouldClose()) {
-        // 1. Cập nhật Logic
-        UpdateFormPosition(&inputForm);
-        UpdateInputForm(&inputForm, &memberList, &totalUsers, maTheMoi);
+        UpdateVitri(&formPM);
+        UpdateInputPM(&formPM, &headList, &totalSlips, maPMHienTai);
 
-        // 2. Vẽ giao diện
-        BeginDrawing();
-        ClearBackground(BLACK);
+        float screenW = (float)GetScreenWidth();
+        float screenH = (float)GetScreenHeight();
+        float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
+        if (scale < 0.5f) scale = 0.5f;
 
-        // Vẽ hình nền và lớp phủ tối
-        DrawTexture(bgTexture, 0, 0, WHITE);
-        DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.4f));
+        float cardrightY = (screenH - 550 * scale) / 2;
+        Rectangle confirmButton = { 
+            (screenW - 800 * scale) / 2 + 630 * scale, 
+            cardrightY + 550 * scale + 30 * scale, 
+            140 * scale, 
+            50 * scale 
+        };
 
-        // Tiêu đề
-        DrawText("HE THONG QUAN LY THU VIEN PROXIMA", 40, 40, 30, GOLD);
-        
-        // Vẽ thẻ thư viện và form nhập liệu
-        DrawLibraryCard(&inputForm, NULL, maTheMoi, mainFont);
-
-        // Danh sách hiển thị bên phải
-        DrawText("DANH SACH DANG KY MOI:", 750, 180, 20, LIGHTGRAY);
-        struct BanDoc *current = memberList;
-        int offset = 0;
-        while (current != NULL && offset < 10) {
-            DrawText(TextFormat("%s - %s", current->maThe, current->hoTen), 750, 220 + (offset * 35), 18, WHITE);
-            current = current->next;
-            offset++;
-        }
-
-        // Hiển thị thông báo khi lưu thành công
-        if (inputForm.showSuccess) {
-            DrawSuccessMessage(mainFont, bgTexture, inputForm.successTimer);
-            if (GetTime() - inputForm.successTimer > 2.0f) {
-                inputForm.showSuccess = false;
+        if (!formPM.showsuccess) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                Vector2 mousePos = GetMousePosition();
+                if (CheckCollisionPointRec(mousePos, confirmButton)) {
+                    bool saveSuccess = LuuPhieuMuonVaoFile(maPMHienTai, &formPM);
+                    if (saveSuccess) {
+                        ThemPhieuMuonVaoList(&headList, maPMHienTai, &formPM);
+                        formPM.showsuccess = true;
+                        formPM.successtimer = 3.0f;
+                    } else {
+                        printf("Lỗi: Không thể ghi dữ liệu phiếu mượn vào file txt!\n");
+                    }
+                }
             }
         }
 
+        BeginDrawing();
+            ClearBackground(GetColor(0xF4F4F9FF)); 
+
+            // Vẽ Thẻ Phiếu mượn sử dụng Font chữ tiếng Việt đã được tối ưu hóa bằng mảng codepoints
+            DrawPM(&formPM, dummyIcons, maPMHienTai, mainFont);
+
+            if (formPM.showsuccess) {
+                DrawSuccess(mainFont, dummyBg, formPM.successtimer);
+            }
         EndDrawing();
     }
 
-    // Giải phóng bộ nhớ và đóng cửa sổ
-    FreeMemberList(memberList);
-    UnloadTexture(bgTexture);
-    CloseWindow();
+    // Giải phóng bộ nhớ RAM cho Danh sách liên kết đơn trước khi đóng ứng dụng
+    PhieuMuonNode *current = headList;
+    while (current != NULL) {
+        PhieuMuonNode *temp = current;
+        current = current->next;
+        free(temp);
+    }
 
+    // Giải phóng Font chữ
+    UnloadFont(mainFont);
+
+    CloseWindow();
     return 0;
 }

@@ -113,6 +113,6 @@ void DrawIcon(Rectangle box, Texture2D icon);
 
 float FindRoundness(float len, float width, float height);
 // Tính tỉ lệ roundness của rounded hay circle, ví dụ dùng rounded thì cần cấp giá trị float roundness, nhưng t sẽ dùng hàm này để điều khiển tỉ lệ đó bo tròn theo ý thích
-
-
+int TinhSoNgay(const char *ngaymuon, const char *ngaytrathucte);
+// Tính thời gian giữa 2 ngày mượn và trả thực tế(số ngày)
 #endif // LIBMANAGE_H
