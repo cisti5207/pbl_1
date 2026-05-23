@@ -39,5 +39,5 @@ void SinhMaTheTuDong(int currentCount, char *maThe);
 void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form);
 bool LuuThanhVienVaoFile(char *maThe, Nhap *form);
 void FreeMemberList(BanDoc *head);
-
+void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_y);
 #endif

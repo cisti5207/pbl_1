@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 #include "raylib.h"
 #include "login.h"
 #include "libmanage.h"
@@ -456,4 +454,3 @@ CheckResult Get_account_return(AccountList _account, Account *account, const cha
     }   
     return FAILED;
 }
->>>>>>> 381e2b85a73eb32f5adb00643f2275eeaf34bf6f

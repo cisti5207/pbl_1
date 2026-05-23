@@ -246,3 +246,60 @@ void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form) {
 
 void SinhMaTheTuDong(int currentCount, char *maThe) { sprintf(maThe, "%08d", currentCount + 1); }
 void FreeMemberList(BanDoc *head) { while (head) { BanDoc *t = head; head = head->next; free(t); } }
+void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_y) {
+    if (the == NULL) return;
+
+    // Tính toán scale chuẩn theo màn hình như code gốc của bro
+    float screenW = (float)GetScreenWidth();
+    float screenH = (float)GetScreenHeight();
+    float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
+    if (scale < 0.5f) scale = 0.5f;
+
+    // Khởi tạo thẻ tại tọa độ truyền vào
+    Rectangle card = { toa_do_x, toa_do_y, 650*scale, 420*scale };
+    
+    // 1. Vẽ Đổ bóng & Nền thẻ
+    DrawRectangleRounded((Rectangle){card.x + 6*scale, card.y + 6*scale, card.width, card.height}, 0.1f, 10, Fade(BLACK, 0.2f));
+    DrawRectangleRounded(card, 0.1f, 10, GetColor(0xffd1dcff)); 
+    DrawRectangleRoundedLines(card, 0.1f, 10, MAROON);
+
+    // 2. Vẽ khu vực Avatar
+    Rectangle avatarBox = { card.x + 45*scale, card.y + 80*scale, 180*scale, 230*scale };
+    DrawRectangleRounded(avatarBox, 0.05f, 5, WHITE);
+    DrawRectangleRoundedLines(avatarBox, 0.05f, 5, MAROON); 
+    DrawCircle(avatarBox.x + avatarBox.width/2, avatarBox.y + 80*scale, 40*scale, Fade(MAROON, 0.3f));
+    DrawEllipse(avatarBox.x + avatarBox.width/2, avatarBox.y + 180*scale, 60*scale, 45*scale, Fade(MAROON, 0.3f));
+
+    // Tiêu đề & ID Thẻ (Lấy ID từ struct BanDoc)
+    DrawTextEx(font, "HoanHoang_DUT library", (Vector2){card.x + 260*scale, card.y + 32*scale}, 36*scale, 1, MAROON);
+    DrawTextEx(font, TextFormat("ID: %s", the->maThe), (Vector2){card.x + 45*scale, card.y + 340*scale}, 24*scale, 1, MAROON); 
+
+    // 3. In Thông tin từ struct BanDoc ra (Không dùng InputBox nữa)
+    const char* labels[] = {"Họ và tên:", "Số điện thoại:", "Căn cước công dân:", "Hạn sử dụng:"};
+    const char* values[] = {the->hoTen, the->sdt, the->cccd, the->hanSD};
+    
+    float textX = card.x + 270 * scale;
+    float startY = card.y + 95 * scale;
+    float boxWidth = 340 * scale;
+    float boxHeight = 42 * scale;
+    float spacing = 78 * scale;
+
+    for (int i = 0; i < 4; i++) {
+        // Vẽ Label nhỏ xíu phía trên (Màu đỏ Maroon)
+        DrawTextEx(font, labels[i], (Vector2){textX, startY + (i * spacing) - 22*scale}, 16*scale, 1, MAROON);
+        
+        // Vẽ background trắng cho giống cái khung nhập liệu (chỉ là khung trang trí)
+        Rectangle textBox = { textX, startY + (i * spacing), boxWidth, boxHeight };
+        DrawRectangleRounded(textBox, 0.2f, 10, WHITE);
+        DrawRectangleRoundedLines(textBox, 0.2f, 10, LIGHTGRAY); // Viền tĩnh màu xám
+        
+        // Cắt chữ nếu dài quá (tránh tràn ra ngoài khung)
+        BeginScissorMode((int)textBox.x + 5, (int)textBox.y, (int)textBox.width - 10, (int)textBox.height);
+            float fontSize = 20 * scale;
+            Vector2 textPos = { textBox.x + 10, textBox.y + (textBox.height - fontSize)/2 };
+            
+            // In nội dung (Tên, SDT, CCCD...) màu Hồng (PINK) như lúc nhập
+            DrawTextEx(font, values[i], textPos, fontSize, 1, PINK);
+        EndScissorMode();
+    }
+}
