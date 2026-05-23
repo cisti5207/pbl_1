@@ -2,8 +2,7 @@
 #define MAIN_H
 
 #include "raylib.h"
-
-#define MAX_PARTICLE 256
+#include "libmanage.h"
 
 typedef enum{
     LOGINAPP,
@@ -18,17 +17,11 @@ typedef struct {
     Rectangle DecribeBox;
     Rectangle FuncBox;
     Rectangle ShowFuncBox;
-
 } MainContainers;
 
 void MainLoadContainers(MainContainers *Containers, Size MainSize);
-void MainInitParticles(Size MainSize);
-void MainUpdateParticlesPosition(Size MainSize);
-void MainDrawParticle(void);
-void MainDrawConnection(void);
-Color MainAnimatedBackground(void);
 void MainDrawPanel(MainContainers Containers);
-void MainFunc(Rectangle ShowFuncBox, Vector2 Mouse);
-
-
+bool MainFunc(Rectangle ShowFuncBox, Vector2 Mouse);
+void LoadUserAvatar(Account acc, Texture2D *avatar);
+void MainDrawDescribeBox(Rectangle box, Account acc, Texture2D avatar, Font fontLarge, Font fontSmall);
 #endif // MAIN_H

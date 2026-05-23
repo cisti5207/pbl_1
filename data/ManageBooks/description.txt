@@ -1,0 +1,199 @@
+T001  Doraemon
+      Chú mèo máy Doraemon từ thế kỷ 22 đến giúp Nobita bằng những bảo bối thần kỳ,
+      mở ra vô số chuyến phiêu lưu hài hước và đầy ý nghĩa về tình bạn, gia đình.
+
+T002  Thám tử lừng danh Conan
+      Shinichi Kudo bị teo nhỏ thành Conan và phải che giấu thân phận trong lúc
+      truy tìm tổ chức áo đen qua hàng loạt vụ án hóc búa.
+
+T003  One Piece
+      Monkey D. Luffy cùng băng Mũ Rơm vượt đại dương để tìm kho báu One Piece
+      và theo đuổi giấc mơ trở thành Vua Hải Tặc.
+
+T004  Naruto
+      Naruto Uzumaki, cậu bé bị cô lập bởi Cửu Vĩ, nỗ lực trở thành Hokage
+      mạnh nhất để được mọi người công nhận.
+
+T005  Bảy viên ngọc rồng
+      Son Goku trải qua nhiều cuộc phiêu lưu và những trận chiến huyền thoại
+      nhằm bảo vệ Trái Đất khỏi các thế lực nguy hiểm.
+
+T006  Attack on Titan
+      Nhân loại sống sau những bức tường khổng lồ để chống lại Titan,
+      cho đến khi Eren quyết tâm khám phá sự thật của thế giới.
+
+T007  Bleach
+      Ichigo Kurosaki vô tình trở thành Tử thần và tham gia vào các cuộc chiến
+      giữa linh hồn, Hollow và Soul Society.
+
+T008  Death Note
+      Light Yagami nhặt được cuốn sổ có thể giết người chỉ bằng tên,
+      kéo theo cuộc đấu trí căng thẳng với thám tử L.
+
+T009  Thanh gươm diệt quỷ
+      Tanjiro Kamado dấn thân vào hành trình diệt quỷ để cứu em gái Nezuko
+      và trả thù cho gia đình bị sát hại.
+
+T010  Jujutsu Kaisen
+      Yuji Itadori bước vào thế giới chú thuật sau khi nuốt ngón tay Sukuna,
+      đối đầu với những lời nguyền đáng sợ.
+
+T011  Chainsaw Man
+      Denji, chàng trai nghèo sống bằng nghề săn quỷ, hợp nhất với quỷ cưa máy
+      để tồn tại trong thế giới đầy bạo lực và phản bội.
+
+T012  Hunter x Hunter
+      Gon Freecss rời quê hương để trở thành Hunter và tìm kiếm người cha mất tích,
+      khám phá một thế giới rộng lớn đầy hiểm nguy.
+
+T013  Fairy Tail
+      Hội pháp sư Fairy Tail nổi tiếng với những nhiệm vụ nguy hiểm,
+      tình đồng đội mạnh mẽ và các trận chiến phép thuật hoành tráng.
+
+T014  Black Clover
+      Asta sinh ra không có ma lực nhưng vẫn quyết tâm trở thành Ma Pháp Vương
+      bằng ý chí và sức mạnh phi thường.
+
+T015  Blue Lock
+      Dự án Blue Lock tập hợp các tiền đạo trẻ nhằm tạo ra chân sút ích kỷ nhất,
+      đưa bóng đá Nhật Bản lên đỉnh thế giới.
+
+T016  Haikyuu!!
+      Hinata Shoyo theo đuổi đam mê bóng chuyền dù sở hữu chiều cao hạn chế,
+      cùng đồng đội chinh phục các giải đấu trung học.
+
+T017  Kuroko no Basket
+      Kuroko và Kagami đối đầu với Thế hệ Kỳ tích trong những trận bóng rổ
+      đầy kỹ năng siêu thực và cạnh tranh khốc liệt.
+
+T018  Slam Dunk
+      Hanamichi Sakuragi từ một tên bất lương trở thành cầu thủ bóng rổ,
+      khám phá đam mê và tinh thần đồng đội.
+
+T019  Tokyo Revengers
+      Takemichi có khả năng quay về quá khứ để thay đổi tương lai,
+      cứu bạn bè khỏi những bi kịch băng đảng.
+
+T020  Spy x Family
+      Một điệp viên, sát thủ và cô bé ngoại cảm vô tình tạo nên gia đình giả,
+      che giấu bí mật riêng giữa cuộc sống thường ngày.
+
+T021  Dr. Stone
+      Sau khi nhân loại bị hóa đá hàng nghìn năm, Senku dùng tri thức khoa học
+      để khôi phục nền văn minh từ con số không.
+
+T022  My Hero Academia
+      Trong thế giới nơi siêu năng lực là điều bình thường, Izuku Midoriya
+      theo đuổi ước mơ trở thành anh hùng vĩ đại.
+
+T023  Fullmetal Alchemist
+      Hai anh em Edward và Alphonse Elric lên đường tìm Hòn đá Triết gia
+      sau thất bại của thuật giả kim cấm kỵ.
+
+T024  Yu-Gi-Oh!
+      Yugi Muto tham gia các trận đấu bài ma thuật sử dụng chiến thuật,
+      trí tuệ và sức mạnh từ linh hồn Pharaoh cổ đại.
+
+T025  Pokemon Adventures
+      Những huấn luyện viên trẻ phiêu lưu qua nhiều vùng đất,
+      chiến đấu và khám phá bí mật của thế giới Pokemon.
+
+T026  InuYasha
+      Kagome xuyên thời gian đến Nhật Bản thời chiến quốc và gặp InuYasha,
+      cùng nhau truy tìm mảnh ngọc Tứ Hồn.
+
+T027  Gintama
+      Trong Edo bị người ngoài hành tinh chiếm đóng, Gintoki cùng bạn bè
+      tạo nên những câu chuyện hài hước xen lẫn cảm động.
+
+T028  Berserk
+      Guts, kiếm sĩ cô độc mang thanh đại kiếm khổng lồ, chiến đấu chống quỷ dữ
+      và số phận tàn khốc trong thế giới đen tối.
+
+T029  Vagabond
+      Bộ truyện khắc họa hành trình trưởng thành của kiếm sĩ Miyamoto Musashi
+      trên con đường tìm kiếm sức mạnh và ý nghĩa cuộc sống.
+
+T030  JoJo's Bizarre Adventure
+      Nhiều thế hệ gia tộc Joestar đối đầu thế lực siêu nhiên bằng năng lực Stand
+      trong những cuộc phiêu lưu độc đáo và kỳ quái.
+
+T031  Sailor Moon
+      Usagi Tsukino trở thành Sailor Moon và cùng các chiến binh thủy thủ
+      bảo vệ thế giới trước thế lực bóng tối.
+
+T032  Cardcaptor Sakura
+      Sakura Kinomoto vô tình giải phóng các lá bài Clow ma thuật
+      và phải thu phục chúng để tránh thảm họa.
+
+T033  Detective School Q
+      Nhóm học sinh trường thám tử Dan khám phá các vụ án bí ẩn,
+      vận dụng suy luận để tìm ra hung thủ.
+
+T034  Kingdom
+      Câu chuyện thời Chiến Quốc Trung Hoa xoay quanh tham vọng thống nhất đất nước
+      và hành trình trở thành đại tướng của Tín.
+
+T035  The Promised Neverland
+      Những đứa trẻ tại trại Grace Field phát hiện bí mật kinh hoàng
+      và lập kế hoạch vượt ngục khỏi số phận đáng sợ.
+
+T036  Fire Force
+      Biệt đội cứu hỏa đặc biệt chiến đấu với các hỏa nhân tự bốc cháy,
+      đồng thời điều tra bí mật đằng sau hiện tượng này.
+
+T037  Soul Eater
+      Học sinh học viện Shibusen hợp tác cùng vũ khí sống để săn linh hồn,
+      ngăn chặn thế lực hắc ám trỗi dậy.
+
+T038  Assassination Classroom
+      Một sinh vật siêu mạnh trở thành giáo viên của lớp 3-E,
+      nơi học sinh phải ám sát thầy trước khi Trái Đất bị hủy diệt.
+
+T039  Katekyo Hitman Reborn!
+      Tsuna, cậu học sinh yếu đuối, được đào tạo để trở thành ông trùm mafia
+      dưới sự hướng dẫn kỳ quặc của Reborn.
+
+T040  Noragami
+      Yato là vị thần vô danh nhận mọi công việc để kiếm tín đồ,
+      vô tình cuốn vào nhiều trận chiến linh hồn.
+
+T041  Komi Can't Communicate
+      Komi mắc chứng khó giao tiếp nhưng luôn cố gắng kết bạn,
+      tạo nên những khoảnh khắc hài hước và dễ thương.
+
+T042  Your Lie in April
+      Thiên tài piano Kousei gặp nghệ sĩ violin Kaori,
+      người giúp cậu tìm lại tình yêu với âm nhạc.
+
+T043  A Silent Voice
+      Shoya tìm cách chuộc lỗi với cô bạn khiếm thính Shoko,
+      đối mặt với sự cô lập và cảm giác tội lỗi.
+
+T044  Fruits Basket
+      Tohru Honda khám phá bí mật gia tộc Soma,
+      những người bị biến thành con giáp khi bị ôm bởi người khác giới.
+
+T045  Nana
+      Hai cô gái cùng tên Nana gặp nhau tại Tokyo,
+      cùng trải qua tình yêu, âm nhạc và những biến động cuộc sống.
+
+T046  Beastars
+      Tại ngôi trường động vật, Legoshi phải đấu tranh giữa bản năng săn mồi
+      và cảm xúc của mình trong xã hội đầy định kiến.
+
+T047  Parasyte
+      Shinichi bị sinh vật ngoài hành tinh ký sinh vào tay phải,
+      cùng tồn tại và chiến đấu để bảo vệ loài người.
+
+T048  Akame ga Kill!
+      Tatsumi gia nhập Night Raid, nhóm sát thủ chống lại đế quốc mục nát
+      bằng những trận chiến tàn khốc.
+
+T049  Classroom of the Elite
+      Học sinh trong ngôi trường ưu tú cạnh tranh bằng trí tuệ và chiến lược
+      để đạt vị trí cao nhất.
+
+T050  Oshi no Ko
+      Bộ truyện khai thác mặt tối ngành giải trí Nhật Bản
+      thông qua câu chuyện đầy bi kịch và bí mật của các thần tượng.

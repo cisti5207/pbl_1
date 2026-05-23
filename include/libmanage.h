@@ -4,12 +4,13 @@
 #include "raylib.h"
 
 #define MAX_INPUT 256
+#define MAX_PARTICLE 256 // Đã chuyển từ main.h sang đây
 
-#define BRIGHTWHITE     (Color) {255, 255, 255, 255}
-#define BRIGHTGRAY      (Color) {209, 209, 209, 255}
-#define WHITESMOKE      (Color) {242, 242, 242, 255}
-#define TEALBLUE        (Color) {21, 96, 130, 255}
-#define SILVERGRAY      (Color) {191, 191, 191, 255}
+#define BRIGHTWHITE     (Color){255, 255, 255, 255}
+#define BRIGHTGRAY      (Color){209, 209, 209, 255}
+#define WHITESMOKE      (Color){242, 242, 242, 255}
+#define TEALBLUE        (Color){21, 96, 130, 255}
+#define SILVERGRAY      (Color){191, 191, 191, 255}
 #define NAVYBLUE        (Color){0, 0, 128, 255}
 #define RICHBLACK       (Color){13, 17, 23, 255}
 #define DARKNAVY        (Color){22, 27, 34, 255}
@@ -26,9 +27,19 @@
 #define WARNINGORANGE   (Color){243, 156, 18, 255}
 #define ERRORRED        (Color){231, 76, 60, 255}
 #define DARKBLUE1       (Color){0, 14, 46, 255}
+#define GRAY_1          (Color){255, 255, 255, 255}
+#define GRAY_2          (Color){229, 229, 229, 255}
+#define GRAY_3          (Color){204, 204, 204, 255}
+#define GRAY_4          (Color){178, 178, 178, 255}
+#define GRAY_5          (Color){153, 153, 153, 255}
+#define GRAY_6          (Color){127, 127, 127, 255}
+#define GRAY_7          (Color){102, 102, 102, 255}
+#define GRAY_8          (Color){ 76,  76,  76, 255}
+#define GRAY_9          (Color){ 51,  51,  51, 255}
+#define GRAY_10         (Color){  0,   0,   0, 255}
 
 #define QuantityFont 32
-#define FONT_SIZE 18
+#define FONT_SIZE 20
 
 #define Arial "font/arial/arial.ttf"
 #define ArialBold "font/arial/arialbd.ttf"
@@ -49,6 +60,7 @@ typedef enum{
     FOUND,
     FAILED
 } CheckResult;
+
 typedef enum {
     STAFF = 0,
     ADMINISTRATOR
@@ -67,6 +79,7 @@ typedef struct Particle {
     float radius;
     float alpha;
 } Particle;
+
 typedef struct {
     Vector2 Mouse;
     Vector2 Screen;
@@ -74,45 +87,35 @@ typedef struct {
     Vector2 Scale;
 } Size;
 
+// --- CÁC HÀM XỬ LÝ BACKGROUND ĐỘNG ---
+void InitParticles(Size size);
+void UpdateParticlesPosition(Size size);
+void DrawBackgroundParticles(void); 
+Color AnimatedBackground(void);
+
+// --- CÁC HÀM UI ---
 void LoadSize(Size *FormSize, Vector2 monitor, Vector2 screen, Vector2 scale, Vector2 mouse);
-/*
-    Cấp giá trị monitor, screen, scale và mouse cho Size
-    Với (Vector2) {0} thì các giá trị của Vector2 đó không đổi
-*/
-
 Font SetFontUTF8(const char *fontPath, int fontSize);
-/*
-    Dùng hàm này để cấp các font có sẵn trong folder "font"
-*/
-
 int lenStringUTF8(const char *str);
-/*
-    Hàm này sẽ độ dài chữ của UTF8
-*/
 void trim(char *str);
-/*
-    loại bỏ các dấu cách thừa phía trước và sau của chuỗi
-*/
 void DeleteLastWord(InputBox *input);
-// Ctrl + Backspace
-
 void PasteClipboard(InputBox *input);
-// Ctrl + V
-
 void DeleteLastChar(InputBox *input);
-// BackSpace
-
 void UpdateInputBox(InputBox *input);
-// Cập nhật chữ trong InputBox.text
-
 int UTF8Width(const char *s, int width);
-// Hàm này gọi là distance của utf8 sẽ hợp lí hơn, nó sẽ tính chênh lệch độ dài giữa độ dài thực tế và độ dài bit của string
-
 void DrawIcon(Rectangle box, Texture2D icon);
-// Vẽ icon theo khung box
-
 float FindRoundness(float len, float width, float height);
+<<<<<<< HEAD
 // Tính tỉ lệ roundness của rounded hay circle, ví dụ dùng rounded thì cần cấp giá trị float roundness, nhưng t sẽ dùng hàm này để điều khiển tỉ lệ đó bo tròn theo ý thích
 int TinhSoNgay(const char *ngaymuon, const char *ngaytrathucte);
 // Tính thời gian giữa 2 ngày mượn và trả thực tế(số ngày)
+=======
+int FindFontSize(float Width, Font font, int space, const char *str);
+
+void FormatPriceToVND(int price, char *buffer);
+void DrawTextAutoWrap(Font font, const char *text, Rectangle bounds, float fontSize, float spacing, Color color);
+
+bool StringContains(const char *haystack, const char *needle);
+
+>>>>>>> 381e2b85a73eb32f5adb00643f2275eeaf34bf6f
 #endif // LIBMANAGE_H
