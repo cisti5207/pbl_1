@@ -121,6 +121,8 @@ void LoadManageBooksUI (ManageBooksUI *UI, Size size);
 void ManageBooksTitle(Texture2D icon, ManageBooksUI UI);
 bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);
 
+void ToLowerCase(char *str);
+bool AdvancedBookSearch(Book book, const char *query);
 int CountStrInBooks (BookList *Books, const char *Str, StateFindBook state);
 
 void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, float *wheel, char *backTarget, bool isVisible);
