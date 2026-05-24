@@ -7,12 +7,6 @@
 #include <math.h>
 #include <ctype.h>
 
-// =========================================================================
-// KHAI BÁO CÁC HÀM TIỆN ÍCH TRÁNH LỖI BIÊN DỊCH
-// =========================================================================
-void ToLowerCase(char *str);
-void PrepareString(char *dest, const char *src, int max_len);
-bool ContextualBookSearch(Book book, const char *query);
 
 // Biến nhớ toàn cục để hệ thống biết bạn đang search từ Tab nào
 static MANAGEBOOKS_STATE g_searchContext = MANAGEBOOKS_Dashboard;
