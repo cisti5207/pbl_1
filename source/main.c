@@ -17,14 +17,8 @@ int main(){
     Size MainSize;
     LoadSize(
         &MainSize,
-        (Vector2) { 
-            GetMonitorWidth(0), 
-            GetMonitorHeight(0) 
-        },
-        (Vector2) { 
-            GetScreenWidth(), 
-            GetScreenHeight() 
-        },
+        (Vector2) { GetMonitorWidth(0), GetMonitorHeight(0) },
+        (Vector2) { GetScreenWidth(), GetScreenHeight() },
         (Vector2) { 
             (float)GetScreenWidth() / GetMonitorWidth(0), 
             (float)GetScreenHeight() / GetMonitorHeight(0) 
@@ -68,10 +62,7 @@ int main(){
         LoadSize(
             &MainSize,
             (Vector2) {0},
-            (Vector2) { 
-                GetScreenWidth(), 
-                GetScreenHeight() 
-            },
+            (Vector2) { GetScreenWidth(), GetScreenHeight() },
             (Vector2) { 
                 (float)GetScreenWidth() / GetMonitorWidth(0), 
                 (float)GetScreenHeight() / GetMonitorHeight(0) 
@@ -300,49 +291,95 @@ void MainDrawPanel(MainContainers Containers){
     DrawRectangleRounded(Containers.PanelBox, FindRoundness(rounded, Containers.PanelBox.width, Containers.PanelBox.height), 10, Fade(SOFTWHITE, 0.1f));
     
     // ----------------------------------------------------
-    // HIỆU ỨNG CẦU VỒNG BO TRÒN - LƯU CHUYỂN QUA LẠI
+    // HIỆU ỨNG CẦU VỒNG LƯU CHUYỂN QUA LẠI
     // ----------------------------------------------------
     float funcRoundness = FindRoundness(rounded, Containers.FuncBox.width, Containers.FuncBox.height);
     float w = Containers.FuncBox.width;
     float h = Containers.FuncBox.height;
     
-    // Tính bán kính bo góc (R) quy đổi sang pixel
     float minDim = (w < h) ? w : h;
     float R = funcRoundness * (minDim / 2.0f); 
     
-    // Dùng hàm sin() kết hợp GetTime() để tạo độ dời (offset), làm màu sắc trôi qua trôi lại (ping-pong)
     float timeOffset = sin(GetTime() * 1.5f) * 180.0f; 
     
     for (int i = 0; i < (int)w; i++) {
-        // Trải dài hệ màu HSV (360 độ) theo chiều ngang và cộng thêm độ dời thời gian
         float hue = fmod(timeOffset + ((float)i / w) * 360.0f + 360.0f, 360.0f);
-        Color c = ColorFromHSV(hue, 0.85f, 0.9f); // Giảm nhẹ độ bão hòa (0.85) để màu nhìn dịu mắt hơn
+        Color c = ColorFromHSV(hue, 0.85f, 0.9f); 
         
         float dx = 0;
-        // Kiểm tra xem nét vẽ hiện tại có nằm trong khu vực 2 góc bo tròn không
         if (i < R) dx = R - i; 
         else if (i > w - R) dx = i - (w - R);
         
         float dy = 0;
         if (dx > 0 && R > 0) {
-            // Áp dụng phương trình đường tròn: dx^2 + (R - dy)^2 = R^2 
             float val = R * R - dx * dx;
             if (val > 0) dy = R - sqrt(val);
             else dy = R;
         }
-        
-        // Vẽ từng thanh dọc nhỏ ghép lại thành dải gradient, tự động thụt vào (dy) để tạo hình bo tròn
         DrawRectangle((int)(Containers.FuncBox.x + i), (int)(Containers.FuncBox.y + dy), 1, (int)(h - 2 * dy), c);
     }
     
-    // Vẽ thêm một lớp viền mỏng ngoài cùng để che khuyết điểm răng cưa (nếu có) và làm khối nổi lên
     DrawRectangleRoundedLinesEx(Containers.FuncBox, funcRoundness, 10, 2.0f, Fade(LIGHTGRAY, 0.5f));
-    // ----------------------------------------------------
-
     DrawRectangleRounded(Containers.ShowFuncBox, FindRoundness(rounded, Containers.ShowFuncBox.width, Containers.ShowFuncBox.height), 10, BRIGHTWHITE);
 }
 
+// -------------------------------------------------------------------------
+// HÀM VẼ THẺ ẢNH (BẢN GỌN NHẸ - KHÔNG DÙNG THUẬT TOÁN BO GÓC)
+// -------------------------------------------------------------------------
+static void DrawMainCard(Texture2D tex, Rectangle box, const char* title, Vector2 mouse) {
+    bool isHovered = CheckCollisionPointRec(mouse, box);
+    
+    // 1. Nếu không có ảnh thì vẽ khối chữ nhật đen
+    if (tex.id == 0) {
+        DrawRectangleRec(box, BLACK);
+    } else {
+        // 2. THUẬT TOÁN CENTER CROP CHUẨN (Giữ nguyên tỷ lệ, cắt rìa, không làm bóp méo ảnh)
+        float boxRatio = box.width / box.height;
+        float texRatio = (float)tex.width / (float)tex.height;
+        
+        Rectangle srcRec;
+        if (texRatio > boxRatio) {
+            // Ảnh gốc bè ngang hơn box -> Giữ nguyên height, cắt bớt 2 bên trái/phải
+            float newWidth = tex.height * boxRatio;
+            srcRec = (Rectangle){ (tex.width - newWidth) / 2.0f, 0.0f, newWidth, (float)tex.height };
+        } else {
+            // Ảnh gốc cao hơn box -> Giữ nguyên width, cắt bớt đỉnh/đáy
+            float newHeight = tex.width / boxRatio;
+            srcRec = (Rectangle){ 0.0f, (tex.height - newHeight) / 2.0f, (float)tex.width, newHeight };
+        }
+        
+        // Vẽ ảnh vuông vức lấp đầy thẻ
+        DrawTexturePro(tex, srcRec, box, (Vector2){0,0}, 0.0f, WHITE);
+    }
+    
+    // 3. Phủ một viền ngoài mỏng tạo điểm nhấn
+    DrawRectangleLinesEx(box, 2.0f, Fade(BLACK, 0.2f));
+    
+    // 4. Hiệu ứng Hover làm tối toàn bộ khối hình chữ nhật
+    if (isHovered) {
+        DrawRectangleRec(box, Fade(BLACK, 0.3f));
+    }
+
+    // 5. Vẽ Text căn giữa ở dưới Thẻ
+    int fontSize = 20;
+    float WidthText = MeasureText(title, fontSize);
+    Vector2 TextPos = { box.x + (box.width - WidthText) * 0.5f, box.y + box.height + 40 };
+    DrawText(title, (int) TextPos.x, (int) TextPos.y, fontSize, isHovered ? TEALBLUE : BLACK);
+}
+
 bool MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
+    // Nạp ảnh tĩnh (Tải 1 lần duy nhất chống giật FPS)
+    static Texture2D texBook = {0}, texUser = {0}, texBorrow = {0}, texStatistic = {0};
+    static bool isLoaded = false;
+    
+    if (!isLoaded) {
+        texBook = LoadTexture("img/main_symbol/book.png");
+        texUser = LoadTexture("img/main_symbol/user.png");
+        texBorrow = LoadTexture("img/main_symbol/borrow.png");
+        texStatistic = LoadTexture("img/main_symbol/statistic.png");
+        isLoaded = true;
+    }
+
     int i = 0;
     float ratioDistance = 0.1f;
     float widthScissor = ShowFuncBox.width - ShowFuncBox.width/4 * ratioDistance;
@@ -376,41 +413,13 @@ bool MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
         ShowFuncBox.height * 0.7f 
     };
 
-    float roundness = widthCard * 0.1f;
-    float WidthText;
+    // Gọi hàm vẽ Thẻ Ảnh chuyên nghiệp (Chỉ còn Center Crop giữ nguyên tỷ lệ, đã gỡ bo góc)
+    DrawMainCard(texBook, ManageBooksBox, "Manage Books", Mouse);
+    DrawMainCard(texUser, ManageUserBox, "Manage User", Mouse);
+    DrawMainCard(texBorrow, ManageBorrowBox, "Manage Borrow", Mouse);
+    DrawMainCard(texStatistic, StatisticBox, "Statistic", Mouse);
 
-    DrawRectangleRounded(ManageBooksBox, FindRoundness(roundness, ManageBooksBox.width, ManageBooksBox.height), 10, BLACK);
-    WidthText = MeasureText("Manage Books", 20);
-    Vector2 ManageBooksText = { 
-        ManageBooksBox.x + (ManageBooksBox.width - WidthText) * 0.5f, 
-        ManageBooksBox.y + ManageBooksBox.height + 50 
-    };
-    DrawText("Manage Books", (int) ManageBooksText.x, (int) ManageBooksText.y, 20, BLACK);
-    
-    DrawRectangleRounded(ManageUserBox, FindRoundness(roundness, ManageUserBox.width, ManageUserBox.height), 10, BLACK);
-    WidthText = MeasureText("Manage User", 20);
-    Vector2 ManageUserText = { 
-        ManageUserBox.x + (ManageUserBox.width - WidthText) * 0.5f, 
-        ManageUserBox.y + ManageUserBox.height + 50 
-    };
-    DrawText("Manage User", (int) ManageUserText.x, (int) ManageUserText.y, 20, BLACK);
-
-    DrawRectangleRounded(ManageBorrowBox, FindRoundness(roundness, ManageBorrowBox.width, ManageBorrowBox.height), 10, BLACK);
-    WidthText = MeasureText("Manage Borrow", 20);
-    Vector2 ManageBorrowText = { 
-        ManageBorrowBox.x + (ManageBorrowBox.width - WidthText) * 0.5f, 
-        ManageBorrowBox.y + ManageBorrowBox.height + 50 
-    };
-    DrawText("Manage Borrow", (int) ManageBorrowText.x, (int) ManageBorrowText.y, 20, BLACK);
-
-    DrawRectangleRounded(StatisticBox, FindRoundness(roundness, StatisticBox.width, StatisticBox.height), 10, BLACK);
-    WidthText = MeasureText("Statistic", 20);
-    Vector2 StatisticText = { 
-        StatisticBox.x + (StatisticBox.width - WidthText) * 0.5f, 
-        StatisticBox.y + StatisticBox.height + 50 
-    };
-    DrawText("Statistic", (int) StatisticText.x, (int) StatisticText.y, 20, BLACK);
-
+    // Xử lý sự kiện click
     if (CheckCollisionPointRec(Mouse, ManageBooksBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         APP_STATE = MANAGEBOOKS; return 1;
     }

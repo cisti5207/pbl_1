@@ -7,6 +7,12 @@
 #include <math.h>
 #include <ctype.h>
 
+// =========================================================================
+// KHAI BÁO CÁC HÀM TIỆN ÍCH TRÁNH LỖI BIÊN DỊCH
+// =========================================================================
+void NormalizeString(const char* src, char* dest, int max_len);
+float CalculateSimilarity(const char* query, const char* text);
+bool ContextualBookSearch(Book book, const char *query);
 
 // Biến nhớ toàn cục để hệ thống biết bạn đang search từ Tab nào
 static MANAGEBOOKS_STATE g_searchContext = MANAGEBOOKS_Dashboard;
@@ -83,9 +89,6 @@ void InitManageBooks(Role _role){
 
         ManageBooksTitle(Avatar, customUI);
 
-        // ------------------------------------------------------------------
-        // GHI NHỚ TAB ĐANG ĐỨNG TRƯỚC KHI BẤM TÌM KIẾM
-        // ------------------------------------------------------------------
         MANAGEBOOKS_STATE loopOldState = State;
         if (ManageBooksFunc(&State, &FindBar, Icon_Find, customUI, ManageBooksSize, _Font) == 1){
             if (State == MANAGEBOOKS_Find) {
@@ -261,6 +264,7 @@ void InitManageBooks(Role _role){
                         prevState = State; 
                         State = MANAGEBOOKS_Detail; 
                     }
+
                     DrawPagination(customUI, Books, _Font, ManageBooksSize, &wheel, NULL, showPagination);
                 }
                 break;
@@ -1049,29 +1053,101 @@ void ManageBooksTitle(Texture2D icon, ManageBooksUI UI){
     DrawIcon(IconBox, icon);
 }
 
-void ToLowerCase(char *str) {
-    for(int i = 0; str[i]; i++) {
-        if ((unsigned char)str[i] < 128) {
-            str[i] = tolower((unsigned char)str[i]);
+// ------------------------------------------------------------------
+// BỘ LỌC CHUẨN HÓA TIẾNG VIỆT (KHÔNG DẤU, KHÔNG CÁCH)
+// ------------------------------------------------------------------
+void NormalizeString(const char* src, char* dest, int max_len) {
+    const char* vn_utf8[] = {
+        "à","á","ạ","ả","ã","â","ầ","ấ","ậ","ẩ","ẫ","ă","ằ","ắ","ặ","ẳ","ẵ",
+        "è","é","ẹ","ẻ","ẽ","ê","ề","ế","ệ","ể","ễ",
+        "ì","í","ị","ỉ","ĩ",
+        "ò","ó","ọ","ỏ","õ","ô","ồ","ố","ộ","ổ","ỗ","ơ","ờ","ớ","ợ","ở","ỡ",
+        "ù","ú","ụ","ủ","ũ","ư","ừ","ứ","ự","ử","ữ",
+        "ỳ","ý","ỵ","ỷ","ỹ",
+        "đ",
+        "À","Á","Ạ","Ả","Ã","Â","Ầ","Ấ","Ậ","Ẩ","Ẫ","Ă","Ằ","Ắ","Ặ","Ẳ","Ẵ",
+        "È","É","Ẹ","Ẻ","Ẽ","Ê","Ề","Ế","Ệ","Ể","Ễ",
+        "Ì","Í","Ị","Ỉ","Ĩ",
+        "Ò","Ó","Ọ","Ỏ","Õ","Ô","Ồ","Ố","Ộ","Ổ","Ỗ","Ơ","Ờ","Ớ","Ợ","Ở","Ỡ",
+        "Ù","Ú","Ụ","Ủ","Ũ","Ư","Ừ","Ứ","Ự","Ử","Ữ",
+        "Ỳ","Ý","Ỵ","Ỷ","Ỹ",
+        "Đ"
+    };
+    const char ascii_repl[] = {
+        'a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a',
+        'e','e','e','e','e','e','e','e','e','e','e',
+        'i','i','i','i','i',
+        'o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o',
+        'u','u','u','u','u','u','u','u','u','u','u',
+        'y','y','y','y','y',
+        'd',
+        'a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a',
+        'e','e','e','e','e','e','e','e','e','e','e',
+        'i','i','i','i','i',
+        'o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o',
+        'u','u','u','u','u','u','u','u','u','u','u',
+        'y','y','y','y','y',
+        'd'
+    };
+    int num_vn = sizeof(vn_utf8) / sizeof(vn_utf8[0]);
+    int i = 0, j = 0;
+
+    while (src[i] != '\0' && j < max_len - 1) {
+        // [QUAN TRỌNG] Bỏ qua toàn bộ dấu cách (Không khoảng trắng)
+        if (isspace((unsigned char)src[i])) {
+            i++;
+            continue; 
+        }
+        
+        bool replaced = false;
+        // Quét và xóa toàn bộ dấu Tiếng Việt
+        for (int k = 0; k < num_vn; k++) {
+            int len = strlen(vn_utf8[k]);
+            if (strncmp(&src[i], vn_utf8[k], len) == 0) {
+                dest[j++] = ascii_repl[k];
+                i += len;
+                replaced = true;
+                break;
+            }
+        }
+        
+        // Đưa về chữ cái thường (lowercase)
+        if (!replaced) {
+            dest[j++] = tolower((unsigned char)src[i]);
+            i++;
         }
     }
-}
-
-// Giới hạn max_len để chống tràn bộ nhớ
-void PrepareString(char *dest, const char *src, int max_len) {
-    while(*src && isspace((unsigned char)*src)) src++;
-    strncpy(dest, src, max_len - 1);
-    dest[max_len - 1] = '\0';
-    int len = strlen(dest);
-    while(len > 0 && isspace((unsigned char)dest[len-1])) {
-        dest[len-1] = '\0';
-        len--;
-    }
-    ToLowerCase(dest);
+    dest[j] = '\0';
 }
 
 // ------------------------------------------------------------------
-// THUẬT TOÁN TÌM KIẾM ĐA NGỮ CẢNH (HỖ TRỢ NGOẶC KÉP "..." + "...")
+// THUẬT TOÁN TÍNH % GIỐNG NHAU (FUZZY MATCH >= 65%)
+// ------------------------------------------------------------------
+float CalculateSimilarity(const char* query, const char* text) {
+    int qLen = strlen(query);
+    int tLen = strlen(text);
+    if (qLen == 0) return 1.0f;
+    if (tLen == 0) return 0.0f;
+    
+    // Nếu text chứa trọn vẹn query -> Giống 100%
+    if (strstr(text, query) != NULL) return 1.0f;
+    
+    // Từ quá ngắn (1 ký tự) bắt buộc phải giống chính xác
+    if (qLen < 2) return 0.0f;
+    
+    // Cắt đôi từ khóa để đối chiếu chống gõ sai (Thuật toán Bigram)
+    int matches = 0;
+    for (int i = 0; i < qLen - 1; i++) {
+        char bigram[3] = {query[i], query[i+1], '\0'};
+        if (strstr(text, bigram) != NULL) {
+            matches++;
+        }
+    }
+    return (float)matches / (qLen - 1); // Trả về tỷ lệ % (0.0 đến 1.0)
+}
+
+// ------------------------------------------------------------------
+// BỘ TÌM KIẾM MẠNH NHẤT (HỖ TRỢ NGOẶC KÉP VÀ DẤU CỘNG)
 // ------------------------------------------------------------------
 bool ContextualBookSearch(Book book, const char *query) {
     if (query == NULL || strlen(query) == 0) return true;
@@ -1080,20 +1156,21 @@ bool ContextualBookSearch(Book book, const char *query) {
     strncpy(queryCopy, query, sizeof(queryCopy) - 1);
     queryCopy[sizeof(queryCopy) - 1] = '\0';
 
-    char part1[256] = {0};
-    char part2[256] = {0};
+    char rawPart1[256] = {0};
+    char rawPart2[256] = {0};
     bool isExact1 = false;
     bool isExact2 = false;
 
+    // Quét tìm cú pháp Ngoặc kép "..." + "..."
     if (strchr(queryCopy, '"') != NULL) {
         const char *q1_start = strchr(queryCopy, '"');
         const char *q1_end = strchr(q1_start + 1, '"');
         
         if (q1_end) {
             int len1 = q1_end - (q1_start + 1);
-            if (len1 >= sizeof(part1)) len1 = sizeof(part1) - 1;
-            strncpy(part1, q1_start + 1, len1);
-            part1[len1] = '\0';
+            if (len1 >= sizeof(rawPart1)) len1 = sizeof(rawPart1) - 1;
+            strncpy(rawPart1, q1_start + 1, len1);
+            rawPart1[len1] = '\0';
             isExact1 = true;
 
             const char *q2_start = strchr(q1_end + 1, '"');
@@ -1101,77 +1178,70 @@ bool ContextualBookSearch(Book book, const char *query) {
                 const char *q2_end = strchr(q2_start + 1, '"');
                 if (q2_end) {
                     int len2 = q2_end - (q2_start + 1);
-                    if (len2 >= sizeof(part2)) len2 = sizeof(part2) - 1;
-                    strncpy(part2, q2_start + 1, len2);
-                    part2[len2] = '\0';
+                    if (len2 >= sizeof(rawPart2)) len2 = sizeof(rawPart2) - 1;
+                    strncpy(rawPart2, q2_start + 1, len2);
+                    rawPart2[len2] = '\0';
                     isExact2 = true;
                 }
             }
         }
     } 
     
+    // Cú pháp dấu cộng truyền thống
     if (!isExact1) {
         char *plusPtr = strchr(queryCopy, '+');
         if (plusPtr != NULL) {
             *plusPtr = '\0'; 
-            PrepareString(part1, queryCopy, sizeof(part1));
-            PrepareString(part2, plusPtr + 1, sizeof(part2));
+            strcpy(rawPart1, queryCopy);
+            strcpy(rawPart2, plusPtr + 1);
         } else {
-            PrepareString(part1, queryCopy, sizeof(part1));
+            strcpy(rawPart1, queryCopy);
         }
-    } else {
-        ToLowerCase(part1);
-        ToLowerCase(part2);
     }
 
-    bool matchPart1 = true;
-    char fieldData[512] = {0};
-
-    switch (g_searchContext) {
-        case MANAGEBOOKS_Author: strcpy(fieldData, book.AuthorBook); break;
-        case MANAGEBOOKS_Publisher: strcpy(fieldData, book.PublisherBook); break;
-        case MANAGEBOOKS_Type: strcpy(fieldData, book.TypeBook); break;
-        case MANAGEBOOKS_Dashboard:
-        default: strcpy(fieldData, book.NameBook); break;
-    }
-    ToLowerCase(fieldData);
+    char normPart1[256] = {0};
+    char normPart2[256] = {0};
     
-    if (strlen(part1) > 0) {
+    // Bình thường hóa: Ép sạch dấu tiếng việt, khoảng trắng, viết hoa
+    if (strlen(rawPart1) > 0) NormalizeString(rawPart1, normPart1, sizeof(normPart1));
+    if (strlen(rawPart2) > 0) NormalizeString(rawPart2, normPart2, sizeof(normPart2));
+
+    // --- KIỂM TRA VẾ 1 (TÌM THEO NGỮ CẢNH CỦA TAB ĐANG ĐỨNG) ---
+    char rawFieldData[512] = {0};
+    switch (g_searchContext) {
+        case MANAGEBOOKS_Author: strcpy(rawFieldData, book.AuthorBook); break;
+        case MANAGEBOOKS_Publisher: strcpy(rawFieldData, book.PublisherBook); break;
+        case MANAGEBOOKS_Type: strcpy(rawFieldData, book.TypeBook); break;
+        case MANAGEBOOKS_Dashboard:
+        default: strcpy(rawFieldData, book.NameBook); break;
+    }
+    
+    char normFieldData[512] = {0};
+    NormalizeString(rawFieldData, normFieldData, sizeof(normFieldData));
+    
+    if (strlen(normPart1) > 0) {
         if (isExact1) {
-            if (strstr(fieldData, part1) == NULL) matchPart1 = false;
+            if (strstr(normFieldData, normPart1) == NULL) return false;
         } else {
-            char p1Copy[256];
-            strcpy(p1Copy, part1);
-            char *token = strtok(p1Copy, " \t");
-            while (token != NULL) {
-                if (strstr(fieldData, token) == NULL) {
-                    matchPart1 = false;
-                    break;
-                }
-                token = strtok(NULL, " \t");
-            }
+            // Tính toán % giống nhau. >65% (0.65f) là đạt!
+            if (CalculateSimilarity(normPart1, normFieldData) < 0.65f) return false;
         }
     }
 
-    if (!matchPart1) return false;
-
-    if (strlen(part2) > 0) {
-        char combinedData[2048];
-        sprintf(combinedData, "%s %s %s %s %s %s", 
+    // --- KIỂM TRA VẾ 2 (LỌC TRÊN TOÀN BỘ DỮ LIỆU) ---
+    if (strlen(normPart2) > 0) {
+        char rawCombined[2048];
+        sprintf(rawCombined, "%s %s %s %s %s %s", 
             book.CodeBook, book.NameBook, book.NormNameBook, 
             book.AuthorBook, book.TypeBook, book.PublisherBook);
-        ToLowerCase(combinedData);
+            
+        char normCombined[2048] = {0};
+        NormalizeString(rawCombined, normCombined, sizeof(normCombined));
 
         if (isExact2) {
-            if (strstr(combinedData, part2) == NULL) return false;
+            if (strstr(normCombined, normPart2) == NULL) return false;
         } else {
-            char p2Copy[256];
-            strcpy(p2Copy, part2);
-            char *token = strtok(p2Copy, " \t");
-            while (token != NULL) {
-                if (strstr(combinedData, token) == NULL) return false;
-                token = strtok(NULL, " \t");
-            }
+            if (CalculateSimilarity(normPart2, normCombined) < 0.65f) return false;
         }
     }
 
