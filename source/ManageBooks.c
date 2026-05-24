@@ -7,20 +7,14 @@
 #include <math.h>
 #include <ctype.h>
 
-// =========================================================================
-// KHAI BÁO CÁC HÀM TIỆN ÍCH TRÁNH LỖI BIÊN DỊCH
-// =========================================================================
-void NormalizeString(const char* src, char* dest, int max_len);
-float CalculateSimilarity(const char* query, const char* text);
-bool ContextualBookSearch(Book book, const char *query);
-
 // Biến nhớ toàn cục để hệ thống biết bạn đang search từ Tab nào
 static MANAGEBOOKS_STATE g_searchContext = MANAGEBOOKS_Dashboard;
 
 // =========================================================================
 // HÀM KHỞI TẠO VÀ VÒNG LẶP CHÍNH
 // =========================================================================
-void InitManageBooks(Role _role){
+void InitManageBooks(Role _role)
+{
     Size ManageBooksSize;
     LoadSize(
         &ManageBooksSize,
@@ -199,6 +193,20 @@ void InitManageBooks(Role _role){
                 char authorToCheck[256];
                 strcpy(authorToCheck, Books->theArray[requestDeleteIndex].AuthorBook);
 
+                // ==========================================
+                // ĐOẠN CODE THÊM VÀO ĐỂ XÓA ẢNH TRUYỆN
+                // ==========================================
+                char imgPath[512];
+                // Định dạng đường dẫn file ảnh dựa trên CodeBook của truyện sắp xóa
+                sprintf(imgPath, "img/img_books/%s.jpg", Books->theArray[requestDeleteIndex].CodeBook);
+                
+                // Tiến hành xóa file ảnh vật lý trên ổ đĩa
+                if (remove(imgPath) == 0) {
+                    printf("Xoa anh thanh cong: %s\n", imgPath);
+                } else {
+                    printf("Khong the xoa anh (file khong ton tai hoac dang bi khoa): %s\n", imgPath);
+                }
+                
                 for (int k = requestDeleteIndex; k < Books->count - 1; k++) {
                     Books->theArray[k] = Books->theArray[k+1];
                 }
@@ -489,8 +497,16 @@ void ShowBookDetail_Panel(Size size, ManageBooksUI UI, Font *_Font, Book book, M
 
 int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs) {
     int result = 0; 
-    Rectangle panelArea = { UI.Panel.x, UI.Panel.y, UI.Panel.width, UI.Panel.height };
+    Rectangle panelArea = { 
+        UI.Panel.x, 
+        UI.Panel.y, 
+        UI.Panel.width, 
+        UI.Panel.height 
+    };
     DrawRectangleRec(panelArea, (Color){ 30, 30, 30, 255 });
+
+    // Biến static để lưu trạng thái lỗi (có hiển thị cảnh báo hay không)
+    static bool showValidationError = false;
 
     float titleFontSize = panelArea.height * 0.045f;
     if (titleFontSize < 25.0f) titleFontSize = 25.0f;
@@ -526,6 +542,11 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
     float inputTextSize = labelFontSize;
 
     bool clickedAnywhere = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+
+    // Ẩn thông báo lỗi nếu người dùng click để sửa dữ liệu
+    if (clickedAnywhere) {
+        showValidationError = false;
+    }
 
     for (int i = 0; i < 8; i++) {
         if (i < 7) {
@@ -564,9 +585,12 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
             boxOutlineColor = GRAY;
         } else {
             bool hasText = (strlen(inputs[i].text) > 0);
+            // Bôi đỏ viền nếu đang báo lỗi và ô này đang trống
+            bool isErrorBox = (showValidationError && !hasText);
+            
             boxBgColor = (inputs[i].isFocused || hasText) ? WHITESMOKE : GRAY;
-            boxOutlineColor = inputs[i].isFocused ? TEALBLUE : DARKGRAY;
-            outlineThick = inputs[i].isFocused ? 3.0f : 2.0f;
+            boxOutlineColor = isErrorBox ? RED : (inputs[i].isFocused ? TEALBLUE : DARKGRAY);
+            outlineThick = inputs[i].isFocused ? 3.0f : (isErrorBox ? 2.5f : 2.0f);
         }
 
         DrawRectangleRounded(inputs[i].box, roundness, 10, boxBgColor);
@@ -627,8 +651,48 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
     float wSave = MeasureTextEx(_Font[0], "LƯU TRUYỆN", inputTextSize + 2.0f, 1).x;
     DrawTextEx(_Font[0], "LƯU TRUYỆN", (Vector2){btnSave.x + (btnSave.width - wSave)/2, btnSave.y + (btnSave.height - (inputTextSize + 2.0f))/2}, inputTextSize + 2.0f, 1, WHITE);
     
+    // --- BỘ XÁC MINH DỮ LIỆU ---
     if (hoverSave && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        result = 1;
+        bool isValid = true;
+        
+        // Quét từ ô 1 (Tên truyện) đến ô 7 (Mô tả)
+        for (int i = 1; i < 8; i++) {
+            bool hasValidChar = false;
+            
+            // Kiểm tra xem chuỗi có ký tự nào khác khoảng trắng/xuống dòng không
+            for (int j = 0; j < inputs[i].length; j++) {
+                if (inputs[i].text[j] != ' ' && inputs[i].text[j] != '\n') {
+                    hasValidChar = true;
+                    break;
+                }
+            }
+            
+            // Nếu phát hiện có ô trống hoặc chỉ chứa khoảng trắng
+            if (!hasValidChar) {
+                isValid = false;
+                break; 
+            }
+        }
+
+        if (isValid) {
+            showValidationError = false;
+            result = 1; // Cho phép Lưu
+        } else {
+            showValidationError = true; // Kích hoạt hiển thị cảnh báo
+        }
+    }
+
+    // --- HIỂN THỊ DÒNG CHỮ CẢNH BÁO ---
+    if (showValidationError) {
+        float distance = panelArea.y + panelArea.height - btnSave.y - btnSave.height;
+        const char *errorMsg = "* Lỗi: Vui lòng nhập đầy đủ thông tin vào tất cả các ô!";
+        float errFontSize = distance * 0.65f;
+        float errWidth = MeasureTextEx(_Font[0], errorMsg, errFontSize, 1).x;
+        Vector2 errPos = { 
+            panelArea.x + (panelArea.width - errWidth) / 2.0f,
+            btnSave.y + btnSave.height + distance * 0.2f
+        };
+        DrawTextEx(_Font[0], errorMsg, errPos, errFontSize, 1, RED);
     }
 
     return result;

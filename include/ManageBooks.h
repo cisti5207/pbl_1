@@ -126,11 +126,11 @@ void ShowType_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Type
 
 void LoadManageBooksUI (ManageBooksUI *UI, Size size);
 void ManageBooksTitle(Texture2D icon, ManageBooksUI UI);
-void ToLowerCase(char *str);
 
-void PrepareString(char *dest, const char *src, int max_len);
-
+void NormalizeString(const char* src, char* dest, int max_len);
+float CalculateSimilarity(const char* query, const char* text);
 bool ContextualBookSearch(Book book, const char *query);
+
 int CountStrInBooks (BookList *Books, const char *Str, StateFindBook state);
 void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, float *wheel, char *backTarget, bool isVisible);
 bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);

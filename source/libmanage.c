@@ -167,12 +167,25 @@ void UpdateInputBox(InputBox *input){
         DeleteLastWord(input);
     } else {
         int keycode = GetKeyPressed();
+        int backspaceCount = 0;
+        
+        // 1. Đếm số lượng tín hiệu Backspace được gửi tới trong 1 frame
         while (keycode > 0) {
-            if (keycode == KEY_BACKSPACE) DeleteLastChar(input);
+            if (keycode == KEY_BACKSPACE) backspaceCount++;
             keycode = GetKeyPressed();
         }
-        if (IsKeyPressedRepeat(KEY_BACKSPACE)) DeleteLastChar(input);
+        
+        // 2. Thực hiện xóa tương ứng với số lệnh nhận được (rất quan trọng để Unikey hoạt động đúng)
+        for (int i = 0; i < backspaceCount; i++) {
+            DeleteLastChar(input);
+        }
+        
+        // 3. Chỉ kích hoạt xóa liên tục (repeat) nếu người dùng đang chủ động giữ phím
+        if (backspaceCount == 0 && IsKeyPressedRepeat(KEY_BACKSPACE)) {
+            DeleteLastChar(input);
+        }
     }
+    
     int charKey = GetCharPressed();
     while (charKey > 0) {
         int size = 0;
