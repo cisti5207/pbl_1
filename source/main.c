@@ -324,14 +324,18 @@ void MainDrawPanel(MainContainers Containers){
 }
 
 // -------------------------------------------------------------------------
-// HÀM VẼ THẺ ẢNH (BẢN GỌN NHẸ - KHÔNG DÙNG THUẬT TOÁN BO GÓC)
+// HÀM VẼ THẺ ẢNH (BẢN CẬP NHẬT - CÓ BO GÓC)
 // -------------------------------------------------------------------------
 static void DrawMainCard(Texture2D tex, Rectangle box, const char* title, Vector2 mouse) {
     bool isHovered = CheckCollisionPointRec(mouse, box);
     
-    // 1. Nếu không có ảnh thì vẽ khối chữ nhật đen
+    // Cài đặt thông số bo góc
+    float roundness = 0.15f; // Tỉ lệ bo góc (0.0 đến 1.0)
+    int segments = 16;       // Độ mịn của đường cong
+
+    // 1. Nếu không có ảnh thì vẽ khối nền đen bo góc
     if (tex.id == 0) {
-        DrawRectangleRec(box, BLACK);
+        DrawRectangleRounded(box, roundness, segments, BLACK);
     } else {
         // 2. THUẬT TOÁN CENTER CROP CHUẨN (Giữ nguyên tỷ lệ, cắt rìa, không làm bóp méo ảnh)
         float boxRatio = box.width / box.height;
@@ -339,25 +343,28 @@ static void DrawMainCard(Texture2D tex, Rectangle box, const char* title, Vector
         
         Rectangle srcRec;
         if (texRatio > boxRatio) {
-            // Ảnh gốc bè ngang hơn box -> Giữ nguyên height, cắt bớt 2 bên trái/phải
             float newWidth = tex.height * boxRatio;
             srcRec = (Rectangle){ (tex.width - newWidth) / 2.0f, 0.0f, newWidth, (float)tex.height };
         } else {
-            // Ảnh gốc cao hơn box -> Giữ nguyên width, cắt bớt đỉnh/đáy
             float newHeight = tex.width / boxRatio;
             srcRec = (Rectangle){ 0.0f, (tex.height - newHeight) / 2.0f, (float)tex.width, newHeight };
         }
         
-        // Vẽ ảnh vuông vức lấp đầy thẻ
+        // Vẽ ảnh vuông vức
         DrawTexturePro(tex, srcRec, box, (Vector2){0,0}, 0.0f, WHITE);
+
+        // CHE GÓC NHỌN CỦA ẢNH (nếu ảnh không phải png trong suốt)
+        // Vẽ viền ngoài cực dày trùng màu nền (BRIGHTWHITE) đè lên 4 góc của thẻ ảnh.
+        // Nếu ảnh của bạn là PNG trong suốt chuẩn, bạn có thể comment lại dòng này.
+        DrawRectangleRoundedLinesEx(box, roundness, segments, 15.0f, BRIGHTWHITE);
     }
     
     // 3. Phủ một viền ngoài mỏng tạo điểm nhấn
-    DrawRectangleLinesEx(box, 2.0f, Fade(BLACK, 0.2f));
+    DrawRectangleRoundedLinesEx(box, roundness, segments, 2.0f, Fade(BLACK, 0.2f));
     
     // 4. Hiệu ứng Hover làm tối toàn bộ khối hình chữ nhật
     if (isHovered) {
-        DrawRectangleRec(box, Fade(BLACK, 0.3f));
+        DrawRectangleRounded(box, roundness, segments, Fade(BLACK, 0.3f));
     }
 
     // 5. Vẽ Text căn giữa ở dưới Thẻ
@@ -413,7 +420,7 @@ bool MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
         ShowFuncBox.height * 0.7f 
     };
 
-    // Gọi hàm vẽ Thẻ Ảnh chuyên nghiệp (Chỉ còn Center Crop giữ nguyên tỷ lệ, đã gỡ bo góc)
+    // Gọi hàm vẽ Thẻ Ảnh đã bo góc
     DrawMainCard(texBook, ManageBooksBox, "Manage Books", Mouse);
     DrawMainCard(texUser, ManageUserBox, "Manage User", Mouse);
     DrawMainCard(texBorrow, ManageBorrowBox, "Manage Borrow", Mouse);
