@@ -31,7 +31,8 @@ typedef struct {
 
 void InitForm(Nhap *form);
 void UpdateFormPosition(Nhap *form); 
-void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *maThe); 
+// Đã thêm int *currentState vào đây!
+void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *maThe, int *currentState); 
 void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font);
 void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer); 
 
@@ -40,4 +41,5 @@ void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form);
 bool LuuThanhVienVaoFile(char *maThe, Nhap *form);
 void FreeMemberList(BanDoc *head);
 void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_y);
+void LayMaTheTiepTheo(BanDoc *head, char *maThe);
 #endif

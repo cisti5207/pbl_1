@@ -105,11 +105,6 @@ void UpdateInputBox(InputBox *input);
 int UTF8Width(const char *s, int width);
 void DrawIcon(Rectangle box, Texture2D icon);
 float FindRoundness(float len, float width, float height);
-<<<<<<< HEAD
-// Tính tỉ lệ roundness của rounded hay circle, ví dụ dùng rounded thì cần cấp giá trị float roundness, nhưng t sẽ dùng hàm này để điều khiển tỉ lệ đó bo tròn theo ý thích
-int TinhSoNgay(const char *ngaymuon, const char *ngaytrathucte);
-// Tính thời gian giữa 2 ngày mượn và trả thực tế(số ngày)
-=======
 int FindFontSize(float Width, Font font, int space, const char *str);
 
 void FormatPriceToVND(int price, char *buffer);
@@ -117,5 +112,4 @@ void DrawTextAutoWrap(Font font, const char *text, Rectangle bounds, float fontS
 
 bool StringContains(const char *haystack, const char *needle);
 
->>>>>>> 381e2b85a73eb32f5adb00643f2275eeaf34bf6f
 #endif // LIBMANAGE_H

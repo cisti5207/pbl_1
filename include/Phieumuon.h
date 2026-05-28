@@ -8,7 +8,7 @@ typedef struct PhieuMuonNode {
     char ngaymuon[20];
     char ngaytra[20]; 
     char matruyen[20];
-    
+    int trangthai;
     struct PhieuMuonNode* next;
 } PhieuMuonNode;
 typedef struct {
@@ -28,6 +28,7 @@ typedef struct {
     bool showsuccess;
     float successtimer;
 } FormPhieuMuon;
+int DemSoPhieuMuon(PhieuMuonNode *head);
 void InitPhieumuon(FormPhieuMuon *Form);
 void UpdateVitri(FormPhieuMuon *Form);
 void SinhMaPM(int currentcount, char *mathe);
