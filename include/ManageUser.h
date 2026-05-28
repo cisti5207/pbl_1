@@ -28,7 +28,7 @@ typedef struct {
     bool showSuccess;    
     float successTimer;  
 } Nhap;
-
+ 
 void InitForm(Nhap *form);
 void UpdateFormPosition(Nhap *form); 
 // Đã thêm int *currentState vào đây!

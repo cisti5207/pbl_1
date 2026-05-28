@@ -117,32 +117,30 @@ typedef enum {
 
 void InitManageBooks(Role _role);
 
-void LoadManageBooksUI (ManageBooksUI *UI, Size size);
-void ManageBooksTitle(Texture2D icon, ManageBooksUI UI);
-bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);
-
-int CountStrInBooks (BookList *Books, const char *Str, StateFindBook state);
-
-void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, float *wheel, char *backTarget, bool isVisible);
-
+void ShowBookDetail_Panel(Size size, ManageBooksUI UI, Font *_Font, Book book, MANAGEBOOKS_STATE *State, MANAGEBOOKS_STATE prevState);
+int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs);
 int ShowBooks_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, BookList *Books, int filterMode, const char *filterValue, Role _role, bool *showPagination, int *requestDeleteIndex);
-
 void ShowAuthor_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, AuthorList *Authors, char *selectedAuthor, BookList *Books);
 void ShowPublisher_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, PublisherList *Publishers, char *selectedPublisher, BookList *Books);
 void ShowType_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font, Type *Types, char *selectedType, BookList *Books);
 
-void ShowBookDetail_Panel(Size size, ManageBooksUI UI, Font *_Font, Book book, MANAGEBOOKS_STATE *State, MANAGEBOOKS_STATE prevState);
-int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs);
+void LoadManageBooksUI (ManageBooksUI *UI, Size size);
+void ManageBooksTitle(Texture2D icon, ManageBooksUI UI);
+
+void NormalizeString(const char* src, char* dest, int max_len);
+float CalculateSimilarity(const char* query, const char* text);
+bool ContextualBookSearch(Book book, const char *query);
+
+int CountStrInBooks (BookList *Books, const char *Str, StateFindBook state);
+void DrawPagination(ManageBooksUI UI, BookList *Books, Font *_Font, Size size, float *wheel, char *backTarget, bool isVisible);
+bool ManageBooksFunc(MANAGEBOOKS_STATE *State, InputBox *FindBar, Texture2D Icon_Find, ManageBooksUI UI, Size size, Font *_Font);
 
 BookList *Loadbooks(const char *filename);
 bool Savebooks(BookList Books);
-
 AuthorList *LoadAuthor(const char *filename);
 bool SaveAuthor(AuthorList _Author);
-
 Type *LoadType(BookList *Books);
 PublisherList *LoadPublisher(BookList *Books);
-
 void LoadDescription(BookList *Books, const char *filename);
 
 #endif // MANAGE_BOOKS_H

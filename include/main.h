@@ -10,6 +10,7 @@ typedef enum{
     MANAGEBOOKS,
     MANAGEUSER,
     MANAGEBORROWING,
+    STATISTIC,
 } AppState;
 
 typedef struct {

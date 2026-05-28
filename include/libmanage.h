@@ -4,7 +4,7 @@
 #include "raylib.h"
 
 #define MAX_INPUT 256
-#define MAX_PARTICLE 256 // Đã chuyển từ main.h sang đây
+#define MAX_PARTICLE 256 
 
 #define BRIGHTWHITE     (Color){255, 255, 255, 255}
 #define BRIGHTGRAY      (Color){209, 209, 209, 255}
