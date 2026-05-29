@@ -1,6 +1,7 @@
 #include "Trasach.h"
 #include "TimkiemLSphieumuon.h" 
-#include "menu.h" // Nhúng menu vào để dùng biến APP_MENU
+#include "menu.h"
+#include "libmanage.h"
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -8,7 +9,7 @@
 // Khai báo các hàm tính toán từ Doanhthu.c 
 int laygiathue(const char *masachcantim);
 int KhoangCachNgay(const char *ngayBatDau, const char *ngayKetThuc);
-double TinhTienThue(int giaGoc, const char *ngayDuKien, const char *ngayTraThucTe);
+double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *ngayDuKien, const char *ngayTraThucTe);
 
 // ==========================================
 // CÁC HÀM XỬ LÝ FILE
@@ -16,11 +17,29 @@ double TinhTienThue(int giaGoc, const char *ngayDuKien, const char *ngayTraThucT
 void CapNhatToanBoFilePhieuMuon(PhieuMuonNode *head) {
     FILE *f = fopen("data/Phieumuon/LSPhieumuon.txt", "w"); 
     if (f == NULL) return;
+
+    // Ghi lại dòng header
+    const char *h1="Phiếu mượn", *h2="Mã thẻ", *h3="Mã truyện",
+               *h4="Tên truyện", *h5="Ngày mượn", *h6="Ngày trả DK", *h7="TT";
+    fprintf(f, "%-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %s\n",
+        UTF8Width(h1,12), h1,
+        UTF8Width(h2,12), h2,
+        UTF8Width(h3,19), h3,
+        UTF8Width(h4,50), h4,
+        UTF8Width(h5,19), h5,
+        UTF8Width(h6,19), h6,
+        h7);
+
     PhieuMuonNode *curr = head;
     while (curr != NULL) {
-        fprintf(f, "%-12s | %-12s | %-19s | %-50s | %-19s | %-19s | %d\n", 
-                curr->maPM, curr->mathe, curr->matruyen, 
-                curr->tentruyen, curr->ngaymuon, curr->ngaytra, curr->trangthai);
+        fprintf(f, "%-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %d\n",
+            UTF8Width(curr->maPM,      12), curr->maPM,
+            UTF8Width(curr->mathe,     12), curr->mathe,
+            UTF8Width(curr->matruyen,  19), curr->matruyen,
+            UTF8Width(curr->tentruyen, 50), curr->tentruyen,
+            UTF8Width(curr->ngaymuon,  19), curr->ngaymuon,
+            UTF8Width(curr->ngaytra,   19), curr->ngaytra,
+            curr->trangthai);
         curr = curr->next;
     }
     fclose(f);
@@ -29,7 +48,7 @@ void CapNhatToanBoFilePhieuMuon(PhieuMuonNode *head) {
 void LuuDoanhThuVaoFile(const char *ngay, int tien) {
     FILE *f = fopen("data/Doanhthu.txt", "a");
     if (f != NULL) {
-        fprintf(f, "%s | %d\n", ngay, tien);
+        fprintf(f, "%s | %d VND\n", ngay, tien);
         fclose(f);
     }
 }
@@ -53,6 +72,7 @@ void InitFormTraSach(FormTraSach *form) {
     form->phieuDangXuLy = NULL;
     form->tienPhat = 0;
     form->tongTien = 0;
+    form->daThanhToan =0;
 }
 
 // ==========================================
@@ -216,25 +236,46 @@ void UpdateLogicTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headPM
         int soNgayMuon = KhoangCachNgay(form->phieuDangXuLy->ngaymuon, form->phieuDangXuLy->ngaytra);
         if (soNgayMuon <= 0) soNgayMuon = 1; 
         
-        int tongGiaGoc = giaMotNgay * soNgayMuon; 
-        
-        if (form->nhapNgayTraThucTe.letterCount >= 8) { 
-            form->tongTien = (int)TinhTienThue(tongGiaGoc, form->phieuDangXuLy->ngaytra, form->nhapNgayTraThucTe.text);
-            form->tienPhat = form->tongTien - tongGiaGoc; 
-        } else {
-            form->tongTien = tongGiaGoc;
-            form->tienPhat = 0;
-        }
+        // MỚI - đúng
+    int soNgayGoc = KhoangCachNgay(form->phieuDangXuLy->ngaymuon, 
+                                form->phieuDangXuLy->ngaytra);
+    if (soNgayGoc <= 0) soNgayGoc = 1;
+    int tienGoc = giaMotNgay * soNgayGoc;
+
+    if (form->nhapNgayTraThucTe.letterCount >= 8) {
+    form->tongTien = (int)TinhTienThue(
+        giaMotNgay,
+        form->phieuDangXuLy->ngaymuon,   // ngày mượn
+        form->phieuDangXuLy->ngaytra,    // ngày dự kiến
+        form->nhapNgayTraThucTe.text     // ngày trả thực tế
+    );
+    form->tienPhat = form->tongTien - tienGoc;
+    } else {
+    form->tongTien = tienGoc;
+    form->tienPhat = 0;
+}
 
         Rectangle btnThanhToan = { rightPaneX + 40, screenH - 90, screenW * 0.35f - 80, 60 };
-        if (CheckCollisionPointRec(GetMousePosition(), btnThanhToan) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            if (form->nhapNgayTraThucTe.letterCount >= 8) {
-                form->phieuDangXuLy->trangthai = 1; 
-                CapNhatToanBoFilePhieuMuon(headPM); 
-                LuuDoanhThuVaoFile(form->nhapNgayTraThucTe.text, form->tongTien);
-                InitFormTraSach(form); 
-            }
-        }
+if (CheckCollisionPointRec(GetMousePosition(), btnThanhToan) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (form->nhapNgayTraThucTe.letterCount >= 8) {
+        form->phieuDangXuLy->trangthai = 1; 
+        CapNhatToanBoFilePhieuMuon(headPM); 
+        LuuDoanhThuVaoFile(form->nhapNgayTraThucTe.text, form->tongTien);
+        
+        // BẬT CỜ BÁO HIỆU CHO MAIN.C BIẾT LÀ ĐÃ THANH TOÁN
+        form->daThanhToan = 1; 
+
+        // Sau đó mới dọn dẹp form để về bước 1
+        form->state = TRA_B1_TIMKEM; 
+        memset(form->maTheDaChon, 0, 15);
+        memset(form->nhapNgayTraThucTe.text, 0, 256);
+        form->nhapNgayTraThucTe.letterCount = 0;
+        form->scrollList = 0;
+        form->phieuDangXuLy = NULL;
+        form->tienPhat = 0;
+        form->tongTien = 0; 
+    }
+}
     }
 }
 

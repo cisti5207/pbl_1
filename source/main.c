@@ -1,128 +1,3 @@
-<<<<<<< HEAD
-#include "raylib.h"
-#include "libmanage.h"
-#include "menu.h" 
-#include "ManageUser.h"
-#include "Phieumuon.h"
-#include "TimkiemLSphieumuon.h" 
-#include "Timkiemthethuvien.h"
-#include "Trasach.h"
-#include "InDanhSachPM.h"
-#include <stdlib.h>
-
-int main(void) {
-    // ========================================================
-    // 1. KHỞI TẠO CỬA SỔ & HỆ THỐNG RAYLIB
-    // ========================================================
-    const int screenWidth = 1100;
-    const int screenHeight = 750;
-    
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth, screenHeight, "HỆ THỐNG QUẢN LÝ THƯ VIỆN - PBL 1");
-    SetExitKey(0); // Chặn phím ESC tắt app đột ngột
-    SetTargetFPS(60);
-
-    // Đã cập nhật đúng đường dẫn font của bro
-    Font mainFont = SetFontUTF8("font/arial/ARIALBD.TTF", 108); 
-    SetTextureFilter(mainFont.texture, TEXTURE_FILTER_BILINEAR);
-    
-    // ========================================================
-    // 2. KHỞI TẠO DỮ LIỆU & BIẾN TOÀN CỤC
-    // ========================================================
-    AppState currentState = APP_MENU;
-
-    BanDoc *headBD = NULL; 
-    int totalUsers = 0;
-    PhieuMuonNode *headPM = NULL;
-    
-    PhieuMuonMang mapPM;
-    InitPhieuMuonMang(&mapPM);
-
-    // Đã cập nhật đúng đường dẫn file của bro
-    DocDuLieuTheBanDoc("data/phieumuon/User.txt", &headBD, &totalUsers);
-    DocDuLieuPhieuMuon("data/phieumuon/LSPhieumuon.txt", &headPM);
-    BuildMap(&mapPM, headPM); 
-
-    // Khởi tạo các Form
-    Nhap formTaoThe; InitForm(&formTaoThe);
-    FormPhieuMuon formTaoPhieu; InitPhieumuon(&formTaoPhieu);
-    FormTimKiemThe formTimKiem; InitListBD(&formTimKiem);
-    FormTraSach formTraSach; InitFormTraSach(&formTraSach);
-    FormInDanhSachPM formInPM; InitFormInDanhSachPM(&formInPM);
-    
-    char maTheTempt[15] = {0}; 
-    Texture2D icons[5] = { 0 }; 
-
-    // ========================================================
-    // 3. VÒNG LẶP GAME CHÍNH (MAIN LOOP)
-    // ========================================================
-    while (!WindowShouldClose()) {
-
-        BeginDrawing();
-        ClearBackground(GetColor(0xFFF0F5FF)); 
-
-        switch (currentState) {
-            case APP_MENU:
-                currentState = DrawAndHandleMenu(mainFont, (float)GetScreenWidth(), (float)GetScreenHeight());
-                break;
-
-            case APP_TAO_THE:
-                UpdateFormPosition(&formTaoThe);
-                UpdateInputForm(&formTaoThe, &headBD, &totalUsers, maTheTempt, (int*)&currentState);
-                DrawLibraryCard(&formTaoThe, icons, maTheTempt, mainFont);
-                break;
-
-            case APP_TAO_PHIEU:
-                UpdateVitri(&formTaoPhieu);
-                UpdateInputPM(&formTaoPhieu, &headPM, (int*)&currentState, maTheTempt);
-                DrawPM(&formTaoPhieu, icons, maTheTempt, mainFont);
-                if (formTaoPhieu.showsuccess) {
-                    BuildMap(&mapPM, headPM);
-                }
-                break;
-
-            case APP_TRA_SACH:
-                UpdateLogicTraSach(&formTraSach, headBD, headPM, (int*)&currentState);
-                DrawGiaoDienTraSach(&formTraSach, headBD, headPM, mainFont);
-                if (formTraSach.state == TRA_B1_TIMKEM && formTraSach.tongTien > 0) {
-                    BuildMap(&mapPM, headPM);
-                    formTraSach.tongTien = 0; 
-                }
-                break;
-
-            case APP_XEM_DANH_SACH:
-                UpdateLogicInDanhSachPM(&formInPM, headPM, (int*)&currentState);
-                DrawGiaoDienInDanhSachPM(&formInPM, headPM, mainFont);
-                break;
-
-            case APP_LICH_SU: 
-                Updatetoado(&formTimKiem);
-                kiemtralienquantiengviet(&formTimKiem, (int*)&currentState);
-                DrawTimKiemThe(&formTimKiem, icons, mainFont, headBD);
-                if (formTimKiem.showmodal) DrawModalLichSuPhieuMuon(&formTimKiem, &mapPM, mainFont);
-                break;
-        }
-
-        EndDrawing();
-    }
-
-    // ========================================================
-    // 4. DỌN DẸP BỘ NHỚ & ĐÓNG CHƯƠNG TRÌNH
-    // ========================================================
-    UnloadFont(mainFont);
-    
-    FreeMemberList(headBD);
-    
-    PhieuMuonNode *currPM = headPM;
-    while (currPM != NULL) {
-        PhieuMuonNode *temp = currPM;
-        currPM = currPM->next;
-        free(temp);
-    }
-    
-    CloseWindow();
-    return 0;
-=======
 #include <stdio.h>
 #include "ManageBooks.h"
 #include "raylib.h"
@@ -130,11 +5,23 @@ int main(void) {
 #include "main.h"
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
+// --- NHÚNG CÁC MODULE CỦA BRO VÀO ĐÂY ---
+#include "ManageUser.h"
+#include "Phieumuon.h"
+#include "TimkiemLSphieumuon.h" 
+#include "Timkiemthethuvien.h"
+#include "Trasach.h"
+#include "InDanhSachPM.h"
+#include "Doanhthu.h"
+#include "menu.h" 
+
+// Gán trạng thái khởi tạo
 AppState APP_STATE = LOGINAPP;
 
 int main(){
-    InitWindow(1200, 800, "Login");
+    InitWindow(1200, 800, "Library System - PBL1");
     SetTargetFPS(60);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowMinSize(1000, 600);
@@ -151,19 +38,66 @@ int main(){
         GetMousePosition()
     );
 
-    // Khởi tạo hạt động 1 lần duy nhất từ thư viện libmanage
     InitParticles(MainSize);
 
-    // Load font để hiển thị Tên Tiếng Việt không bị lỗi
     Font fontTitle = SetFontUTF8(ArialBold, 80); 
     Font fontSub = SetFontUTF8(Roboto_Semibold, 40);
+
+    // --- KHỞI TẠO DỮ LIỆU CỦA BRO Ở ĐÂY ---
+    Font mainFont = SetFontUTF8("font/arial/ARIALBD.TTF", 108); 
+    SetTextureFilter(mainFont.texture, TEXTURE_FILTER_BILINEAR);
+
+    BanDoc *headBD = NULL; 
+    int totalUsers = 0;
+    PhieuMuonNode *headPM = NULL;
+    
+    PhieuMuonMang mapPM;
+    InitPhieuMuonMang(&mapPM);
+
+    DocDuLieuTheBanDoc("data/phieumuon/User.txt", &headBD, &totalUsers);
+    DocDuLieuPhieuMuon("data/phieumuon/LSphieumuon.txt", &headPM);
+    BuildMap(&mapPM, headPM); 
+
+    DoanhThuMap mapDT;
+    InitDoanhThuMap(&mapDT);
+    FormDoanhThu formDT;
+    InitFormDoanhThu(&formDT);
+
+    // Nạp dữ liệu doanh thu từ file vào map
+    {
+        FILE *fDT = fopen("data/Doanhthu.txt", "r");
+        if (fDT != NULL) {
+            char lineDT[256];
+            while (fgets(lineDT, sizeof(lineDT), fDT)) {
+                char ngay[30];
+                double tien;
+                if (sscanf(lineDT, "%29[^|] | %lf", ngay, &tien) == 2) {
+                    // Trim khoảng trắng cuối ngày
+                    int len = strlen(ngay);
+                    while (len > 0 && ngay[len-1] == ' ') ngay[--len] = '\0';
+                    ThemDoanhThu(&mapDT, ngay, tien);
+                }
+            }
+            fclose(fDT);
+        }
+    }
+
+    Nhap formTaoThe; InitForm(&formTaoThe);
+    FormPhieuMuon formTaoPhieu; InitPhieumuon(&formTaoPhieu);
+    FormTimKiemThe formTimKiem; InitListBD(&formTimKiem);
+    FormTraSach formTraSach; InitFormTraSach(&formTraSach);
+    FormInDanhSachPM formInPM; InitFormInDanhSachPM(&formInPM);
+    
+    char maTheTempt[15] = {0}; 
+    Texture2D icons[5] = { 0 }; 
+    // --------------------------------------
 
     Account _Account;
     Texture2D userAvatar = {0};
 
     if (InitLogin(&_Account) == LOGIN_SUCCESS) {
         APP_STATE = HOME;
-        LoadUserAvatar(_Account, &userAvatar); // Nạp avatar khi đăng nhập thành công
+        LoadUserAvatar(_Account, &userAvatar);
     } else {
         printf("Login failed or window closed.\n");
         CloseWindow();
@@ -171,135 +105,171 @@ int main(){
     }
 
     Role _role;
-    if (strcmp(_Account.role, "Administrator") == 0)
-        _role = ADMINISTRATOR;
-    else 
-        _role = STAFF;
+    if (strcmp(_Account.role, "Administrator") == 0) _role = ADMINISTRATOR;
+    else _role = STAFF;
 
     MainContainers Containers;
     MainLoadContainers(&Containers, MainSize);
     
     while (!WindowShouldClose()){
-        // Cập nhật vị trí hạt động từ thư viện
-        UpdateParticlesPosition(MainSize);
         
-        MainSize.Mouse = GetMousePosition();
-        LoadSize(
-            &MainSize,
-            (Vector2) {0},
-            (Vector2) { GetScreenWidth(), GetScreenHeight() },
-            (Vector2) { 
-                (float)GetScreenWidth() / GetMonitorWidth(0), 
-                (float)GetScreenHeight() / GetMonitorHeight(0) 
-            },
-            (Vector2) {0}
-        );
-    
-        MainLoadContainers(&Containers, MainSize);
-
-        BeginDrawing();
-        // Gọi nền động từ thư viện
-        ClearBackground(AnimatedBackground());
-        DrawBackgroundParticles();
-
-        MainDrawPanel(Containers);
+        // ==========================================
+        // MÀN HÌNH CHÍNH (CỦA BẠN BRO)
+        // ==========================================
+        if (APP_STATE == HOME) {
+            UpdateParticlesPosition(MainSize);
+            MainSize.Mouse = GetMousePosition();
+            LoadSize(
+                &MainSize,
+                (Vector2) {0},
+                (Vector2) { GetScreenWidth(), GetScreenHeight() },
+                (Vector2) { 
+                    (float)GetScreenWidth() / GetMonitorWidth(0), 
+                    (float)GetScreenHeight() / GetMonitorHeight(0) 
+                },
+                (Vector2) {0}
+            );
         
-        // Vẽ DecribeBox Xịn Xò đè lên khu vực đã chia
-        MainDrawDescribeBox(Containers.DecribeBox, _Account, userAvatar, fontTitle, fontSub);
+            MainLoadContainers(&Containers, MainSize);
 
-        MainFunc(Containers.ShowFuncBox, MainSize.Mouse);
-        
-        EndDrawing();
-
-        switch(APP_STATE){
-            case HOME:
-                SetWindowTitle("Home");
-                break;
+            BeginDrawing();
+            ClearBackground(AnimatedBackground());
+            DrawBackgroundParticles();
+            MainDrawPanel(Containers);
+            MainDrawDescribeBox(Containers.DecribeBox, _Account, userAvatar, fontTitle, fontSub);
             
-            case LOGINAPP:
-                SetWindowTitle("Login");
-                
-                _Account = (Account) {0};
-                if (InitLogin(&_Account) == LOGIN_SUCCESS) {
-                    APP_STATE = HOME;
-                    if (strcmp(_Account.role, "Administrator") == 0)
-                        _role = ADMINISTRATOR;
-                    else 
-                        _role = STAFF;
-                    
-                    // Nạp lại avatar mỗi khi đăng nhập một tài khoản khác
-                    LoadUserAvatar(_Account, &userAvatar);
-                } else {
-                    printf("Login failed or window closed.\n");
-                    goto EXIT_APP; 
-                }
-
-                printf("| %s | %s | %s | %s | %s | %s |\n",
-                    _Account.username, _Account.realName, _Account.password,
-                    _Account.cccd, _Account.dateOfBirth, _Account.role
-                );
-                break;
-
-            case MANAGEBOOKS:
-                SetWindowTitle("Manage Books");
-                InitManageBooks(_role);
+            // Xử lý vẽ menu 3 NÚT TỔNG và hứng sự kiện chuyển trang
+            MainFunc(Containers.ShowFuncBox, MainSize.Mouse);
+            
+            EndDrawing();
+        } 
+        // ==========================================
+        // LOGIN & QUẢN LÝ SÁCH (CỦA BẠN BRO)
+        // ==========================================
+        else if (APP_STATE == LOGINAPP) {
+            SetWindowTitle("Login");
+            _Account = (Account) {0};
+            if (InitLogin(&_Account) == LOGIN_SUCCESS) {
                 APP_STATE = HOME;
-                break;
+                if (strcmp(_Account.role, "Administrator") == 0) _role = ADMINISTRATOR;
+                else _role = STAFF;
+                LoadUserAvatar(_Account, &userAvatar);
+            } else {
+                goto EXIT_APP; 
+            }
+        } 
+        else if (APP_STATE == MANAGEBOOKS) {
+            SetWindowTitle("Manage Books");
+            InitManageBooks(_role);
+            APP_STATE = HOME;
+        } 
+        // ==========================================
+        // PHÂN HỆ NGHIỆP VỤ (CỦA BRO)
+        // ==========================================
+        else {
+            BeginDrawing();
+            ClearBackground(GetColor(0xFFF0F5FF)); 
 
-            case MANAGEUSER:
-                SetWindowTitle("Manage User");
-                APP_STATE = HOME; 
-                break;
+            int tempState = APP_STATE; 
 
-            case MANAGEBORROWING:
-                SetWindowTitle("Manage Borrow");
-                APP_STATE = HOME; 
-                break;
-                
-            case STATISTIC: 
-                SetWindowTitle("Statistic");
-                APP_STATE = HOME; 
-                break;
+            switch (APP_STATE) {
+                case APP_MENU: // VẼ MENU HỒNG CỦA BRO RA ĐÂY!
+                    tempState = DrawAndHandleMenu(mainFont, GetScreenWidth(), GetScreenHeight());
+                    break;
+                case APP_TAO_THE:
+                    UpdateFormPosition(&formTaoThe);
+                    UpdateInputForm(&formTaoThe, &headBD, &totalUsers, maTheTempt, &tempState);
+                    DrawLibraryCard(&formTaoThe, icons, maTheTempt, mainFont);
+                    break;
+                case APP_TAO_PHIEU:
+                    UpdateVitri(&formTaoPhieu);
+                    UpdateInputPM(&formTaoPhieu, &headPM, &tempState, maTheTempt);
+                    DrawPM(&formTaoPhieu, icons, maTheTempt, mainFont);
+                    if (formTaoPhieu.showsuccess) BuildMap(&mapPM, headPM);
+                    break;
+                case APP_TRA_SACH:
+                    UpdateLogicTraSach(&formTraSach, headBD, headPM, &tempState);
+                    DrawGiaoDienTraSach(&formTraSach, headBD, headPM, mainFont);
+                    if (formTraSach.daThanhToan) {
+                        BuildMap(&mapPM, headPM);
+                        // Reload doanh thu vào map ngay sau khi thanh toán
+                        GiaiPhongDoanhThuMap(&mapDT);
+                        InitDoanhThuMap(&mapDT);
+                        FILE *fDT2 = fopen("data/Doanhthu.txt", "r");
+                        if (fDT2 != NULL) {
+                            char lineDT2[256];
+                            while (fgets(lineDT2, sizeof(lineDT2), fDT2)) {
+                                char ngay[30]; double tien;
+                                if (sscanf(lineDT2, "%29[^|] | %lf", ngay, &tien) == 2) {
+                                    int len = strlen(ngay);
+                                    while (len > 0 && ngay[len-1] == ' ') ngay[--len] = '\0';
+                                    ThemDoanhThu(&mapDT, ngay, tien);
+                                }
+                            }
+                            fclose(fDT2);
+                        }
+                        InitFormDoanhThu(&formDT);
+                        formTraSach.daThanhToan = 0; // Reset cờ
+                    }
+                    break;
+                case APP_XEM_DANH_SACH:
+                    UpdateLogicInDanhSachPM(&formInPM, headPM, &tempState);
+                    DrawGiaoDienInDanhSachPM(&formInPM, headPM, mainFont);
+                    break;
+                case APP_LICH_SU: 
+                    Updatetoado(&formTimKiem);
+                    kiemtralienquantiengviet(&formTimKiem, &tempState);
+                    DrawTimKiemThe(&formTimKiem, icons, mainFont, headBD);
+                    if (formTimKiem.showmodal) DrawModalLichSuPhieuMuon(&formTimKiem, &mapPM, mainFont);
+                    break;
+                case APP_DOANH_THU:
+                    DrawDashboardDoanhThu(&mapDT, &formDT, mainFont, &tempState);
+                    break;
+            }
+
+            // Gán lại trạng thái
+            APP_STATE = tempState;
+
+            EndDrawing();
         }
     }
 
 EXIT_APP:
-    printf("Exiting application...\n");
-    // Giải phóng bộ nhớ ảnh và font trước khi thoát
     if (userAvatar.id != 0) UnloadTexture(userAvatar);
     UnloadFont(fontTitle);
     UnloadFont(fontSub);
+    UnloadFont(mainFont);
+    
+    FreeMemberList(headBD);
+    GiaiPhongDoanhThuMap(&mapDT);
+    PhieuMuonNode *currPM = headPM;
+    while (currPM != NULL) {
+        PhieuMuonNode *temp = currPM;
+        currPM = currPM->next;
+        free(temp);
+    }
+
     CloseWindow(); 
     return 0;
 }
 
-// ---------------------------------------------------------
-// HÀM XỬ LÝ LOAD AVATAR ĐỘNG
-// ---------------------------------------------------------
 void LoadUserAvatar(Account acc, Texture2D *avatar) {
     if (avatar->id != 0) {
         UnloadTexture(*avatar);
         avatar->id = 0;
     }
-    
     char avatarPath[512];
     sprintf(avatarPath, "img/avatar/%s.jpg", acc.username);
-    
-    if (FileExists(avatarPath)) {
-        *avatar = LoadTexture(avatarPath);
-    } else {
-        *avatar = LoadTexture("img/avatar/non.jpg");
-    }
+    if (FileExists(avatarPath)) *avatar = LoadTexture(avatarPath);
+    else *avatar = LoadTexture("img/avatar/non.jpg");
 }
 
-// ---------------------------------------------------------
-// HÀM VẼ GIAO DIỆN DESCRIBE BOX
-// ---------------------------------------------------------
 void MainDrawDescribeBox(Rectangle box, Account acc, Texture2D avatar, Font fontLarge, Font fontSmall) {
     Color darkBg = (Color){ 30, 35, 45, 255 };
     DrawRectangleRounded(box, 0.15f, 20, darkBg);
     
     BeginScissorMode((int)box.x, (int)box.y, (int)box.width, (int)box.height);
+    // Đã sửa dòng dưới đây: Tách Vector2 thành 2 tham số int x, y theo đúng chuẩn của Raylib
     DrawCircleGradient((int)(box.x + box.height/2), (int)(box.y + box.height/2), box.height * 1.5f, Fade(TEALBLUE, 0.2f), BLANK);
     EndScissorMode();
     
@@ -412,25 +382,18 @@ void MainLoadContainers(MainContainers *Containers, Size MainSize){
 
 void MainDrawPanel(MainContainers Containers){
     float rounded = Containers.PanelBox.width * 0.01f;
-    
     DrawRectangleRounded(Containers.PanelBox, FindRoundness(rounded, Containers.PanelBox.width, Containers.PanelBox.height), 10, Fade(SOFTWHITE, 0.1f));
     
-    // ----------------------------------------------------
-    // HIỆU ỨNG CẦU VỒNG LƯU CHUYỂN QUA LẠI
-    // ----------------------------------------------------
     float funcRoundness = FindRoundness(rounded, Containers.FuncBox.width, Containers.FuncBox.height);
     float w = Containers.FuncBox.width;
     float h = Containers.FuncBox.height;
-    
     float minDim = (w < h) ? w : h;
     float R = funcRoundness * (minDim / 2.0f); 
-    
     float timeOffset = sin(GetTime() * 1.5f) * 180.0f; 
     
     for (int i = 0; i < (int)w; i++) {
         float hue = fmod(timeOffset + ((float)i / w) * 360.0f + 360.0f, 360.0f);
         Color c = ColorFromHSV(hue, 0.85f, 0.9f); 
-        
         float dx = 0;
         if (i < R) dx = R - i; 
         else if (i > w - R) dx = i - (w - R);
@@ -448,24 +411,16 @@ void MainDrawPanel(MainContainers Containers){
     DrawRectangleRounded(Containers.ShowFuncBox, FindRoundness(rounded, Containers.ShowFuncBox.width, Containers.ShowFuncBox.height), 10, BRIGHTWHITE);
 }
 
-// -------------------------------------------------------------------------
-// HÀM VẼ THẺ ẢNH (BẢN CẬP NHẬT - CÓ BO GÓC)
-// -------------------------------------------------------------------------
 static void DrawMainCard(Texture2D tex, Rectangle box, const char* title, Vector2 mouse) {
     bool isHovered = CheckCollisionPointRec(mouse, box);
-    
-    // Cài đặt thông số bo góc
-    float roundness = 0.15f; // Tỉ lệ bo góc (0.0 đến 1.0)
-    int segments = 16;       // Độ mịn của đường cong
+    float roundness = 0.15f; 
+    int segments = 16;       
 
-    // 1. Nếu không có ảnh thì vẽ khối nền đen bo góc
     if (tex.id == 0) {
         DrawRectangleRounded(box, roundness, segments, BLACK);
     } else {
-        // 2. THUẬT TOÁN CENTER CROP CHUẨN (Giữ nguyên tỷ lệ, cắt rìa, không làm bóp méo ảnh)
         float boxRatio = box.width / box.height;
         float texRatio = (float)tex.width / (float)tex.height;
-        
         Rectangle srcRec;
         if (texRatio > boxRatio) {
             float newWidth = tex.height * boxRatio;
@@ -474,97 +429,64 @@ static void DrawMainCard(Texture2D tex, Rectangle box, const char* title, Vector
             float newHeight = tex.width / boxRatio;
             srcRec = (Rectangle){ 0.0f, (tex.height - newHeight) / 2.0f, (float)tex.width, newHeight };
         }
-        
-        // Vẽ ảnh vuông vức
         DrawTexturePro(tex, srcRec, box, (Vector2){0,0}, 0.0f, WHITE);
-
-        // CHE GÓC NHỌN CỦA ẢNH (nếu ảnh không phải png trong suốt)
-        // Vẽ viền ngoài cực dày trùng màu nền (BRIGHTWHITE) đè lên 4 góc của thẻ ảnh.
-        // Nếu ảnh của bạn là PNG trong suốt chuẩn, bạn có thể comment lại dòng này.
         DrawRectangleRoundedLinesEx(box, roundness, segments, 15.0f, BRIGHTWHITE);
     }
     
-    // 3. Phủ một viền ngoài mỏng tạo điểm nhấn
     DrawRectangleRoundedLinesEx(box, roundness, segments, 2.0f, Fade(BLACK, 0.2f));
+    if (isHovered) DrawRectangleRounded(box, roundness, segments, Fade(BLACK, 0.3f));
     
-    // 4. Hiệu ứng Hover làm tối toàn bộ khối hình chữ nhật
-    if (isHovered) {
-        DrawRectangleRounded(box, roundness, segments, Fade(BLACK, 0.3f));
-    }
-
-    // 5. Vẽ Text căn giữa ở dưới Thẻ
     int fontSize = 20;
     float WidthText = MeasureText(title, fontSize);
-    Vector2 TextPos = { box.x + (box.width - WidthText) * 0.5f, box.y + box.height + 40 };
+    Vector2 TextPos = { box.x + (box.width - WidthText) * 0.5f, box.y + box.height + 25 };
     DrawText(title, (int) TextPos.x, (int) TextPos.y, fontSize, isHovered ? TEALBLUE : BLACK);
 }
 
+// =========================================================================
+// HÀM VẼ GIAO DIỆN CHỌN MENU: HIỆN CHUẨN 3 NÚT (ManageBooks, ManageUsers, Statistic)
+// =========================================================================
 bool MainFunc(Rectangle ShowFuncBox, Vector2 Mouse){
-    // Nạp ảnh tĩnh (Tải 1 lần duy nhất chống giật FPS)
-    static Texture2D texBook = {0}, texUser = {0}, texBorrow = {0}, texStatistic = {0};
+    static Texture2D texBook = {0}, texUser = {0}, texStatistic = {0};
     static bool isLoaded = false;
     
     if (!isLoaded) {
         texBook = LoadTexture("img/main_symbol/book.png");
-        texUser = LoadTexture("img/main_symbol/user.png");
-        texBorrow = LoadTexture("img/main_symbol/borrow.png");
+        texUser = LoadTexture("img/main_symbol/user.png"); // Bro có thể kiếm icon đẹp hơn để đổi sau
         texStatistic = LoadTexture("img/main_symbol/statistic.png");
         isLoaded = true;
     }
 
-    int i = 0;
-    float ratioDistance = 0.1f;
-    float widthScissor = ShowFuncBox.width - ShowFuncBox.width/4 * ratioDistance;
-    float widthCard = widthScissor / 4;
+    // HIỂN THỊ ĐÚNG 3 NÚT CHÍNH TRÊN TRANG HOME
+    int numCards = 3; 
     
-    Rectangle ManageBooksBox = { 
-        ShowFuncBox.x + widthCard * ratioDistance + (float) i++ * widthCard, 
-        ShowFuncBox.y + ShowFuncBox.height * 0.1f, 
-        widthCard * (1.0f - ratioDistance), 
-        ShowFuncBox.height * 0.7f 
-    };
+    const char* titles[] = {"Manage Books", "Manage Users", "Statistic"};
+    Texture2D texs[] = {texBook, texUser, texStatistic};
     
-    Rectangle ManageUserBox = { 
-        ShowFuncBox.x + widthCard * ratioDistance + (float) i++ * widthCard, 
-        ShowFuncBox.y + ShowFuncBox.height * 0.1f, 
-        widthCard * (1.0f - ratioDistance), 
-        ShowFuncBox.height * 0.7f 
-    };
+    // GẮN CHỨC NĂNG TƯƠNG ỨNG CHO 3 NÚT
+    // APP_MENU chính là gọi ra cái file menu.c màu hồng của bro đấy!
+    int states[] = {MANAGEBOOKS, APP_MENU, APP_DOANH_THU}; 
     
-    Rectangle ManageBorrowBox = { 
-        ShowFuncBox.x + widthCard * ratioDistance + (float) i++ * widthCard, 
-        ShowFuncBox.y + ShowFuncBox.height * 0.1f, 
-        widthCard * (1.0f - ratioDistance), 
-        ShowFuncBox.height * 0.7f 
-    };
-    
-    Rectangle StatisticBox = { 
-        ShowFuncBox.x + widthCard * ratioDistance + (float) i++ * widthCard, 
-        ShowFuncBox.y + ShowFuncBox.height * 0.1f, 
-        widthCard * (1.0f - ratioDistance), 
-        ShowFuncBox.height * 0.7f 
-    };
+    // Thuật toán tự động chia khoảng cách cho 3 nút
+    float totalSpacing = ShowFuncBox.width * 0.1f; 
+    float spacingPerCard = totalSpacing / (numCards + 1);
+    float widthCard = (ShowFuncBox.width - totalSpacing) / numCards;
 
-    // Gọi hàm vẽ Thẻ Ảnh đã bo góc
-    DrawMainCard(texBook, ManageBooksBox, "Manage Books", Mouse);
-    DrawMainCard(texUser, ManageUserBox, "Manage User", Mouse);
-    DrawMainCard(texBorrow, ManageBorrowBox, "Manage Borrow", Mouse);
-    DrawMainCard(texStatistic, StatisticBox, "Statistic", Mouse);
-
-    // Xử lý sự kiện click
-    if (CheckCollisionPointRec(Mouse, ManageBooksBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        APP_STATE = MANAGEBOOKS; return 1;
+    bool clicked = false;
+    for(int i = 0; i < numCards; i++) {
+        Rectangle cardBox = { 
+            ShowFuncBox.x + spacingPerCard * (i + 1) + widthCard * i, 
+            ShowFuncBox.y + ShowFuncBox.height * 0.1f, 
+            widthCard, 
+            ShowFuncBox.height * 0.7f 
+        };
+        
+        DrawMainCard(texs[i], cardBox, titles[i], Mouse);
+        
+        // Bắt click
+        if (CheckCollisionPointRec(Mouse, cardBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+            APP_STATE = states[i];
+            clicked = true;
+        }
     }
-    if (CheckCollisionPointRec(Mouse, ManageUserBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        APP_STATE = MANAGEUSER; return 1;
-    }
-    if (CheckCollisionPointRec(Mouse, ManageBorrowBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        APP_STATE = MANAGEBORROWING; return 1;
-    }
-    if (CheckCollisionPointRec(Mouse, StatisticBox) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        APP_STATE = STATISTIC; return 1;
-    }
-
-    return 0;
->>>>>>> 674ec34198b8d64dfa4271f76cec6b3461d3aa40
+    return clicked;
 }

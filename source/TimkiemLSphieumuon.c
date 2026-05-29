@@ -48,6 +48,7 @@ void DocDuLieuPhieuMuon(const char *filepath, PhieuMuonNode **head) {
     }
 
     char line[1024];
+    fgets(line, sizeof(line), f);
     while (fgets(line, sizeof(line), f)) {
         PhieuMuonNode *newNode = (PhieuMuonNode*)malloc(sizeof(PhieuMuonNode));
         if (newNode == NULL) break;

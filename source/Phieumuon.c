@@ -211,7 +211,7 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
     DrawTextEx(font, "Phiếu mượn sách ", (Vector2){cardleft.x + 136*scale, cardright.y + 36*scale}, 36*scale, 1, MAROON);
     DrawTextEx(font, TextFormat("IDPM: %s", mathe), (Vector2){cardright.x + 10*scale, cardright.y + 480*scale}, 24*scale, 1, GetColor(0x1E96FCFF));
     
-    const char* labels[] = {"Mã thẻ bạn đọc:", "Mã truyện:", "Tên truyện:", "Ngày mượn:", "Ngày trả thực tế:"};
+    const char* labels[] = {"Mã thẻ bạn đọc:", "Mã truyện:", "Tên truyện:", "Ngày mượn:", "Ngày trả dự kiến:"};
     InputBox_PM* boxes[] = {&Form->mathe, &Form->matruyen, &Form->tentruyen, &Form->ngaymuon, &Form->ngaytra};
     
     for (int i = 0; i < 5; i++) {
@@ -273,16 +273,20 @@ bool LuuPhieuMuonVaoFile(char *maphieu, FormPhieuMuon *Form) {
     if (f == NULL) {
         return false;
     }
-
     for (int i = strlen(Form->mathe.text)-1; i >= 0 && Form->mathe.text[i] == ' '; i--) Form->mathe.text[i] = '\0';
     for (int i = strlen(Form->matruyen.text)-1; i >= 0 && Form->matruyen.text[i] == ' '; i--) Form->matruyen.text[i] = '\0';
     for (int i = strlen(Form->tentruyen.text)-1; i >= 0 && Form->tentruyen.text[i] == ' '; i--) Form->tentruyen.text[i] = '\0';
     for (int i = strlen(Form->ngaymuon.text)-1; i >= 0 && Form->ngaymuon.text[i] == ' '; i--) Form->ngaymuon.text[i] = '\0';
     for (int i = strlen(Form->ngaytra.text)-1; i >= 0 && Form->ngaytra.text[i] == ' '; i--) Form->ngaytra.text[i] = '\0';
 
-    fprintf(f, "%-10s | %-12s | %-10s | %-25s | %-12s | %-12s | %d\n", 
-            maphieu, Form->mathe.text, Form->matruyen.text, Form->tentruyen.text, Form->ngaymuon.text, Form->ngaytra.text, 0);
-    
+    fprintf(f, "%-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %d\n",
+    UTF8Width(maphieu, 12),             maphieu,
+    UTF8Width(Form->mathe.text, 12),    Form->mathe.text,
+    UTF8Width(Form->matruyen.text, 19), Form->matruyen.text,
+    UTF8Width(Form->tentruyen.text, 50),Form->tentruyen.text,
+    UTF8Width(Form->ngaymuon.text, 12), Form->ngaymuon.text,
+    UTF8Width(Form->ngaytra.text, 12),  Form->ngaytra.text,
+    0);
     fflush(f); 
     fclose(f);
     return true;

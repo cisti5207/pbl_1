@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <libmanage.h>
 void InitForm(Nhap *form) {
     memset(form->hoTen.text, 0, 256);
     memset(form->sdt.text, 0, 256);
@@ -250,14 +250,17 @@ bool LuuThanhVienVaoFile(char *maThe, Nhap *form) {
     FILE *f = fopen("data/Phieumuon/User.txt", "a"); 
     if (f == NULL) return false;
 
-    // Xóa khoảng trắng thừa để file gọn gàng
     for (int i = strlen(form->hoTen.text)-1; i >= 0 && form->hoTen.text[i] == ' '; i--) form->hoTen.text[i] = '\0';
     for (int i = strlen(form->sdt.text)-1; i >= 0 && form->sdt.text[i] == ' '; i--) form->sdt.text[i] = '\0';
     for (int i = strlen(form->cccd.text)-1; i >= 0 && form->cccd.text[i] == ' '; i--) form->cccd.text[i] = '\0';
     for (int i = strlen(form->hanSD.text)-1; i >= 0 && form->hanSD.text[i] == ' '; i--) form->hanSD.text[i] = '\0';
 
-    fprintf(f, "%-12s | %-25s | %-12s | %-15s | %-12s\n", 
-            maThe, form->hoTen.text, form->sdt.text, form->cccd.text, form->hanSD.text);
+    fprintf(f, "%-*s | %-*s | %-*s | %-*s | %-*s\n",
+        UTF8Width(maThe, 12),              maThe,
+        UTF8Width(form->hoTen.text, 35),   form->hoTen.text,
+        UTF8Width(form->sdt.text, 15),     form->sdt.text,
+        UTF8Width(form->cccd.text, 15),    form->cccd.text,
+        UTF8Width(form->hanSD.text, 12),   form->hanSD.text);
     
     fclose(f);
     return true;

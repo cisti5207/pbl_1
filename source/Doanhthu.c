@@ -13,9 +13,10 @@ typedef struct {
 } AggItem;
 
 int laygiathue(const char *masachcantim) {
-    FILE *f = fopen("data/dataTruyen.txt", "r"); 
-    if (f == NULL) return 5000; 
-
+    FILE *f = fopen("data/ManageBooks/dataTruyen.txt", "r"); 
+    if (f == NULL) {
+        return 2000; 
+    }
     char line[1024]; 
     int lineCount = 0;
 
@@ -23,8 +24,10 @@ int laygiathue(const char *masachcantim) {
         lineCount++;
         if (lineCount <= 3) continue;
         char ma[20];
-        if (sscanf(line, " | %[^ | ]", ma) == 1) {
-            if (strcmp(ma, masachcantim) == 0) {
+       if (sscanf(line, " | %[^|]", ma) == 1) {
+    int len = strlen(ma);
+    while (len > 0 && ma[len-1] == ' ') ma[--len] = '\0';
+    if (strcmp(ma, masachcantim) == 0) {
                 int giathue;
                 sscanf(line, " | %*[^|] | %*[^|] | %*[^|] | %*[^|] | %*[^|] | %*[^|] | %*[^|] | %*[^|] | %*[^|] | %*[^|] | %d |", &giathue);
                 fclose(f);
@@ -33,7 +36,7 @@ int laygiathue(const char *masachcantim) {
         }
     }
     fclose(f);
-    return 5000; 
+    return 2000; 
 }
 
 time_t ParseDateStr(const char *dateStr) {
@@ -57,18 +60,32 @@ int KhoangCachNgay(const char *ngayBatDau, const char *ngayKetThuc) {
     return (int)(diff / (60.0 * 60.0 * 24.0));
 }
 
-double TinhTienThue(int giaGoc, const char *ngayDuKien, const char *ngayTraThucTe) {
-    int lechngay = KhoangCachNgay(ngayDuKien, ngayTraThucTe);
-    double tien = (double)giaGoc;
-
-    if (lechngay > 0) {
-        tien = tien * pow(1.05, lechngay);
+double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *ngayDuKien, const char *ngayTraThucTe) {
+    
+    // Số ngày thuê gốc (ngayMuon -> ngayDuKien)
+    int soNgayGoc = KhoangCachNgay(ngayMuon, ngayDuKien);
+    if (soNgayGoc <= 0) soNgayGoc = 1;
+    
+    double tienGoc = (double)giaMotNgay * soNgayGoc;
+    
+    // Số ngày lệch (âm = trả sớm, dương = trả trễ, 0 = đúng hạn)
+    int lechNgay = KhoangCachNgay(ngayDuKien, ngayTraThucTe);
+    
+    if (lechNgay == 0) {
+        // Đúng hạn: giữ nguyên
+        return tienGoc;
     } 
-    else if (lechngay < 0) {
-        int ngaySom = -lechngay;
-        tien = tien * pow(0.95, ngaySom);
+    else if (lechNgay < 0) {
+        // Trả sớm: giảm 5%/ngày trên số ngày sớm
+        int ngaySom = -lechNgay;
+        double giamGia = (double)giaMotNgay * ngaySom * 0.05;
+        return tienGoc - giamGia;
+    } 
+    else {
+        // Trả trễ: cộng thêm 5%/ngày trên số ngày trễ
+        double phuThu = (double)giaMotNgay * lechNgay * 0.05;
+        return tienGoc + phuThu;
     }
-    return tien;
 }
 
 unsigned int HashNgay(const char *ngay) {
@@ -140,7 +157,7 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
     bool isHoverBack = CheckCollisionPointRec(GetMousePosition(), btnBack);
     if (IsKeyPressed(KEY_ESCAPE) || (isHoverBack && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
         InitFormDoanhThu(form);
-        *currentState = APP_MENU; 
+        *currentState = HOME; 
         return; 
     }
     
@@ -324,7 +341,7 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
             
             DrawTextEx(font, items[i].label, (Vector2){board.x + 50, startY + 12}, 20, 1, DARKGRAY);
             DrawTextEx(font, TextFormat("%.0f VNĐ", items[i].amount), (Vector2){board.x + board.width - 250, startY + 12}, 22, 1, GetColor(0x27AE60FF)); // Màu xanh lá nhẹ
-        }
+        } 
         startY += rowHeight;
     }
     

@@ -3,6 +3,9 @@
 
 // Hàm vẽ và xử lý Menu VIP, co giãn mượt mà mọi tỉ lệ
 AppState DrawAndHandleMenu(Font font, float screenW, float screenH) {
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        return HOME;
+    }
     // 1. VẼ NỀN GRADIENT SANG TRỌNG
     DrawRectangleGradientV(0, 0, screenW, screenH, GetColor(0xFFF0F5FF), GetColor(0xFFE4EBFF)); // Hồng pastel chuyển sắc
     
@@ -98,6 +101,17 @@ AppState DrawAndHandleMenu(Font font, float screenW, float screenH) {
     // Trang trí thêm: 2 dải màu nhấn nhá ở góc
     DrawCircle(0, screenH, 150 * scale, Fade(PINK, 0.2f));
     DrawCircle(screenW, screenH, 100 * scale, Fade(GetColor(0xFFB6C1FF), 0.3f));
+
+    // Nút về HOME vẽ CUỐI CÙNG để không bị che bởi header
+    Rectangle btnBack = { 20, 20, 140, 44 };
+    bool isHoverBack = CheckCollisionPointRec(GetMousePosition(), btnBack);
+    // Nền trắng đục để nổi lên trên gradient hồng
+    DrawRectangleRounded(btnBack, 0.3f, 10, isHoverBack ? MAROON : WHITE);
+    DrawRectangleRoundedLines(btnBack, 0.3f, 10, MAROON);
+    DrawTextEx(font, "< Quay lại", (Vector2){btnBack.x + 12, btnBack.y + 12}, 20, 1, isHoverBack ? WHITE : MAROON);
+    if (isHoverBack && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        return HOME;
+    }
 
     return nextState;
 }

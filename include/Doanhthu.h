@@ -38,7 +38,7 @@ typedef struct {
 // 3. Các hàm xử lý Logic Ngày & Toán học
 int KhoangCachNgay(const char *ngayBatDau, const char *ngayKetThuc);
 void CongThemNgay(const char *ngayGoc, int soNgayThem, char *ngayKetQua);
-double TinhTienThue(int giaGoc, const char *ngayDuKien, const char *ngayTraThucTe);
+double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *ngayDuKien, const char *ngayTraThucTe); 
 
 // 4. Các hàm xử lý Map Doanh Thu
 void InitDoanhThuMap(DoanhThuMap *map);

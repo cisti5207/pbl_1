@@ -3,14 +3,19 @@
 
 #include "raylib.h"
 #include "libmanage.h"
+#include "login.h"
 
-typedef enum{
-    LOGINAPP,
+typedef enum AppState {
+    LOGINAPP = 0,
     HOME,
     MANAGEBOOKS,
-    MANAGEUSER,
-    MANAGEBORROWING,
-    STATISTIC,
+    APP_MENU,          
+    APP_TAO_THE,
+    APP_TAO_PHIEU,
+    APP_XEM_DANH_SACH,
+    APP_LICH_SU,
+    APP_TRA_SACH,
+    APP_DOANH_THU
 } AppState;
 
 typedef struct {

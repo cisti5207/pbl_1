@@ -27,6 +27,7 @@ typedef struct {
     
     int tienPhat; // Tiền phạt tính toán được
     int tongTien;
+    int daThanhToan;
 } FormTraSach;
 
 void InitFormTraSach(FormTraSach *form);

@@ -3,7 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\Users\\HOAN\\Downloads\\Ảnh đồ\\raylib-6.0_win64_msvc16\\raylib-6.0_win64_msvc16\\include",
+                "C:\\msys64\\ucrt64\\include",
                 "${workspaceFolder}/include"
             ],
             "defines": [
@@ -12,11 +12,11 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.26100.0",
-            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
             "cStandard": "c23",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-gcc-x64",
-            "configurationProvider": "ms-vscode.makefile-tools"
+            "configurationProvider": "ms-vscode.makefile-tools",
+            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe"
         }
     ],
     "version": 4
