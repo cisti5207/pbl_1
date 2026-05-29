@@ -6,6 +6,38 @@
 #include <string.h>
 #include <stdlib.h>
 
+void TimTenTruyenTheoMa(const char *matruyen, char *tentruyen_out) {
+    tentruyen_out[0] = '\0';
+
+    FILE *f = fopen("data/ManageBooks/dataTruyen.txt", "r");
+    if (f == NULL) return;
+
+    char line[1024];
+    while (fgets(line, sizeof(line), f)) {
+        char *p = line;
+        while (*p == ' ' || *p == '\t') p++;
+        if (*p != '|') continue;
+
+        char ma[64] = {0}, maphu[256] = {0}, ten[256] = {0};
+        if (sscanf(p, " | %63[^|] | %255[^|] | %255[^|]", ma, maphu, ten) == 3) {
+            int len = strlen(ma);
+            while (len > 0 && (ma[len-1] == ' ' || ma[len-1] == '\r' || ma[len-1] == '\n')) ma[--len] = '\0';
+            char *pMa = ma;
+            while (*pMa == ' ') pMa++;
+
+            if (strcmp(pMa, matruyen) == 0) {
+                len = strlen(ten);
+                while (len > 0 && (ten[len-1] == ' ' || ten[len-1] == '\r' || ten[len-1] == '\n')) ten[--len] = '\0';
+                char *pTen = ten;
+                while (*pTen == ' ') pTen++;
+                strcpy(tentruyen_out, pTen);
+                break;
+            }
+        }
+    }
+    fclose(f);
+}
+
 int DemSoPhieuMuon(PhieuMuonNode *head) {
     int count = 0;
     PhieuMuonNode *temp = head;
@@ -104,6 +136,7 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         Vector2 mousepoint = GetMousePosition();
         for (int i = 0; i < 5; i++) {
+            if (i == 2) continue; // tentruyen bi lock
             if (CheckCollisionPointRec(mousepoint, boxes[i]->rec)) {
                 for (int j = 0; j < 5; j++) boxes[j]->isfocused = false;
                 boxes[i]->isfocused = true;
@@ -113,6 +146,7 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
     }
     
     for (int i = 0; i < 5; i++) {
+        if (i == 2) continue; // tentruyen bi lock hoan toan
         if (boxes[i]->isfocused) {
             int key = GetKeyPressed();
             while (key > 0) {
@@ -157,12 +191,25 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
             
             if (IsKeyPressed(KEY_TAB)) {
                 boxes[i]->isfocused = false;
-                boxes[(i + 1) % 5]->isfocused = true;
+                int next = (i == 1) ? 3 : (i + 1) % 5;
+                if (next == 2) next = 3;
+                boxes[next]->isfocused = true;
                 break;
             }
         }
     }
     
+    // 3.5. TU DONG DIEN TEN TRUYEN
+    {
+        char tentruyen_tam[512] = {0};
+        if (Form->matruyen.lettercount > 0)
+            TimTenTruyenTheoMa(Form->matruyen.text, tentruyen_tam);
+        strncpy(Form->tentruyen.text, tentruyen_tam, 511);
+        Form->tentruyen.text[511] = '\0';
+        Form->tentruyen.lettercount = (int)strlen(Form->tentruyen.text);
+        Form->tentruyen.isfocused = false;
+    }
+
     // 4. XỬ LÝ NÚT XÁC NHẬN
     float screenW = (float)GetScreenWidth();
     float screenH = (float)GetScreenHeight();
@@ -284,8 +331,8 @@ bool LuuPhieuMuonVaoFile(char *maphieu, FormPhieuMuon *Form) {
     UTF8Width(Form->mathe.text, 12),    Form->mathe.text,
     UTF8Width(Form->matruyen.text, 19), Form->matruyen.text,
     UTF8Width(Form->tentruyen.text, 50),Form->tentruyen.text,
-    UTF8Width(Form->ngaymuon.text, 12), Form->ngaymuon.text,
-    UTF8Width(Form->ngaytra.text, 12),  Form->ngaytra.text,
+    UTF8Width(Form->ngaymuon.text, 19), Form->ngaymuon.text,
+    UTF8Width(Form->ngaytra.text, 19),  Form->ngaytra.text,
     0);
     fflush(f); 
     fclose(f);

@@ -38,4 +38,5 @@ void DrawSuccess(Font font, Texture2D background2, float currenttimer);
 bool LuuPhieuMuonVaoFile(char *maphieu, FormPhieuMuon *Form);
 void ThemPhieuMuonVaoList(PhieuMuonNode **head, char *maPM, FormPhieuMuon *Form);
 int UTF8Width(const char *str, int displayWidth);
+void TimTenTruyenTheoMa(const char *matruyen, char *tentruyen_out);
 #endif 

@@ -78,12 +78,12 @@ double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *ngayDuKien
     else if (lechNgay < 0) {
         // Trả sớm: giảm 5%/ngày trên số ngày sớm
         int ngaySom = -lechNgay;
-        double giamGia = (double)giaMotNgay * ngaySom * 0.05;
+        double giamGia = (double)giaMotNgay * ngaySom * 0.1;
         return tienGoc - giamGia;
     } 
     else {
         // Trả trễ: cộng thêm 5%/ngày trên số ngày trễ
-        double phuThu = (double)giaMotNgay * lechNgay * 0.05;
+        double phuThu = (double)giaMotNgay * lechNgay * 0.1;
         return tienGoc + phuThu;
     }
 }
