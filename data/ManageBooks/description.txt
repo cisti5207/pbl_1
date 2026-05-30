@@ -3,197 +3,465 @@ T001  Doraemon
       mở ra vô số chuyến phiêu lưu hài hước và đầy ý nghĩa về tình bạn, gia đình.
 
 T002  Thám tử lừng danh Conan
-      Shinichi Kudo bị teo nhỏ thành Conan và phải che giấu thân phận trong lúc
-      truy tìm tổ chức áo đen qua hàng loạt vụ án hóc búa.
+      Cậu học sinh trung học Kudo Shinichi bị teo nhỏ thành Edogawa Conan, âm thầm phá giải
+      vô số vụ án hóc búa để truy tìm và lật đổ tổ chức Áo Đen bí ẩn.
 
 T003  One Piece
-      Monkey D. Luffy cùng băng Mũ Rơm vượt đại dương để tìm kho báu One Piece
-      và theo đuổi giấc mơ trở thành Vua Hải Tặc.
+      Cuộc hành trình vĩ đại của Monkey D. Luffy và băng hải tặc Mũ Rơm trên biển cả bao la,
+      nhằm tìm kiếm kho báu One Piece và trở thành Vua Hải Tặc.
 
 T004  Naruto
-      Naruto Uzumaki, cậu bé bị cô lập bởi Cửu Vĩ, nỗ lực trở thành Hokage
-      mạnh nhất để được mọi người công nhận.
+      Câu chuyện về Uzumaki Naruto, một ninja thiếu niên luôn bị xua đuổi, nỗ lực 
+      tìm kiếm sự công nhận từ mọi người và khao khát trở thành Hokage vĩ đại.
 
 T005  Bảy viên ngọc rồng
-      Son Goku trải qua nhiều cuộc phiêu lưu và những trận chiến huyền thoại
-      nhằm bảo vệ Trái Đất khỏi các thế lực nguy hiểm.
+      Hành trình phiêu lưu của Son Goku từ lúc bé đến khi trưởng thành, cùng những người bạn 
+      đi tìm 7 viên ngọc rồng rải rác khắp nơi để bảo vệ Trái Đất khỏi cái ác.
 
 T006  Attack on Titan
-      Nhân loại sống sau những bức tường khổng lồ để chống lại Titan,
-      cho đến khi Eren quyết tâm khám phá sự thật của thế giới.
+      Trận chiến sinh tồn khốc liệt của nhân loại sống trong những bức tường khổng lồ,
+      chống lại bọn Titan ăn thịt người đáng sợ và khám phá bí mật thế giới.
 
 T007  Bleach
-      Ichigo Kurosaki vô tình trở thành Tử thần và tham gia vào các cuộc chiến
-      giữa linh hồn, Hollow và Soul Society.
+      Kurosaki Ichigo vô tình nhận được sức mạnh của Tử Thần (Shinigami), gánh vác
+      nhiệm vụ tiêu diệt các ác linh Hollow và bảo vệ sự cân bằng của hai thế giới.
 
 T008  Death Note
-      Light Yagami nhặt được cuốn sổ có thể giết người chỉ bằng tên,
-      kéo theo cuộc đấu trí căng thẳng với thám tử L.
+      Cuộc đấu trí căng thẳng giữa thần đồng Yagami Light, người nắm giữ cuốn sổ tử thần,
+      và vị thám tử lập dị tài ba L để tìm ra định nghĩa thực sự của công lý.
 
 T009  Thanh gươm diệt quỷ
-      Tanjiro Kamado dấn thân vào hành trình diệt quỷ để cứu em gái Nezuko
-      và trả thù cho gia đình bị sát hại.
+      Hành trình gian nan của Kamado Tanjirou trở thành kiếm sĩ diệt quỷ để trả thù
+      cho gia đình và tìm cách chữa trị cho người em gái đã biến thành quỷ.
 
 T010  Jujutsu Kaisen
-      Yuji Itadori bước vào thế giới chú thuật sau khi nuốt ngón tay Sukuna,
-      đối đầu với những lời nguyền đáng sợ.
+      Itadori Yuji nuốt ngón tay của một Nguyền hồn tối thượng, bị cuốn vào thế giới
+      của các Chú thuật sư và những trận chiến khốc liệt bảo vệ loài người.
 
 T011  Chainsaw Man
-      Denji, chàng trai nghèo sống bằng nghề săn quỷ, hợp nhất với quỷ cưa máy
-      để tồn tại trong thế giới đầy bạo lực và phản bội.
+      Denji, một thiếu niên nghèo khổ, dung hợp với ác quỷ cưa máy Pochita, trở thành
+      Người Cưa và dấn thân vào công việc săn quỷ máu lửa và điên rồ.
 
 T012  Hunter x Hunter
-      Gon Freecss rời quê hương để trở thành Hunter và tìm kiếm người cha mất tích,
-      khám phá một thế giới rộng lớn đầy hiểm nguy.
+      Cậu bé Gon Freecss tham gia cuộc thi Hunter vô cùng khắc nghiệt để tìm người cha 
+      mất tích và khám phá một thế giới đầy những điều kỳ bí và sức mạnh Niệm.
 
 T013  Fairy Tail
-      Hội pháp sư Fairy Tail nổi tiếng với những nhiệm vụ nguy hiểm,
-      tình đồng đội mạnh mẽ và các trận chiến phép thuật hoành tráng.
+      Chuyến phiêu lưu của Lucy, Natsu và những người bạn trong hội ma đạo sĩ Fairy Tail,
+      cùng nhau sát cánh vượt qua nhiều nhiệm vụ và thử thách hiểm nguy.
 
 T014  Black Clover
-      Asta sinh ra không có ma lực nhưng vẫn quyết tâm trở thành Ma Pháp Vương
-      bằng ý chí và sức mạnh phi thường.
+      Asta, cậu bé sinh ra không có ma pháp trong thế giới phép thuật, nỗ lực vươn lên
+      bằng thanh ma kiếm chống phép thuật để thực hiện ước mơ trở thành Ma Pháp Vương.
 
 T015  Blue Lock
-      Dự án Blue Lock tập hợp các tiền đạo trẻ nhằm tạo ra chân sút ích kỷ nhất,
-      đưa bóng đá Nhật Bản lên đỉnh thế giới.
+      Một dự án đào tạo tiền đạo tàn khốc bậc nhất Nhật Bản nhằm tìm ra siêu sao 
+      bóng đá ích kỷ nhất, đủ sức đưa đội tuyển quốc gia lên đỉnh thế giới.
 
 T016  Haikyuu!!
-      Hinata Shoyo theo đuổi đam mê bóng chuyền dù sở hữu chiều cao hạn chế,
-      cùng đồng đội chinh phục các giải đấu trung học.
+      Câu chuyện truyền cảm hứng về Hinata Shoyo cùng đội bóng chuyền trường Karasuno 
+      không ngừng nỗ lực, đập tan định kiến để vươn tới giải đấu quốc gia.
 
-T017  Kuroko no Basket
-      Kuroko và Kagami đối đầu với Thế hệ Kỳ tích trong những trận bóng rổ
-      đầy kỹ năng siêu thực và cạnh tranh khốc liệt.
+T017  Classroom of the Elite
+      Tại ngôi trường đào tạo tinh hoa của chính phủ, Ayanokoji Kiyotaka che giấu 
+      tài năng thực sự và âm thầm thao túng các cuộc đấu trí khốc liệt giữa các lớp.
 
-T018  Slam Dunk
-      Hanamichi Sakuragi từ một tên bất lương trở thành cầu thủ bóng rổ,
-      khám phá đam mê và tinh thần đồng đội.
+T018  Harry Potter
+      Hành trình trưởng thành đầy phép màu tại trường Hogwarts của cậu bé phù thủy 
+      Harry Potter và cuộc chiến chống lại Chúa tể hắc ám Voldemort.
 
-T019  Tokyo Revengers
-      Takemichi có khả năng quay về quá khứ để thay đổi tương lai,
-      cứu bạn bè khỏi những bi kịch băng đảng.
+T019  20th Century Boys
+      Nhóm bạn thuở nhỏ phải đối mặt với một giáo phái do kẻ tự xưng là "Bạn" đứng đầu,
+      kẻ âm mưu hủy diệt thế giới dựa trên trí tưởng tượng thời thơ ấu của họ.
 
-T020  Spy x Family
-      Một điệp viên, sát thủ và cô bé ngoại cảm vô tình tạo nên gia đình giả,
-      che giấu bí mật riêng giữa cuộc sống thường ngày.
+T020  Monster
+      Bác sĩ Tenma từ bỏ mọi thứ để truy lùng Johan - con ác quỷ đội lốt thiên thần
+      mà chính tay anh đã cứu sống, nhằm ngăn chặn những tội ác tày trời.
 
-T021  Dr. Stone
-      Sau khi nhân loại bị hóa đá hàng nghìn năm, Senku dùng tri thức khoa học
-      để khôi phục nền văn minh từ con số không.
+T021  Pluto
+      Lấy bối cảnh trong vũ trụ Astro Boy, thám tử Gesicht điều tra hàng loạt vụ án mạng
+      nhắm vào 7 robot vĩ đại nhất thế giới và những người ủng hộ luật robot.
 
-T022  My Hero Academia
-      Trong thế giới nơi siêu năng lực là điều bình thường, Izuku Midoriya
-      theo đuổi ước mơ trở thành anh hùng vĩ đại.
+T022  Master Keaton
+      Hành trình của Taichi Keaton, một chuyên viên bảo hiểm, giáo sư khảo cổ và cựu 
+      quân nhân SAS, đi khắp thế giới để phá án và khám phá văn hóa nhân loại.
 
-T023  Fullmetal Alchemist
-      Hai anh em Edward và Alphonse Elric lên đường tìm Hòn đá Triết gia
-      sau thất bại của thuật giả kim cấm kỵ.
+T023  Billy Bat
+      Họa sĩ người Mỹ gốc Nhật phát hiện ra nhân vật dơi của mình từng xuất hiện trong lịch sử
+      và dính líu đến những âm mưu thao túng thế giới suốt hàng ngàn năm.
 
-T024  Yu-Gi-Oh!
-      Yugi Muto tham gia các trận đấu bài ma thuật sử dụng chiến thuật,
-      trí tuệ và sức mạnh từ linh hồn Pharaoh cổ đại.
+T024  Yotsuba&!
+      Cuộc sống thường ngày tràn ngập tiếng cười và những khám phá mới mẻ, trong trẻo 
+      của cô bé 5 tuổi kỳ lạ, luôn tràn đầy năng lượng Yotsuba.
 
-T025  Pokemon Adventures
-      Những huấn luyện viên trẻ phiêu lưu qua nhiều vùng đất,
-      chiến đấu và khám phá bí mật của thế giới Pokemon.
+T025  Azumanga Daioh
+      Bộ truyện hài hước xoay quanh những mẩu chuyện đời thường ngốc nghếch nhưng 
+      vô cùng đáng yêu của một nhóm nữ sinh trung học và các giáo viên.
 
-T026  InuYasha
-      Kagome xuyên thời gian đến Nhật Bản thời chiến quốc và gặp InuYasha,
-      cùng nhau truy tìm mảnh ngọc Tứ Hồn.
+T026  Black Jack
+      Vị bác sĩ phẫu thuật thiên tài không giấy phép Black Jack với kỹ năng siêu phàm,
+      luôn đòi giá cắt cổ nhưng mang trong mình tấm lòng nhân đạo sâu sắc.
 
-T027  Gintama
-      Trong Edo bị người ngoài hành tinh chiếm đóng, Gintoki cùng bạn bè
-      tạo nên những câu chuyện hài hước xen lẫn cảm động.
+T027  Dororo
+      Hyakkimaru, người bị quỷ dữ cướp đi 48 bộ phận cơ thể, cùng chú bé đạo chích Dororo
+      rong ruổi khắp nơi để diệt quỷ và lấy lại hình hài con người.
 
-T028  Berserk
-      Guts, kiếm sĩ cô độc mang thanh đại kiếm khổng lồ, chiến đấu chống quỷ dữ
-      và số phận tàn khốc trong thế giới đen tối.
+T028  Astro Boy
+      Cậu bé robot Atom (Astro) sở hữu sức mạnh phi thường và trái tim nhân hậu, không ngừng 
+      chiến đấu để bảo vệ hòa bình và kết nối con người với thế giới robot.
 
-T029  Vagabond
-      Bộ truyện khắc họa hành trình trưởng thành của kiếm sĩ Miyamoto Musashi
-      trên con đường tìm kiếm sức mạnh và ý nghĩa cuộc sống.
+T029  Hi Chim Sẻ Hello
+      Một tập truyện ngắn hài hước và đầy tính châm biếm về cuộc sống đời thường,
+      xã hội Nhật Bản qua lăng kính độc đáo của "vị thần truyện tranh" Osamu Tezuka.
 
-T030  JoJo's Bizarre Adventure
-      Nhiều thế hệ gia tộc Joestar đối đầu thế lực siêu nhiên bằng năng lực Stand
-      trong những cuộc phiêu lưu độc đáo và kỳ quái.
+T030  Phoenix
+      Kiệt tác vĩ đại về vòng luân hồi, sự sống và cái chết, trải dài từ quá khứ viễn cổ 
+      đến tương lai xa xôi qua sự chứng kiến của sinh vật bất tử Chim Lửa.
 
-T031  Sailor Moon
-      Usagi Tsukino trở thành Sailor Moon và cùng các chiến binh thủy thủ
-      bảo vệ thế giới trước thế lực bóng tối.
+T031  Buddha
+      Bản hùng ca tái hiện sinh động cuộc đời của Đức Phật Thích Ca Mâu Ni từ một vị 
+      hoàng tử uy quyền đến khi giác ngộ và đi khắp nơi truyền bá chân lý.
 
-T032  Cardcaptor Sakura
-      Sakura Kinomoto vô tình giải phóng các lá bài Clow ma thuật
-      và phải thu phục chúng để tránh thảm họa.
+T032  Thám tử Kindaichi
+      Những vụ án mạng rùng rợn, phức tạp và những màn suy luận đỉnh cao của cậu học sinh 
+      Kindaichi Hajime, người thừa kế trí tuệ của người ông thám tử lừng danh.
 
-T033  Detective School Q
-      Nhóm học sinh trường thám tử Dan khám phá các vụ án bí ẩn,
-      vận dụng suy luận để tìm ra hung thủ.
+T033  Sword Art Online
+      Người chơi bị mắc kẹt trong một tựa game thực tế ảo tử thần. Kirito phải chiến đấu 
+      để sinh tồn, chinh phục các tầng tháp và giải cứu hàng ngàn game thủ.
 
-T034  Kingdom
-      Câu chuyện thời Chiến Quốc Trung Hoa xoay quanh tham vọng thống nhất đất nước
-      và hành trình trở thành đại tướng của Tín.
+T034  Overlord
+      Một game thủ bị kẹt trong tựa game yêu thích với hình hài một bộ xương, anh bắt đầu 
+      dẫn dắt lăng mộ Nazarick vĩ đại của mình từng bước chinh phục thế giới mới.
 
-T035  The Promised Neverland
-      Những đứa trẻ tại trại Grace Field phát hiện bí mật kinh hoàng
-      và lập kế hoạch vượt ngục khỏi số phận đáng sợ.
+T035  No Game No Life
+      Hai anh em game thủ thiên tài Sora và Shiro bị triệu hồi đến Disboard, một thế giới kỳ lạ 
+      nơi mọi tranh chấp, kể cả biên giới quốc gia, đều được quyết định bằng trò chơi.
 
-T036  Fire Force
-      Biệt đội cứu hỏa đặc biệt chiến đấu với các hỏa nhân tự bốc cháy,
-      đồng thời điều tra bí mật đằng sau hiện tượng này.
+T036  Re:Zero
+      Cậu thiếu niên Natsuki Subaru bị triệu hồi đến thế giới khác và phát hiện ra mình có năng lực 
+      "Trở về từ cõi chết" để thay đổi bi kịch và cứu lấy những người anh yêu thương.
 
-T037  Soul Eater
-      Học sinh học viện Shibusen hợp tác cùng vũ khí sống để săn linh hồn,
-      ngăn chặn thế lực hắc ám trỗi dậy.
+T037  Slime Chuyển Sinh
+      Một người đàn ông bị đâm chết và chuyển sinh thành con Slime bé nhỏ, từ đó bắt đầu hành trình
+      kết giao bạn bè và xây dựng một vương quốc hòa bình cho các quái vật.
 
-T038  Assassination Classroom
-      Một sinh vật siêu mạnh trở thành giáo viên của lớp 3-E,
-      nơi học sinh phải ám sát thầy trước khi Trái Đất bị hủy diệt.
+T038  Your Name
+      Câu chuyện hoán đổi thân xác kỳ diệu và cảm động giữa cô nữ sinh Mitsuha ở vùng quê 
+      và chàng trai Taki ở Tokyo, vượt qua cả giới hạn của không gian và thời gian.
 
-T039  Katekyo Hitman Reborn!
-      Tsuna, cậu học sinh yếu đuối, được đào tạo để trở thành ông trùm mafia
-      dưới sự hướng dẫn kỳ quặc của Reborn.
+T039  5 Centimet Trên Giây
+      Ba câu chuyện ngắn xoay quanh mối tình đầu dang dở của Takaki, miêu tả khoảng cách 
+      của sự chia xa và nỗi buồn của thời gian qua những thước phim tuyệt đẹp.
 
-T040  Noragami
-      Yato là vị thần vô danh nhận mọi công việc để kiếm tín đồ,
-      vô tình cuốn vào nhiều trận chiến linh hồn.
+T040  Đứa Con Của Thời Tiết
+      Cậu thiếu niên Hodaka bỏ nhà lên Tokyo và gặp gỡ Hina, một cô gái có khả năng thay đổi thời tiết,
+      dẫn đến những lựa chọn đánh đổi định mệnh giữa tình yêu và thế giới.
 
-T041  Komi Can't Communicate
-      Komi mắc chứng khó giao tiếp nhưng luôn cố gắng kết bạn,
-      tạo nên những khoảnh khắc hài hước và dễ thương.
+T041  Suzume Khóa Chặt Cửa Nào
+      Hành trình của cô nữ sinh Suzume cùng một chàng trai bị biến thành chiếc ghế ba chân 
+      đi khắp nước Nhật để khóa lại những cánh cửa giải phóng thảm họa.
 
-T042  Your Lie in April
-      Thiên tài piano Kousei gặp nghệ sĩ violin Kaori,
-      người giúp cậu tìm lại tình yêu với âm nhạc.
+T042  Khu Vườn Ngôn Từ
+      Cuộc gặp gỡ tĩnh lặng dưới trời mưa tại khu vườn Shinjuku giữa một cậu nam sinh đam mê 
+      làm giày và một cô giáo đang hoàn toàn mất phương hướng trong cuộc sống.
 
-T043  A Silent Voice
-      Shoya tìm cách chuộc lỗi với cô bạn khiếm thính Shoko,
-      đối mặt với sự cô lập và cảm giác tội lỗi.
+T043  Tiếng Gọi Từ Vì Sao
+      Mối tình xa cách đến nao lòng giữa Mikako phải đi chiến đấu ngoài không gian và Noboru 
+      ở lại Trái Đất, nơi những tin nhắn phải mất nhiều năm ánh sáng mới đến nơi.
 
-T044  Fruits Basket
-      Tohru Honda khám phá bí mật gia tộc Soma,
-      những người bị biến thành con giáp khi bị ôm bởi người khác giới.
+T044  Thế Giới Hoàn Mỹ
+      Câu chuyện tu tiên rực rỡ và bi tráng của Thạch Hạo, thiếu niên từng bị khoét mất Chí Tôn cốt, 
+      mạnh mẽ vươn lên nghịch thiên bách chiến, quét ngang cửu thiên thập địa.
 
-T045  Nana
-      Hai cô gái cùng tên Nana gặp nhau tại Tokyo,
-      cùng trải qua tình yêu, âm nhạc và những biến động cuộc sống.
+T045  Toàn Chức Cao Thủ
+      Diệp Tu, một tuyển thủ eSport huyền thoại bị câu lạc bộ ép giải nghệ, đã trở lại tựa game 
+      Vinh Quang để làm lại từ đầu và tìm lại đỉnh cao vinh quang của đời mình.
 
-T046  Beastars
-      Tại ngôi trường động vật, Legoshi phải đấu tranh giữa bản năng săn mồi
-      và cảm xúc của mình trong xã hội đầy định kiến.
+T046  Ma Đạo Tổ Sư
+      Mối tình tri kỷ đầy sóng gió giữa Ngụy Vô Tiện và Lam Vong Cơ, xen lẫn những âm mưu, 
+      ân oán và sự thật bị chôn vùi trong thế giới tu chân khốc liệt.
 
-T047  Parasyte
-      Shinichi bị sinh vật ngoài hành tinh ký sinh vào tay phải,
-      cùng tồn tại và chiến đấu để bảo vệ loài người.
+T047  Thiên Quan Tứ Phúc
+      Câu chuyện về vị Thái tử Tiên Lạc Tạ Liên ba lần phi thăng, cùng mối nhân duyên 
+      chấp niệm sâu sắc và khắc cốt ghi tâm suốt 800 năm với Quỷ vương Hoa Thành.
 
-T048  Akame ga Kill!
-      Tatsumi gia nhập Night Raid, nhóm sát thủ chống lại đế quốc mục nát
-      bằng những trận chiến tàn khốc.
+T048  Rừng Na Uy
+      Câu chuyện day dứt về tình yêu, sự cô đơn và nỗi đau trưởng thành của chàng thanh niên Toru 
+      khi kẹt giữa hai cô gái Naoko và Midori trong xã hội Nhật Bản hiện đại.
 
-T049  Classroom of the Elite
-      Học sinh trong ngôi trường ưu tú cạnh tranh bằng trí tuệ và chiến lược
-      để đạt vị trí cao nhất.
+T049  Kafka Bên Bờ Biển
+      Hành trình bỏ nhà đi của cậu thiếu niên Kafka 15 tuổi để trốn tránh lời nguyền và cuộc tìm kiếm 
+      của ông lão Nakata, đan xen giữa thực tại và những bí ẩn siêu thực.
 
-T050  Oshi no Ko
-      Bộ truyện khai thác mặt tối ngành giải trí Nhật Bản
-      thông qua câu chuyện đầy bi kịch và bí mật của các thần tượng.
+T050  1Q84
+      Aomame và Tengo vô tình bị cuốn vào một thế giới song song mang tên 1Q84, nơi có hai mặt trăng 
+      trên bầu trời và sự thao túng đáng sợ của một giáo phái mang bí danh Sakigake.
+
+T051  Biên Niên Ký Chim Vặn Dây Cót
+      Chuyến hành trình vào sâu thẳm tiềm thức và những giếng cạn vô hình của Okada Toru 
+      để tìm lại người vợ đột ngột mất tích và đối mặt với bóng tối lịch sử.
+
+T052  Phía Nam Biên Giới Phía Tây Mặt Trời
+      Câu chuyện tình yêu và sự tiếc nuối của Hajime khi bất ngờ gặp lại cô bạn thưở ấu thơ Shimamoto, 
+      kẻ khuấy động dữ dội cuộc sống tưởng chừng vô cùng hoàn hảo bình yên của anh.
+
+T053  Cuộc Săn Cừu Hoang
+      Một cuộc điều tra kỳ lạ và siêu thực xoay quanh bức ảnh có một con cừu mang vết sao trên lưng, 
+      dẫn nhân vật chính vào một thế giới hoang đường, thoát khỏi đời sống tẻ nhạt.
+
+T054  Nghệ Thuật Tinh Tế Của Việc Đếch Quan Tâm
+      Một góc nhìn thực tế và gai góc về cách lựa chọn những gì thực sự quan trọng để bận tâm, 
+      giúp con người đối mặt với sự tiêu cực và sống một cuộc đời bớt mệt mỏi hơn.
+
+T055  Nhà Giả Kim
+      Cuộc hành trình theo đuổi vận mệnh của cậu bé chăn cừu Santiago qua sa mạc, tìm hiểu 
+      tiếng nói của trái tim mình và khám phá ra ngôn ngữ chung của cả vũ trụ.
+
+T056  Hoàng Tử Bé
+      Tác phẩm giàu tính triết lý về tình yêu, sự thuần khiết và ý nghĩa thực sự của cuộc sống 
+      qua góc nhìn ngây thơ của một cậu bé đến từ hành tinh khác.
+
+T057  Kẻ Trộm Sách
+      Câu chuyện cảm động được kể bởi Thần Chết về cô bé Liesel Meminger tại nước Đức thời Thế chiến II, 
+      nơi những cuốn sách ăn trộm mang lại niềm hy vọng giữa cảnh tàn phá.
+
+T058  Suối Nguồn
+      Tác phẩm đồ sộ về cuộc đấu tranh của kiến trúc sư Howard Roark nhằm bảo vệ lý tưởng sáng tạo cá nhân, 
+      từ chối khuất phục trước những định kiến của xã hội đám đông.
+
+T059  Giết Con Chim Nhại
+      Bức tranh chân thực về nạn phân biệt chủng tộc ở miền Nam nước Mỹ qua góc nhìn ngây thơ 
+      của cô bé Scout và người cha luật sư đáng kính Atticus Finch.
+
+T060  Mắt Biếc
+      Tình yêu đơn phương đầy khắc khoải và trong trẻo của Ngạn dành cho Hà Lan - cô gái có đôi mắt biếc, 
+      kéo dài từ thuở ấu thơ ở làng Đo Đo đến khi cả hai đã trưởng thành.
+
+T061  Cho Tôi Xin Một Vé Đi Tuổi Thơ
+      Tác phẩm hài hước, dí dỏm về thế giới đầy mơ mộng và nổi loạn của những đứa trẻ, 
+      mang lại những suy ngẫm vô cùng sâu sắc cho cả những người đã lớn.
+
+T062  Kính Vạn Hoa
+      Bộ truyện gắn liền với tuổi thơ của biết bao thế hệ học trò về bộ ba Quý ròm, Tiểu Long và nhỏ Hạnh 
+      cùng những chuyến phiêu lưu học đường đầy kịch tính và thú vị.
+
+T063  Cô Gái Đến Từ Hôm Qua
+      Những dòng hồi tưởng ngọt ngào, tinh nghịch của Thư về cô bạn nhỏ thuở xưa và những rắc rối 
+      với cô bạn gái hiện tại, tạo nên một cái kết bất ngờ và lãng mạn.
+
+T064  Trại Hoa Vàng
+      Tình yêu học trò hồn nhiên và những đam mê trong sáng của Chuẩn cùng những người bạn 
+      ở Trại Hoa Vàng rực rỡ, nơi ươm mầm cho những khát vọng tuổi trẻ.
+
+T065  Bồ Câu Không Đưa Thư
+      Câu chuyện tình cảm tuổi học trò xoay quanh những lá thư giấu tên bí ẩn kẹp trong hộc bàn 
+      và những rung động, hờn giận đầu đời vô cùng trong sáng.
+
+T066  Thằng Quỷ Nhỏ
+      Câu chuyện vui nhộn về lớp học với nhân vật trung tâm là một cậu bé hay trêu chọc bạn bè 
+      nhưng ẩn sâu bên trong lại mang một trái tim vô cùng nhân hậu và ấm áp.
+
+T067  Bàn Có Năm Chỗ Ngồi
+      Ký ức thời đi học của một nhóm bạn chung bàn, cùng nhau chia sẻ những buồn vui trong học tập,
+      những rung động hồn nhiên và sự gắn kết của tuổi mới lớn.
+
+T068  Hạ Đỏ
+      Mùa hè vương vấn mối tình đầu đơn phương, trong trẻo và nhiều nuối tiếc của cậu học trò tên Chương 
+      khi về quê nội nghỉ hè giữa khung cảnh thôn quê thanh bình.
+
+T069  Thiên Thần Nhỏ Của Tôi
+      Tình bạn đẹp đẽ và thơ ngây giữa Kha và cô bé Hồng Hoa luôn mang lại niềm vui trong khu vườn 
+      nhỏ bé rực rỡ với biết bao loài vật đáng yêu xung quanh.
+
+T070  Bảy Bước Tới Mùa Hè
+      Những kỷ niệm tuổi thơ mùa hè ngọt ngào với những trò chơi con trẻ và cảm xúc chớm nở 
+      đầy dễ thương, rụt rè của lứa tuổi mới lớn đầy mộng mơ.
+
+T071  Con Chó Nhỏ Mang Giỏ Hoa Hồng
+      Thế giới sinh động, đáng yêu và đầy ắp tình cảm của năm chú chó sống trong một gia đình, 
+      qua đó truyền tải thông điệp nhân văn về tình yêu thương muôn loài.
+
+T072  Cảm Ơn Người Lớn
+      Phần tiếp nối đầy hoài niệm của tác phẩm "Cho tôi xin một vé đi tuổi thơ", mang đến nhiều 
+      chiêm nghiệm sâu sắc và triết lý nhẹ nhàng cho những ai đã làm người lớn.
+
+T073  Làm Bạn Với Bầu Trời
+      Câu chuyện nhẹ nhàng, chữa lành về cậu bé Tèo luôn giữ nụ cười hồn nhiên và lòng bao dung 
+      rộng lớn với thế giới, dù mang trong mình những khiếm khuyết cơ thể.
+
+T074  Đảo Mộng Mơ
+      Trí tưởng tượng bay bổng vô tận của những đứa trẻ biến một đống cát nhỏ bé thành một hòn đảo hoang 
+      với vô vàn câu chuyện phiêu lưu kỳ thú đánh bại cướp biển.
+
+T075  Tôi Thấy Hoa Vàng Trên Cỏ Xanh
+      Cuộc sống vùng quê nghèo đầy tình anh em, tình cảm làng xóm, xen lẫn những rung động tinh khôi 
+      và những câu chuyện đồng thoại xót xa mà ấm áp.
+
+T076  Ngồi Khóc Trên Cây
+      Câu chuyện tình yêu tuổi mới lớn có chút bi thương nhưng cũng đầy ắp sự hy vọng của Rùa 
+      và chàng sinh viên năm nhất tên Đông tại một vùng quê yên ả.
+
+T077  Chúc Một Ngày Tốt Lành
+      Một thế giới đồng thoại mới lạ, nơi các loài động vật học tiếng của nhau và cùng tạo ra 
+      những điều kỳ diệu, xua tan nỗi buồn cho những người dân trong ngôi làng nhỏ.
+
+T078  Ngày Xưa Có Một Chuyện Tình
+      Mối tình tay ba nhiều trăn trở, băn khoăn và nuối tiếc giữa Vinh, Miền và Phúc, 
+      trải dài từ khi họ là những đứa trẻ vô tư cho đến lúc chập chững trưởng thành.
+
+T079  Thiên Tài Bên Trái Kẻ Điên Bên Phải
+      Cuốn sách tổng hợp các cuộc phỏng vấn với những bệnh nhân tâm thần, hé mở góc nhìn độc đáo, 
+      logic đến đáng kinh ngạc về thế giới quan của họ.
+
+T080  Muôn Kiếp Nhân Sinh
+      Những trải nghiệm tiền kiếp trải dài qua nhiều nền văn minh, lý giải sâu sắc luật nhân quả 
+      và ý nghĩa của việc tu dưỡng đạo đức, tinh thần trong đời sống hiện tại.
+
+T081  Hành Trình Về Phương Đông
+      Ghi chép về hành trình đến Ấn Độ của các học giả phương Tây nhằm khám phá những sự thật tâm linh, 
+      Yoga và triết lý siêu việt vượt ngoài khả năng của khoa học.
+
+T082  Hiểu Về Trái Tim
+      Những bài học chữa lành tâm hồn, giúp người đọc thấu hiểu cảm xúc của bản thân, 
+      vượt qua những nỗi đau sân si và học cách yêu thương thực sự trọn vẹn.
+
+T083  Đắc Nhân Tâm
+      Cuốn sách kinh điển mọi thời đại về nghệ thuật thu phục lòng người, giao tiếp hiệu quả 
+      và xây dựng những mối quan hệ bền vững, tích cực trong cuộc sống.
+
+T084  Quốc Gia Khởi Nghiệp
+      Giải mã sự phát triển thần kỳ của Israel, từ một quốc gia nhỏ bé cằn cỗi vươn lên thành 
+      cường quốc hàng đầu thế giới về công nghệ, quân sự và khởi nghiệp.
+
+T085  Từ Tốt Đến Vĩ Đại
+      Cuốn sách nghiên cứu chuyên sâu về những công ty có bước nhảy vọt xuất sắc và duy trì 
+      sự thành công vượt bậc trong thời gian dài nhờ nguyên lý con người và kỷ luật.
+
+T086  Suy Nghĩ Nhanh Và Chậm
+      Phân tích hệ thống tư duy nhanh (cảm tính) và chậm (logic) của con người, giải thích 
+      cách chúng ảnh hưởng và chi phối đến mọi quyết định hành vi của chúng ta.
+
+T087  Lược Sử Loài Người
+      Bức tranh toàn cảnh về lịch sử tiến hóa của loài Homo sapiens, từ thời tiền sử săn bắt 
+      hái lượm cho đến thời đại cách mạng khoa học kỹ thuật hiện đại.
+
+T088  Lược Sử Tương Lai
+      Dự đoán về hướng đi của nhân loại trong tương lai khi phải đối mặt với sự trỗi dậy của 
+      trí tuệ nhân tạo, công nghệ sinh học và khát vọng vươn tới sự bất tử.
+
+T089  21 Bài Học Cho Thế Kỷ 21
+      Phân tích những thách thức toàn cầu lớn nhất hiện nay như biến đổi khí hậu, khủng bố, 
+      thông tin sai lệch và AI, qua đó đưa ra những định hướng tồn tại cho tương lai.
+
+T090  Tôi Tự Học
+      Đưa ra phương pháp và tư tưởng đúng đắn về việc tự học, giúp người đọc xây dựng 
+      nền tảng tri thức vững chắc và rèn luyện nhân cách cao đẹp suốt đời.
+
+T091  Hải Thượng Y Tông Tâm Lĩnh
+      Bộ bách khoa toàn thư vô giá về nền y học cổ truyền Việt Nam do đại danh y 
+      Lê Hữu Trác (Hải Thượng Lãn Ông) dành cả đời để đúc kết và biên soạn.
+
+T092  Tắt Đèn
+      Tác phẩm hiện thực phê phán xuất sắc, lột tả số phận bi thảm cùng cực của người nông dân 
+      Việt Nam dưới ách sưu thuế trước Cách mạng, điển hình là nhân vật chị Dậu.
+
+T093  Chí Phèo
+      Bi kịch tha hóa và khao khát hoàn lương tuyệt vọng của Chí Phèo, phản ánh bản chất của 
+      xã hội phong kiến thối nát đã tàn phá cả nhân hình lẫn nhân tính con người.
+
+T094  Số Đỏ
+      Một kiệt tác trào phúng châm biếm sâu cay xã hội tư sản thành thị rởm đời qua bước đường 
+      thăng tiến vùn vụt, nực cười của tên ma cà bông Xuân Tóc Đỏ.
+
+T095  Dế Mèn Phiêu Lưu Ký
+      Chuyến phiêu lưu đầy kịch tính, thú vị và những bài học đường đời sâu sắc của Dế Mèn, 
+      một tác phẩm văn học kinh điển nhất dành cho thiếu nhi Việt Nam.
+
+T096  Đất Rừng Phương Nam
+      Khám phá vẻ đẹp thiên nhiên hoang sơ, trù phú và hào sảng của miền Nam Việt Nam thời kháng chiến 
+      qua bước chân phiêu bạt của cậu bé thiếu niên tên An.
+
+T097  Cánh Đồng Bất Tận
+      Tập truyện ngắn mang đậm hơi thở sông nước miền Tây, khắc họa nỗi đau, sự bấp bênh trôi dạt 
+      và những khát khao hạnh phúc nhỏ nhoi của kiếp người làm nghề chăn vịt.
+
+T098  Tây Du Ký
+      Hành trình diệt yêu hàng ma vô vàn gian nan, thử thách của thầy trò Đường Tăng để đến 
+      Tây Thiên thỉnh kinh, mang đậm triết lý và tư tưởng Phật giáo thâm sâu.
+
+T099  Tam Quốc Diễn Nghĩa
+      Bức tranh lịch sử hùng tráng và những mưu mô chính trị đỉnh cao thời kỳ chia ba thiên hạ: 
+      Ngụy, Thục, Ngô, với vô số nhân vật anh hùng hào kiệt lỗi lạc.
+
+T100  Thủy Hử
+      Câu chuyện bi tráng về 108 vị anh hùng Lương Sơn Bạc, những con người bị ép đến bước đường cùng 
+      phải tụ nghĩa nổi dậy chống lại triều đình tham quan ô lại.
+
+T101  Hồng Lâu Mộng
+      Bức tranh vô cùng rộng lớn về sự hưng suy của một đại gia tộc phong kiến và mối tình bi kịch 
+      ngang trái, đẫm nước mắt giữa Giả Bảo Ngọc và Lâm Đại Ngọc.
+
+T102  Xứ Cát
+      Một sử thi khoa học viễn tưởng hoành tráng về sự trỗi dậy của Paul Atreides giữa những mưu đồ 
+      chính trị, tôn giáo và sinh thái khắc nghiệt trên hành tinh sa mạc Arrakis.
+
+T103  Gatsby Vĩ Đại
+      Cuốn tiểu thuyết vạch trần những ảo tưởng sụp đổ của "Giấc mơ Mỹ" thập niên 20 qua 
+      tình yêu mù quáng và sự xa hoa phù phiếm của gã nhà giàu Jay Gatsby.
+
+T104  1984
+      Một viễn cảnh đen tối về xã hội toàn trị nơi mọi hành động, suy nghĩ và ngôn ngữ 
+      của con người đều bị kiểm soát, giám sát chặt chẽ bởi "Anh Cả".
+
+T105  Trại Súc Vật
+      Tác phẩm ngụ ngôn châm biếm sâu sắc về lý tưởng chính trị, miêu tả một cuộc cách mạng 
+      lật đổ sự cai trị của con người do các loài vật thực hiện rồi lại rơi vào ách độc tài mới.
+
+T106  Bắt Trẻ Đồng Xanh
+      Tâm lý nổi loạn, hoang mang và khát khao giữ lấy sự thuần khiết trong sáng của chàng thiếu niên 
+      Holden Caulfield giữa một xã hội của những người lớn bị cho là giả dối.
+
+T107  Mật Mã Da Vinci
+      Giáo sư Robert Langdon bị cuốn vào cuộc truy tìm Chén Thánh, phải giải mã những bí ẩn 
+      được cất giấu khéo léo trong các tác phẩm hội họa của Leonardo da Vinci.
+
+T108  Thiên Thần Và Ác Quỷ
+      Robert Langdon chạy đua với thời gian để ngăn chặn âm mưu hủy diệt Tòa thánh Vatican 
+      của hội kín Illuminati bằng một quả bom phản vật chất bị đánh cắp.
+
+T109  Sự Im Lặng Của Bầy Cừu
+      Cuộc phỏng vấn trí tuệ, rợn người giữa nữ thực tập sinh FBI Clarice Starling và kẻ ăn thịt người 
+      uyển bác Hannibal Lecter để tìm manh mối bắt giữ một tên giết người hàng loạt.
+
+T110  Rồng Đỏ
+      Will Graham, đặc vụ FBI có khả năng đồng cảm với kẻ sát nhân, buộc phải tái xuất và tìm đến 
+      sự tư vấn của Hannibal Lecter để ngăn chặn tên ác nhân có biệt danh "Tiên Răng".
+
+T111  Pháo Đài Số
+      Cuộc chiến khốc liệt để giải mã một thuật toán mã hóa không thể phá vỡ, đe dọa trực tiếp 
+      đến sự sống còn của hệ thống tình báo Cơ quan An ninh Quốc gia Mỹ (NSA).
+
+T112  Điểm Dối Lừa
+      Một phát kiến khoa học chấn động tại Bắc Cực thực chất là một âm mưu chính trị vô cùng tinh vi, 
+      buộc chuyên gia phân tích tình báo Rachel Sexton phải liều mạng tìm ra sự thật.
+
+T113  Cuộc Đời Của Pi
+      Hành trình sinh tồn phi thường, đầy những hiểm nguy và phép màu trên một chiếc thuyền cứu sinh 
+      lênh đênh giữa đại dương của cậu bé người Ấn Độ tên Pi và một con hổ Bengal.
+
+T114  Chúa Tể Những Chiếc Nhẫn
+      Sử thi vĩ đại về cuộc hành trình gian nan của người Hobbit Frodo Baggins và Hiệp hội bảo vệ nhẫn 
+      nhằm tiến vào Mordor để tiêu hủy Chiếc nhẫn quyền lực của Chúa tể Sauron.
+
+T115  Trò Chơi Vương Quyền
+      Cuộc chiến chính trị tàn khốc và những mưu đồ đẫm máu giữa các gia tộc vĩ đại nhằm tranh giành 
+      Ngai Sắt để cai trị toàn bộ Bảy Vương Quốc trên lục địa Westeros.
+
+T116  Cây Cam Ngọt Của Tôi
+      Câu chuyện tuổi thơ cảm động đến rơi nước mắt về cậu bé Zézé nghèo khó, tinh nghịch nhưng 
+      luôn ẩn chứa một trái tim vô cùng nhạy cảm, khao khát tình yêu thương và sự thấu hiểu.
+
+T117  Tiếng Chim Hót Trong Bụi Mận Gai
+      Câu chuyện tình yêu mãnh liệt, day dứt nhưng bị thế tục và tôn giáo ngăn cấm giữa 
+      cô gái Meggie Cleary và vị cha xứ ôm mộng thăng tiến Ralph de Bricassart.

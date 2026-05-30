@@ -168,7 +168,7 @@ int main(){
         // ==========================================
         else {
             BeginDrawing();
-            ClearBackground(GetColor(0xFFF0F5FF)); 
+            ClearBackground(AnimatedBackground()); 
 
             int tempState = APP_STATE; 
 

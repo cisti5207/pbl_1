@@ -1,48 +1,72 @@
-Tổng: 47
-|    Au001 |                  Fujiko F. Fujio |
-|    Au002 |                     Gosho Aoyama |
-|    Au003 |                     Eiichiro Oda |
-|    Au004 |                Masashi Kishimoto |
-|    Au005 |                   Akira Toriyama |
-|    Au006 |                   Hajime Isayama |
-|    Au007 |                        Tite Kubo |
-|    Au008 |                     Tsugumi Ohba |
-|    Au009 |                 Koyoharu Gotouge |
-|    Au010 |                     Gege Akutami |
-|    Au011 |                 Tatsuki Fujimoto |
-|    Au012 |                Yoshihiro Togashi |
-|    Au013 |                     Hiro Mashima |
-|    Au014 |                      Yuki Tabata |
-|    Au015 |               Muneyuki Kaneshiro |
-|    Au016 |                Haruichi Furudate |
-|    Au017 |               Tadatoshi Fujimaki |
-|    Au018 |                   Takehiko Inoue |
-|    Au019 |                        Ken Wakui |
-|    Au020 |                     Tatsuya Endo |
-|    Au021 |                 Riichiro Inagaki |
-|    Au022 |                  Kohei Horikoshi |
-|    Au023 |                   Hiromu Arakawa |
-|    Au024 |                 Kazuki Takahashi |
-|    Au025 |                  Hidenori Kusaka |
-|    Au026 |                 Rumiko Takahashi |
-|    Au027 |                  Hideaki Sorachi |
-|    Au028 |                    Kentaro Miura |
-|    Au029 |                   Hirohiko Araki |
-|    Au030 |                   Naoko Takeuchi |
-|    Au031 |                            CLAMP |
-|    Au032 |                    Seimaru Amagi |
-|    Au033 |                    Yasuhisa Hara |
-|    Au034 |                      Kaiu Shirai |
-|    Au035 |                   Atsushi Ohkubo |
-|    Au036 |                     Yusei Matsui |
-|    Au037 |                      Akira Amano |
-|    Au038 |                       Adachitoka |
-|    Au039 |                     Tomohito Oda |
-|    Au040 |                   Naoshi Arakawa |
-|    Au041 |                   Yoshitoki Oima |
-|    Au042 |                   Natsuki Takaya |
-|    Au043 |                        Ai Yazawa |
-|    Au044 |                     Paru Itagaki |
-|    Au045 |                   Hitoshi Iwaaki |
-|    Au046 |                         Takahiro |
-|    Au047 |                  Syougo Kinugasa |
+Tổng: 71
+| Au001 | Fujiko F. Fujio |
+| Au002 | Gosho Aoyama |
+| Au003 | Eiichiro Oda |
+| Au004 | Masashi Kishimoto |
+| Au005 | Akira Toriyama |
+| Au006 | Hajime Isayama |
+| Au007 | Tite Kubo |
+| Au008 | Tsugumi Ohba |
+| Au009 | Koyoharu Gotouge |
+| Au010 | Gege Akutami |
+| Au011 | Tatsuki Fujimoto |
+| Au012 | Yoshihiro Togashi |
+| Au013 | Hiro Mashima |
+| Au014 | Yuki Tabata |
+| Au015 | Muneyuki Kaneshiro |
+| Au016 | Haruichi Furudate |
+| Au017 | Syougo Kinugasa |
+| Au018 | J.K. Rowling |
+| Au019 | Naoki Urasawa |
+| Au020 | Kiyohiko Azuma |
+| Au021 | Osamu Tezuka |
+| Au022 | Seimaru Amagi |
+| Au023 | Reki Kawahara |
+| Au024 | Kugane Maruyama |
+| Au025 | Yuu Kamiya |
+| Au026 | Tappei Nagatsuki |
+| Au027 | Fuse |
+| Au028 | Makoto Shinkai |
+| Au029 | Thần Đông |
+| Au030 | Hồ Điệp Lam |
+| Au031 | Mặc Hương Đồng Khứu |
+| Au032 | Haruki Murakami |
+| Au033 | Mark Manson |
+| Au034 | Paulo Coelho |
+| Au035 | Antoine de Saint-Exupéry |
+| Au036 | Markus Zusak |
+| Au037 | Ayn Rand |
+| Au038 | Harper Lee |
+| Au039 | Nguyễn Nhật Ánh |
+| Au040 | Cao Minh |
+| Au041 | Nguyên Phong |
+| Au042 | Baird T. Spalding |
+| Au043 | Minh Niệm |
+| Au044 | Dale Carnegie |
+| Au045 | Dan Senor |
+| Au046 | Jim Collins |
+| Au047 | Daniel Kahneman |
+| Au048 | Yuval Noah Harari |
+| Au049 | Thu Giang Nguyễn Duy Cần |
+| Au050 | Lê Hữu Trác |
+| Au051 | Ngô Tất Tố |
+| Au052 | Nam Cao |
+| Au053 | Vũ Trọng Phụng |
+| Au054 | Tô Hoài |
+| Au055 | Đoàn Giỏi |
+| Au056 | Nguyễn Ngọc Tư |
+| Au057 | Ngô Thừa Ân |
+| Au058 | La Quán Trung |
+| Au059 | Thi Nại Am |
+| Au060 | Tào Tuyết Cần |
+| Au061 | Frank Herbert |
+| Au062 | F. Scott Fitzgerald |
+| Au063 | George Orwell |
+| Au064 | J.D. Salinger |
+| Au065 | Dan Brown |
+| Au066 | Thomas Harris |
+| Au067 | Yann Martel |
+| Au068 | J.R.R. Tolkien |
+| Au069 | George R.R. Martin |
+| Au070 | José Mauro de Vasconcelos |
+| Au071 | Colleen McCullough |
