@@ -1,0 +1,765 @@
+Tên truyện có cả tập (Nếu không nó từ ghi lại y tên đầu tiên) | CXXX (ví dụ tập 1 là 001 nếu không có tập thì 000) | Mã truyện | Số lượng hiện tại | Số lượng nhập vào
+Doraemon - Tập 2 | C002 | T001 | 22 | 27
+Doraemon - Tập 3 | C003 | T001 | 25 | 25
+Doraemon - Tập 4 | C004 | T001 | 25 | 25
+Doraemon - Tập 5 | C005 | T001 | 25 | 25
+Doraemon - Tập 6 | C006 | T001 | 25 | 25
+Doraemon - Tập 7 | C007 | T001 | 25 | 25
+Doraemon - Tập 8 | C008 | T001 | 25 | 25
+Doraemon - Tập 9 | C009 | T001 | 25 | 25
+Doraemon - Tập 10 | C010 | T001 | 25 | 25
+Doraemon - Tập 11 | C011 | T001 | 25 | 25
+Doraemon - Tập 12 | C012 | T001 | 25 | 25
+Doraemon - Tập 13 | C013 | T001 | 25 | 25
+Doraemon - Tập 14 | C014 | T001 | 25 | 25
+Doraemon - Tập 15 | C015 | T001 | 25 | 25
+Doraemon - Tập 16 | C016 | T001 | 25 | 25
+Doraemon - Tập 17 | C017 | T001 | 25 | 25
+Doraemon - Tập 18 | C018 | T001 | 25 | 25
+Doraemon - Tập 19 | C019 | T001 | 25 | 25
+Doraemon - Tập 20 | C020 | T001 | 25 | 25
+Thám tử lừng danh Conan - Tập 1 | C001 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 2 | C002 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 3 | C003 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 4 | C004 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 5 | C005 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 6 | C006 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 7 | C007 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 8 | C008 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 9 | C009 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 10 | C010 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 11 | C011 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 12 | C012 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 13 | C013 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 14 | C014 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 15 | C015 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 16 | C016 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 17 | C017 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 18 | C018 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 19 | C019 | T002 | 25 | 25
+Thám tử lừng danh Conan - Tập 20 | C020 | T002 | 25 | 25
+One Piece - Tập 1 | C001 | T003 | 25 | 25
+One Piece - Tập 2 | C002 | T003 | 25 | 25
+One Piece - Tập 3 | C003 | T003 | 25 | 25
+One Piece - Tập 4 | C004 | T003 | 25 | 25
+One Piece - Tập 5 | C005 | T003 | 25 | 25
+One Piece - Tập 6 | C006 | T003 | 25 | 25
+One Piece - Tập 7 | C007 | T003 | 25 | 25
+One Piece - Tập 8 | C008 | T003 | 25 | 25
+One Piece - Tập 9 | C009 | T003 | 25 | 25
+One Piece - Tập 10 | C010 | T003 | 25 | 25
+One Piece - Tập 11 | C011 | T003 | 25 | 25
+One Piece - Tập 12 | C012 | T003 | 25 | 25
+One Piece - Tập 13 | C013 | T003 | 25 | 25
+One Piece - Tập 14 | C014 | T003 | 25 | 25
+One Piece - Tập 15 | C015 | T003 | 25 | 25
+One Piece - Tập 16 | C016 | T003 | 25 | 25
+One Piece - Tập 17 | C017 | T003 | 25 | 25
+One Piece - Tập 18 | C018 | T003 | 25 | 25
+One Piece - Tập 19 | C019 | T003 | 25 | 25
+One Piece - Tập 20 | C020 | T003 | 25 | 25
+Naruto - Tập 1 | C001 | T004 | 25 | 25
+Naruto - Tập 2 | C002 | T004 | 25 | 25
+Naruto - Tập 3 | C003 | T004 | 25 | 25
+Naruto - Tập 4 | C004 | T004 | 25 | 25
+Naruto - Tập 5 | C005 | T004 | 25 | 25
+Naruto - Tập 6 | C006 | T004 | 25 | 25
+Naruto - Tập 7 | C007 | T004 | 25 | 25
+Naruto - Tập 8 | C008 | T004 | 25 | 25
+Naruto - Tập 9 | C009 | T004 | 25 | 25
+Naruto - Tập 10 | C010 | T004 | 25 | 25
+Naruto - Tập 11 | C011 | T004 | 25 | 25
+Naruto - Tập 12 | C012 | T004 | 25 | 25
+Naruto - Tập 13 | C013 | T004 | 25 | 25
+Naruto - Tập 14 | C014 | T004 | 25 | 25
+Naruto - Tập 15 | C015 | T004 | 25 | 25
+Naruto - Tập 16 | C016 | T004 | 25 | 25
+Naruto - Tập 17 | C017 | T004 | 25 | 25
+Naruto - Tập 18 | C018 | T004 | 25 | 25
+Naruto - Tập 19 | C019 | T004 | 25 | 25
+Naruto - Tập 20 | C020 | T004 | 25 | 25
+Bảy viên ngọc rồng - Tập 1 | C001 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 2 | C002 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 3 | C003 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 4 | C004 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 5 | C005 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 6 | C006 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 7 | C007 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 8 | C008 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 9 | C009 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 10 | C010 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 11 | C011 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 12 | C012 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 13 | C013 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 14 | C014 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 15 | C015 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 16 | C016 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 17 | C017 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 18 | C018 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 19 | C019 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 20 | C020 | T005 | 25 | 25
+Attack on Titan - Tập 1 | C001 | T006 | 25 | 25
+Attack on Titan - Tập 2 | C002 | T006 | 25 | 25
+Attack on Titan - Tập 3 | C003 | T006 | 25 | 25
+Attack on Titan - Tập 4 | C004 | T006 | 25 | 25
+Attack on Titan - Tập 5 | C005 | T006 | 25 | 25
+Attack on Titan - Tập 6 | C006 | T006 | 25 | 25
+Attack on Titan - Tập 7 | C007 | T006 | 25 | 25
+Attack on Titan - Tập 8 | C008 | T006 | 25 | 25
+Attack on Titan - Tập 9 | C009 | T006 | 25 | 25
+Attack on Titan - Tập 10 | C010 | T006 | 25 | 25
+Attack on Titan - Tập 11 | C011 | T006 | 25 | 25
+Attack on Titan - Tập 12 | C012 | T006 | 25 | 25
+Attack on Titan - Tập 13 | C013 | T006 | 25 | 25
+Attack on Titan - Tập 14 | C014 | T006 | 25 | 25
+Attack on Titan - Tập 15 | C015 | T006 | 25 | 25
+Attack on Titan - Tập 16 | C016 | T006 | 25 | 25
+Attack on Titan - Tập 17 | C017 | T006 | 25 | 25
+Attack on Titan - Tập 18 | C018 | T006 | 25 | 25
+Attack on Titan - Tập 19 | C019 | T006 | 25 | 25
+Attack on Titan - Tập 20 | C020 | T006 | 25 | 25
+Bleach - Tập 1 | C001 | T007 | 25 | 25
+Bleach - Tập 2 | C002 | T007 | 25 | 25
+Bleach - Tập 3 | C003 | T007 | 25 | 25
+Bleach - Tập 4 | C004 | T007 | 25 | 25
+Bleach - Tập 5 | C005 | T007 | 25 | 25
+Bleach - Tập 6 | C006 | T007 | 25 | 25
+Bleach - Tập 7 | C007 | T007 | 25 | 25
+Bleach - Tập 8 | C008 | T007 | 25 | 25
+Bleach - Tập 9 | C009 | T007 | 25 | 25
+Bleach - Tập 10 | C010 | T007 | 25 | 25
+Bleach - Tập 11 | C011 | T007 | 25 | 25
+Bleach - Tập 12 | C012 | T007 | 25 | 25
+Bleach - Tập 13 | C013 | T007 | 25 | 25
+Bleach - Tập 14 | C014 | T007 | 25 | 25
+Bleach - Tập 15 | C015 | T007 | 25 | 25
+Bleach - Tập 16 | C016 | T007 | 25 | 25
+Bleach - Tập 17 | C017 | T007 | 25 | 25
+Bleach - Tập 18 | C018 | T007 | 25 | 25
+Bleach - Tập 19 | C019 | T007 | 25 | 25
+Bleach - Tập 20 | C020 | T007 | 25 | 25
+Death Note - Tập 1 | C001 | T008 | 25 | 25
+Death Note - Tập 2 | C002 | T008 | 25 | 25
+Death Note - Tập 3 | C003 | T008 | 25 | 25
+Death Note - Tập 4 | C004 | T008 | 25 | 25
+Death Note - Tập 5 | C005 | T008 | 25 | 25
+Death Note - Tập 6 | C006 | T008 | 25 | 25
+Death Note - Tập 7 | C007 | T008 | 25 | 25
+Death Note - Tập 8 | C008 | T008 | 25 | 25
+Death Note - Tập 9 | C009 | T008 | 25 | 25
+Death Note - Tập 10 | C010 | T008 | 25 | 25
+Death Note - Tập 11 | C011 | T008 | 25 | 25
+Death Note - Tập 12 | C012 | T008 | 25 | 25
+Thanh gươm diệt quỷ - Tập 1 | C001 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 2 | C002 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 3 | C003 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 4 | C004 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 5 | C005 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 6 | C006 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 7 | C007 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 8 | C008 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 9 | C009 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 10 | C010 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 11 | C011 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 12 | C012 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 13 | C013 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 14 | C014 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 15 | C015 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 16 | C016 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 17 | C017 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 18 | C018 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 19 | C019 | T009 | 25 | 25
+Thanh gươm diệt quỷ - Tập 20 | C020 | T009 | 25 | 25
+Jujutsu Kaisen - Tập 1 | C001 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 2 | C002 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 3 | C003 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 4 | C004 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 5 | C005 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 6 | C006 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 7 | C007 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 8 | C008 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 9 | C009 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 10 | C010 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 11 | C011 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 12 | C012 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 13 | C013 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 14 | C014 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 15 | C015 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 16 | C016 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 17 | C017 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 18 | C018 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 19 | C019 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 20 | C020 | T010 | 25 | 25
+Chainsaw Man - Tập 1 | C001 | T011 | 25 | 25
+Chainsaw Man - Tập 2 | C002 | T011 | 25 | 25
+Chainsaw Man - Tập 3 | C003 | T011 | 25 | 25
+Chainsaw Man - Tập 4 | C004 | T011 | 25 | 25
+Chainsaw Man - Tập 5 | C005 | T011 | 25 | 25
+Chainsaw Man - Tập 6 | C006 | T011 | 25 | 25
+Chainsaw Man - Tập 7 | C007 | T011 | 25 | 25
+Chainsaw Man - Tập 8 | C008 | T011 | 25 | 25
+Chainsaw Man - Tập 9 | C009 | T011 | 25 | 25
+Chainsaw Man - Tập 10 | C010 | T011 | 25 | 25
+Chainsaw Man - Tập 11 | C011 | T011 | 25 | 25
+Chainsaw Man - Tập 12 | C012 | T011 | 25 | 25
+Chainsaw Man - Tập 13 | C013 | T011 | 25 | 25
+Chainsaw Man - Tập 14 | C014 | T011 | 25 | 25
+Chainsaw Man - Tập 15 | C015 | T011 | 25 | 25
+Chainsaw Man - Tập 16 | C016 | T011 | 25 | 25
+Hunter x Hunter - Tập 1 | C001 | T012 | 25 | 25
+Hunter x Hunter - Tập 2 | C002 | T012 | 25 | 25
+Hunter x Hunter - Tập 3 | C003 | T012 | 25 | 25
+Hunter x Hunter - Tập 4 | C004 | T012 | 25 | 25
+Hunter x Hunter - Tập 5 | C005 | T012 | 25 | 25
+Hunter x Hunter - Tập 6 | C006 | T012 | 25 | 25
+Hunter x Hunter - Tập 7 | C007 | T012 | 25 | 25
+Hunter x Hunter - Tập 8 | C008 | T012 | 25 | 25
+Hunter x Hunter - Tập 9 | C009 | T012 | 25 | 25
+Hunter x Hunter - Tập 10 | C010 | T012 | 25 | 25
+Hunter x Hunter - Tập 11 | C011 | T012 | 25 | 25
+Hunter x Hunter - Tập 12 | C012 | T012 | 25 | 25
+Hunter x Hunter - Tập 13 | C013 | T012 | 25 | 25
+Hunter x Hunter - Tập 14 | C014 | T012 | 25 | 25
+Hunter x Hunter - Tập 15 | C015 | T012 | 25 | 25
+Hunter x Hunter - Tập 16 | C016 | T012 | 25 | 25
+Hunter x Hunter - Tập 17 | C017 | T012 | 25 | 25
+Hunter x Hunter - Tập 18 | C018 | T012 | 25 | 25
+Hunter x Hunter - Tập 19 | C019 | T012 | 25 | 25
+Hunter x Hunter - Tập 20 | C020 | T012 | 25 | 25
+Fairy Tail - Tập 1 | C001 | T013 | 25 | 25
+Fairy Tail - Tập 2 | C002 | T013 | 25 | 25
+Fairy Tail - Tập 3 | C003 | T013 | 25 | 25
+Fairy Tail - Tập 4 | C004 | T013 | 25 | 25
+Fairy Tail - Tập 5 | C005 | T013 | 25 | 25
+Fairy Tail - Tập 6 | C006 | T013 | 25 | 25
+Fairy Tail - Tập 7 | C007 | T013 | 25 | 25
+Fairy Tail - Tập 8 | C008 | T013 | 25 | 25
+Fairy Tail - Tập 9 | C009 | T013 | 25 | 25
+Fairy Tail - Tập 10 | C010 | T013 | 25 | 25
+Fairy Tail - Tập 11 | C011 | T013 | 25 | 25
+Fairy Tail - Tập 12 | C012 | T013 | 25 | 25
+Fairy Tail - Tập 13 | C013 | T013 | 25 | 25
+Fairy Tail - Tập 14 | C014 | T013 | 25 | 25
+Fairy Tail - Tập 15 | C015 | T013 | 25 | 25
+Fairy Tail - Tập 16 | C016 | T013 | 25 | 25
+Fairy Tail - Tập 17 | C017 | T013 | 25 | 25
+Fairy Tail - Tập 18 | C018 | T013 | 25 | 25
+Fairy Tail - Tập 19 | C019 | T013 | 25 | 25
+Fairy Tail - Tập 20 | C020 | T013 | 25 | 25
+Black Clover - Tập 1 | C001 | T014 | 25 | 25
+Black Clover - Tập 2 | C002 | T014 | 25 | 25
+Black Clover - Tập 3 | C003 | T014 | 25 | 25
+Black Clover - Tập 4 | C004 | T014 | 25 | 25
+Black Clover - Tập 5 | C005 | T014 | 25 | 25
+Black Clover - Tập 6 | C006 | T014 | 25 | 25
+Black Clover - Tập 7 | C007 | T014 | 25 | 25
+Black Clover - Tập 8 | C008 | T014 | 25 | 25
+Black Clover - Tập 9 | C009 | T014 | 25 | 25
+Black Clover - Tập 10 | C010 | T014 | 25 | 25
+Black Clover - Tập 11 | C011 | T014 | 25 | 25
+Black Clover - Tập 12 | C012 | T014 | 25 | 25
+Black Clover - Tập 13 | C013 | T014 | 25 | 25
+Black Clover - Tập 14 | C014 | T014 | 25 | 25
+Black Clover - Tập 15 | C015 | T014 | 25 | 25
+Black Clover - Tập 16 | C016 | T014 | 25 | 25
+Black Clover - Tập 17 | C017 | T014 | 25 | 25
+Black Clover - Tập 18 | C018 | T014 | 25 | 25
+Black Clover - Tập 19 | C019 | T014 | 25 | 25
+Black Clover - Tập 20 | C020 | T014 | 25 | 25
+Blue Lock - Tập 1 | C001 | T015 | 25 | 25
+Blue Lock - Tập 2 | C002 | T015 | 25 | 25
+Blue Lock - Tập 3 | C003 | T015 | 25 | 25
+Blue Lock - Tập 4 | C004 | T015 | 25 | 25
+Blue Lock - Tập 5 | C005 | T015 | 25 | 25
+Blue Lock - Tập 6 | C006 | T015 | 25 | 25
+Blue Lock - Tập 7 | C007 | T015 | 25 | 25
+Blue Lock - Tập 8 | C008 | T015 | 25 | 25
+Blue Lock - Tập 9 | C009 | T015 | 25 | 25
+Blue Lock - Tập 10 | C010 | T015 | 25 | 25
+Blue Lock - Tập 11 | C011 | T015 | 25 | 25
+Blue Lock - Tập 12 | C012 | T015 | 25 | 25
+Blue Lock - Tập 13 | C013 | T015 | 25 | 25
+Blue Lock - Tập 14 | C014 | T015 | 25 | 25
+Blue Lock - Tập 15 | C015 | T015 | 25 | 25
+Blue Lock - Tập 16 | C016 | T015 | 25 | 25
+Blue Lock - Tập 17 | C017 | T015 | 25 | 25
+Blue Lock - Tập 18 | C018 | T015 | 25 | 25
+Blue Lock - Tập 19 | C019 | T015 | 25 | 25
+Blue Lock - Tập 20 | C020 | T015 | 25 | 25
+Haikyuu!! - Tập 1 | C001 | T016 | 25 | 25
+Haikyuu!! - Tập 2 | C002 | T016 | 25 | 25
+Haikyuu!! - Tập 3 | C003 | T016 | 25 | 25
+Haikyuu!! - Tập 4 | C004 | T016 | 25 | 25
+Haikyuu!! - Tập 5 | C005 | T016 | 25 | 25
+Haikyuu!! - Tập 6 | C006 | T016 | 25 | 25
+Haikyuu!! - Tập 7 | C007 | T016 | 25 | 25
+Haikyuu!! - Tập 8 | C008 | T016 | 25 | 25
+Haikyuu!! - Tập 9 | C009 | T016 | 25 | 25
+Haikyuu!! - Tập 10 | C010 | T016 | 25 | 25
+Haikyuu!! - Tập 11 | C011 | T016 | 25 | 25
+Haikyuu!! - Tập 12 | C012 | T016 | 25 | 25
+Haikyuu!! - Tập 13 | C013 | T016 | 25 | 25
+Haikyuu!! - Tập 14 | C014 | T016 | 25 | 25
+Haikyuu!! - Tập 15 | C015 | T016 | 25 | 25
+Haikyuu!! - Tập 16 | C016 | T016 | 25 | 25
+Haikyuu!! - Tập 17 | C017 | T016 | 25 | 25
+Haikyuu!! - Tập 18 | C018 | T016 | 25 | 25
+Haikyuu!! - Tập 19 | C019 | T016 | 25 | 25
+Haikyuu!! - Tập 20 | C020 | T016 | 25 | 25
+Classroom of the Elite - Tập 1 | C001 | T017 | 25 | 25
+Classroom of the Elite - Tập 2 | C002 | T017 | 25 | 25
+Classroom of the Elite - Tập 3 | C003 | T017 | 25 | 25
+Classroom of the Elite - Tập 4 | C004 | T017 | 25 | 25
+Classroom of the Elite - Tập 5 | C005 | T017 | 25 | 25
+Classroom of the Elite - Tập 6 | C006 | T017 | 25 | 25
+Classroom of the Elite - Tập 7 | C007 | T017 | 25 | 25
+Classroom of the Elite - Tập 8 | C008 | T017 | 25 | 25
+Classroom of the Elite - Tập 9 | C009 | T017 | 25 | 25
+Classroom of the Elite - Tập 10 | C010 | T017 | 25 | 25
+Classroom of the Elite - Tập 11 | C011 | T017 | 25 | 25
+Classroom of the Elite - Tập 12 | C012 | T017 | 25 | 25
+Classroom of the Elite - Tập 13 | C013 | T017 | 25 | 25
+Classroom of the Elite - Tập 14 | C014 | T017 | 25 | 25
+Classroom of the Elite - Tập 15 | C015 | T017 | 25 | 25
+Classroom of the Elite - Tập 16 | C016 | T017 | 25 | 25
+Classroom of the Elite - Tập 17 | C017 | T017 | 25 | 25
+Classroom of the Elite - Tập 18 | C018 | T017 | 25 | 25
+Classroom of the Elite - Tập 19 | C019 | T017 | 25 | 25
+Classroom of the Elite - Tập 20 | C020 | T017 | 25 | 25
+Harry Potter - Tập 1 | C001 | T018 | 25 | 25
+Harry Potter - Tập 2 | C002 | T018 | 25 | 25
+Harry Potter - Tập 3 | C003 | T018 | 25 | 25
+Harry Potter - Tập 4 | C004 | T018 | 25 | 25
+Harry Potter - Tập 5 | C005 | T018 | 25 | 25
+Harry Potter - Tập 6 | C006 | T018 | 25 | 25
+Harry Potter - Tập 7 | C007 | T018 | 25 | 25
+20th Century Boys - Tập 1 | C001 | T019 | 25 | 25
+20th Century Boys - Tập 2 | C002 | T019 | 25 | 25
+20th Century Boys - Tập 3 | C003 | T019 | 25 | 25
+20th Century Boys - Tập 4 | C004 | T019 | 25 | 25
+20th Century Boys - Tập 5 | C005 | T019 | 25 | 25
+20th Century Boys - Tập 6 | C006 | T019 | 25 | 25
+20th Century Boys - Tập 7 | C007 | T019 | 25 | 25
+20th Century Boys - Tập 8 | C008 | T019 | 25 | 25
+20th Century Boys - Tập 9 | C009 | T019 | 25 | 25
+20th Century Boys - Tập 10 | C010 | T019 | 25 | 25
+20th Century Boys - Tập 11 | C011 | T019 | 25 | 25
+20th Century Boys - Tập 12 | C012 | T019 | 25 | 25
+20th Century Boys - Tập 13 | C013 | T019 | 25 | 25
+20th Century Boys - Tập 14 | C014 | T019 | 25 | 25
+20th Century Boys - Tập 15 | C015 | T019 | 25 | 25
+20th Century Boys - Tập 16 | C016 | T019 | 25 | 25
+20th Century Boys - Tập 17 | C017 | T019 | 25 | 25
+20th Century Boys - Tập 18 | C018 | T019 | 25 | 25
+20th Century Boys - Tập 19 | C019 | T019 | 25 | 25
+20th Century Boys - Tập 20 | C020 | T019 | 25 | 25
+Monster - Tập 1 | C001 | T020 | 25 | 25
+Monster - Tập 2 | C002 | T020 | 25 | 25
+Monster - Tập 3 | C003 | T020 | 25 | 25
+Monster - Tập 4 | C004 | T020 | 25 | 25
+Monster - Tập 5 | C005 | T020 | 25 | 25
+Monster - Tập 6 | C006 | T020 | 25 | 25
+Monster - Tập 7 | C007 | T020 | 25 | 25
+Monster - Tập 8 | C008 | T020 | 25 | 25
+Monster - Tập 9 | C009 | T020 | 25 | 25
+Monster - Tập 10 | C010 | T020 | 25 | 25
+Monster - Tập 11 | C011 | T020 | 25 | 25
+Monster - Tập 12 | C012 | T020 | 25 | 25
+Monster - Tập 13 | C013 | T020 | 25 | 25
+Monster - Tập 14 | C014 | T020 | 25 | 25
+Monster - Tập 15 | C015 | T020 | 25 | 25
+Monster - Tập 16 | C016 | T020 | 25 | 25
+Monster - Tập 17 | C017 | T020 | 25 | 25
+Monster - Tập 18 | C018 | T020 | 25 | 25
+Pluto - Tập 1 | C001 | T021 | 25 | 25
+Pluto - Tập 2 | C002 | T021 | 25 | 25
+Pluto - Tập 3 | C003 | T021 | 25 | 25
+Pluto - Tập 4 | C004 | T021 | 25 | 25
+Pluto - Tập 5 | C005 | T021 | 25 | 25
+Pluto - Tập 6 | C006 | T021 | 25 | 25
+Pluto - Tập 7 | C007 | T021 | 25 | 25
+Pluto - Tập 8 | C008 | T021 | 25 | 25
+Master Keaton - Tập 1 | C001 | T022 | 25 | 25
+Master Keaton - Tập 2 | C002 | T022 | 25 | 25
+Master Keaton - Tập 3 | C003 | T022 | 25 | 25
+Master Keaton - Tập 4 | C004 | T022 | 25 | 25
+Master Keaton - Tập 5 | C005 | T022 | 25 | 25
+Master Keaton - Tập 6 | C006 | T022 | 25 | 25
+Master Keaton - Tập 7 | C007 | T022 | 25 | 25
+Master Keaton - Tập 8 | C008 | T022 | 25 | 25
+Master Keaton - Tập 9 | C009 | T022 | 25 | 25
+Master Keaton - Tập 10 | C010 | T022 | 25 | 25
+Master Keaton - Tập 11 | C011 | T022 | 25 | 25
+Master Keaton - Tập 12 | C012 | T022 | 25 | 25
+Master Keaton - Tập 13 | C013 | T022 | 25 | 25
+Master Keaton - Tập 14 | C014 | T022 | 25 | 25
+Master Keaton - Tập 15 | C015 | T022 | 25 | 25
+Master Keaton - Tập 16 | C016 | T022 | 25 | 25
+Master Keaton - Tập 17 | C017 | T022 | 25 | 25
+Master Keaton - Tập 18 | C018 | T022 | 25 | 25
+Billy Bat - Tập 1 | C001 | T023 | 25 | 25
+Billy Bat - Tập 2 | C002 | T023 | 25 | 25
+Billy Bat - Tập 3 | C003 | T023 | 25 | 25
+Billy Bat - Tập 4 | C004 | T023 | 25 | 25
+Billy Bat - Tập 5 | C005 | T023 | 25 | 25
+Billy Bat - Tập 6 | C006 | T023 | 25 | 25
+Billy Bat - Tập 7 | C007 | T023 | 25 | 25
+Billy Bat - Tập 8 | C008 | T023 | 25 | 25
+Billy Bat - Tập 9 | C009 | T023 | 25 | 25
+Billy Bat - Tập 10 | C010 | T023 | 25 | 25
+Billy Bat - Tập 11 | C011 | T023 | 25 | 25
+Billy Bat - Tập 12 | C012 | T023 | 25 | 25
+Billy Bat - Tập 13 | C013 | T023 | 25 | 25
+Billy Bat - Tập 14 | C014 | T023 | 25 | 25
+Billy Bat - Tập 15 | C015 | T023 | 25 | 25
+Billy Bat - Tập 16 | C016 | T023 | 25 | 25
+Billy Bat - Tập 17 | C017 | T023 | 25 | 25
+Billy Bat - Tập 18 | C018 | T023 | 25 | 25
+Billy Bat - Tập 19 | C019 | T023 | 25 | 25
+Billy Bat - Tập 20 | C020 | T023 | 25 | 25
+Yotsuba&! - Tập 1 | C001 | T024 | 25 | 25
+Yotsuba&! - Tập 2 | C002 | T024 | 25 | 25
+Yotsuba&! - Tập 3 | C003 | T024 | 25 | 25
+Yotsuba&! - Tập 4 | C004 | T024 | 25 | 25
+Yotsuba&! - Tập 5 | C005 | T024 | 25 | 25
+Yotsuba&! - Tập 6 | C006 | T024 | 25 | 25
+Yotsuba&! - Tập 7 | C007 | T024 | 25 | 25
+Yotsuba&! - Tập 8 | C008 | T024 | 25 | 25
+Yotsuba&! - Tập 9 | C009 | T024 | 25 | 25
+Yotsuba&! - Tập 10 | C010 | T024 | 25 | 25
+Yotsuba&! - Tập 11 | C011 | T024 | 25 | 25
+Yotsuba&! - Tập 12 | C012 | T024 | 25 | 25
+Yotsuba&! - Tập 13 | C013 | T024 | 25 | 25
+Yotsuba&! - Tập 14 | C014 | T024 | 25 | 25
+Yotsuba&! - Tập 15 | C015 | T024 | 25 | 25
+Azumanga Daioh - Tập 1 | C001 | T025 | 25 | 25
+Azumanga Daioh - Tập 2 | C002 | T025 | 25 | 25
+Azumanga Daioh - Tập 3 | C003 | T025 | 25 | 25
+Azumanga Daioh - Tập 4 | C004 | T025 | 25 | 25
+Black Jack - Tập 1 | C001 | T026 | 25 | 25
+Black Jack - Tập 2 | C002 | T026 | 25 | 25
+Black Jack - Tập 3 | C003 | T026 | 25 | 25
+Black Jack - Tập 4 | C004 | T026 | 25 | 25
+Black Jack - Tập 5 | C005 | T026 | 25 | 25
+Black Jack - Tập 6 | C006 | T026 | 25 | 25
+Black Jack - Tập 7 | C007 | T026 | 25 | 25
+Black Jack - Tập 8 | C008 | T026 | 25 | 25
+Black Jack - Tập 9 | C009 | T026 | 25 | 25
+Black Jack - Tập 10 | C010 | T026 | 25 | 25
+Black Jack - Tập 11 | C011 | T026 | 25 | 25
+Black Jack - Tập 12 | C012 | T026 | 25 | 25
+Black Jack - Tập 13 | C013 | T026 | 25 | 25
+Black Jack - Tập 14 | C014 | T026 | 25 | 25
+Black Jack - Tập 15 | C015 | T026 | 25 | 25
+Black Jack - Tập 16 | C016 | T026 | 25 | 25
+Black Jack - Tập 17 | C017 | T026 | 25 | 25
+Dororo - Tập 1 | C001 | T027 | 25 | 25
+Dororo - Tập 2 | C002 | T027 | 25 | 25
+Dororo - Tập 3 | C003 | T027 | 25 | 25
+Dororo - Tập 4 | C004 | T027 | 25 | 25
+Astro Boy - Tập 1 | C001 | T028 | 25 | 25
+Astro Boy - Tập 2 | C002 | T028 | 25 | 25
+Astro Boy - Tập 3 | C003 | T028 | 25 | 25
+Astro Boy - Tập 4 | C004 | T028 | 25 | 25
+Astro Boy - Tập 5 | C005 | T028 | 25 | 25
+Astro Boy - Tập 6 | C006 | T028 | 25 | 25
+Astro Boy - Tập 7 | C007 | T028 | 25 | 25
+Astro Boy - Tập 8 | C008 | T028 | 25 | 25
+Astro Boy - Tập 9 | C009 | T028 | 25 | 25
+Astro Boy - Tập 10 | C010 | T028 | 25 | 25
+Astro Boy - Tập 11 | C011 | T028 | 25 | 25
+Astro Boy - Tập 12 | C012 | T028 | 25 | 25
+Astro Boy - Tập 13 | C013 | T028 | 25 | 25
+Astro Boy - Tập 14 | C014 | T028 | 25 | 25
+Astro Boy - Tập 15 | C015 | T028 | 25 | 25
+Astro Boy - Tập 16 | C016 | T028 | 25 | 25
+Astro Boy - Tập 17 | C017 | T028 | 25 | 25
+Astro Boy - Tập 18 | C018 | T028 | 25 | 25
+Astro Boy - Tập 19 | C019 | T028 | 25 | 25
+Astro Boy - Tập 20 | C020 | T028 | 25 | 25
+Hi Chim Sẻ Hello | C000 | T029 | 25 | 25
+Phoenix - Tập 1 | C001 | T030 | 25 | 25
+Phoenix - Tập 2 | C002 | T030 | 25 | 25
+Phoenix - Tập 3 | C003 | T030 | 25 | 25
+Phoenix - Tập 4 | C004 | T030 | 25 | 25
+Phoenix - Tập 5 | C005 | T030 | 25 | 25
+Phoenix - Tập 6 | C006 | T030 | 25 | 25
+Phoenix - Tập 7 | C007 | T030 | 25 | 25
+Phoenix - Tập 8 | C008 | T030 | 25 | 25
+Phoenix - Tập 9 | C009 | T030 | 25 | 25
+Phoenix - Tập 10 | C010 | T030 | 25 | 25
+Phoenix - Tập 11 | C011 | T030 | 25 | 25
+Phoenix - Tập 12 | C012 | T030 | 25 | 25
+Buddha - Tập 1 | C001 | T031 | 25 | 25
+Buddha - Tập 2 | C002 | T031 | 25 | 25
+Buddha - Tập 3 | C003 | T031 | 25 | 25
+Buddha - Tập 4 | C004 | T031 | 25 | 25
+Buddha - Tập 5 | C005 | T031 | 25 | 25
+Buddha - Tập 6 | C006 | T031 | 25 | 25
+Buddha - Tập 7 | C007 | T031 | 25 | 25
+Buddha - Tập 8 | C008 | T031 | 25 | 25
+Thám tử Kindaichi - Tập 1 | C001 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 2 | C002 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 3 | C003 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 4 | C004 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 5 | C005 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 6 | C006 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 7 | C007 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 8 | C008 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 9 | C009 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 10 | C010 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 11 | C011 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 12 | C012 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 13 | C013 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 14 | C014 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 15 | C015 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 16 | C016 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 17 | C017 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 18 | C018 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 19 | C019 | T032 | 25 | 25
+Thám tử Kindaichi - Tập 20 | C020 | T032 | 25 | 25
+Sword Art Online - Tập 1 | C001 | T033 | 25 | 25
+Sword Art Online - Tập 2 | C002 | T033 | 25 | 25
+Sword Art Online - Tập 3 | C003 | T033 | 25 | 25
+Sword Art Online - Tập 4 | C004 | T033 | 25 | 25
+Sword Art Online - Tập 5 | C005 | T033 | 25 | 25
+Sword Art Online - Tập 6 | C006 | T033 | 25 | 25
+Sword Art Online - Tập 7 | C007 | T033 | 25 | 25
+Sword Art Online - Tập 8 | C008 | T033 | 25 | 25
+Sword Art Online - Tập 9 | C009 | T033 | 25 | 25
+Sword Art Online - Tập 10 | C010 | T033 | 25 | 25
+Sword Art Online - Tập 11 | C011 | T033 | 25 | 25
+Sword Art Online - Tập 12 | C012 | T033 | 25 | 25
+Sword Art Online - Tập 13 | C013 | T033 | 25 | 25
+Sword Art Online - Tập 14 | C014 | T033 | 25 | 25
+Sword Art Online - Tập 15 | C015 | T033 | 25 | 25
+Sword Art Online - Tập 16 | C016 | T033 | 25 | 25
+Sword Art Online - Tập 17 | C017 | T033 | 25 | 25
+Sword Art Online - Tập 18 | C018 | T033 | 25 | 25
+Sword Art Online - Tập 19 | C019 | T033 | 25 | 25
+Sword Art Online - Tập 20 | C020 | T033 | 25 | 25
+Overlord - Tập 1 | C001 | T034 | 25 | 25
+Overlord - Tập 2 | C002 | T034 | 25 | 25
+Overlord - Tập 3 | C003 | T034 | 25 | 25
+Overlord - Tập 4 | C004 | T034 | 25 | 25
+Overlord - Tập 5 | C005 | T034 | 25 | 25
+Overlord - Tập 6 | C006 | T034 | 25 | 25
+Overlord - Tập 7 | C007 | T034 | 25 | 25
+Overlord - Tập 8 | C008 | T034 | 25 | 25
+Overlord - Tập 9 | C009 | T034 | 25 | 25
+Overlord - Tập 10 | C010 | T034 | 25 | 25
+Overlord - Tập 11 | C011 | T034 | 25 | 25
+Overlord - Tập 12 | C012 | T034 | 25 | 25
+Overlord - Tập 13 | C013 | T034 | 25 | 25
+Overlord - Tập 14 | C014 | T034 | 25 | 25
+Overlord - Tập 15 | C015 | T034 | 25 | 25
+Overlord - Tập 16 | C016 | T034 | 25 | 25
+No Game No Life - Tập 1 | C001 | T035 | 25 | 25
+No Game No Life - Tập 2 | C002 | T035 | 25 | 25
+No Game No Life - Tập 3 | C003 | T035 | 25 | 25
+No Game No Life - Tập 4 | C004 | T035 | 25 | 25
+No Game No Life - Tập 5 | C005 | T035 | 25 | 25
+No Game No Life - Tập 6 | C006 | T035 | 25 | 25
+No Game No Life - Tập 7 | C007 | T035 | 25 | 25
+No Game No Life - Tập 8 | C008 | T035 | 25 | 25
+No Game No Life - Tập 9 | C009 | T035 | 25 | 25
+No Game No Life - Tập 10 | C010 | T035 | 25 | 25
+No Game No Life - Tập 11 | C011 | T035 | 25 | 25
+No Game No Life - Tập 12 | C012 | T035 | 25 | 25
+Re:Zero - Tập 1 | C001 | T036 | 25 | 25
+Re:Zero - Tập 2 | C002 | T036 | 25 | 25
+Re:Zero - Tập 3 | C003 | T036 | 25 | 25
+Re:Zero - Tập 4 | C004 | T036 | 25 | 25
+Re:Zero - Tập 5 | C005 | T036 | 25 | 25
+Re:Zero - Tập 6 | C006 | T036 | 25 | 25
+Re:Zero - Tập 7 | C007 | T036 | 25 | 25
+Re:Zero - Tập 8 | C008 | T036 | 25 | 25
+Re:Zero - Tập 9 | C009 | T036 | 25 | 25
+Re:Zero - Tập 10 | C010 | T036 | 25 | 25
+Re:Zero - Tập 11 | C011 | T036 | 25 | 25
+Re:Zero - Tập 12 | C012 | T036 | 25 | 25
+Re:Zero - Tập 13 | C013 | T036 | 25 | 25
+Re:Zero - Tập 14 | C014 | T036 | 25 | 25
+Re:Zero - Tập 15 | C015 | T036 | 25 | 25
+Re:Zero - Tập 16 | C016 | T036 | 25 | 25
+Re:Zero - Tập 17 | C017 | T036 | 25 | 25
+Re:Zero - Tập 18 | C018 | T036 | 25 | 25
+Re:Zero - Tập 19 | C019 | T036 | 25 | 25
+Re:Zero - Tập 20 | C020 | T036 | 25 | 25
+Slime Chuyển Sinh - Tập 1 | C001 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 2 | C002 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 3 | C003 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 4 | C004 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 5 | C005 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 6 | C006 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 7 | C007 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 8 | C008 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 9 | C009 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 10 | C010 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 11 | C011 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 12 | C012 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 13 | C013 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 14 | C014 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 15 | C015 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 16 | C016 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 17 | C017 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 18 | C018 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 19 | C019 | T037 | 25 | 25
+Slime Chuyển Sinh - Tập 20 | C020 | T037 | 25 | 25
+Your Name | C000 | T038 | 25 | 25
+5 Centimet Trên Giây | C000 | T039 | 25 | 25
+Đứa Con Của Thời Tiết | C000 | T040 | 25 | 25
+Suzume Khóa Chặt Cửa Nào | C000 | T041 | 25 | 25
+Khu Vườn Ngôn Từ | C000 | T042 | 25 | 25
+Tiếng Gọi Từ Vì Sao | C000 | T043 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 1 | C001 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 2 | C002 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 3 | C003 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 4 | C004 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 5 | C005 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 6 | C006 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 7 | C007 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 8 | C008 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 9 | C009 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 10 | C010 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 11 | C011 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 12 | C012 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 13 | C013 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 14 | C014 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 15 | C015 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 16 | C016 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 17 | C017 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 18 | C018 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 19 | C019 | T044 | 25 | 25
+Thế Giới Hoàn Mỹ - Tập 20 | C020 | T044 | 25 | 25
+Toàn Chức Cao Thủ - Tập 1 | C001 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 2 | C002 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 3 | C003 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 4 | C004 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 5 | C005 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 6 | C006 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 7 | C007 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 8 | C008 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 9 | C009 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 10 | C010 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 11 | C011 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 12 | C012 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 13 | C013 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 14 | C014 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 15 | C015 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 16 | C016 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 17 | C017 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 18 | C018 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 19 | C019 | T045 | 25 | 25
+Toàn Chức Cao Thủ - Tập 20 | C020 | T045 | 25 | 25
+Ma Đạo Tổ Sư - Tập 1 | C001 | T046 | 25 | 25
+Ma Đạo Tổ Sư - Tập 2 | C002 | T046 | 25 | 25
+Ma Đạo Tổ Sư - Tập 3 | C003 | T046 | 25 | 25
+Ma Đạo Tổ Sư - Tập 4 | C004 | T046 | 25 | 25
+Thiên Quan Tứ Phúc - Tập 1 | C001 | T047 | 25 | 25
+Thiên Quan Tứ Phúc - Tập 2 | C002 | T047 | 25 | 25
+Thiên Quan Tứ Phúc - Tập 3 | C003 | T047 | 25 | 25
+Thiên Quan Tứ Phúc - Tập 4 | C004 | T047 | 25 | 25
+Thiên Quan Tứ Phúc - Tập 5 | C005 | T047 | 25 | 25
+Thiên Quan Tứ Phúc - Tập 6 | C006 | T047 | 25 | 25
+Rừng Na Uy | C000 | T048 | 25 | 25
+Kafka Bên Bờ Biển | C000 | T049 | 25 | 25
+1Q84 - Tập 1 | C001 | T050 | 25 | 25
+1Q84 - Tập 2 | C002 | T050 | 25 | 25
+1Q84 - Tập 3 | C003 | T050 | 25 | 25
+Biên Niên Ký Chim Vặn Dây Cót - Tập 1 | C001 | T051 | 25 | 25
+Biên Niên Ký Chim Vặn Dây Cót - Tập 2 | C002 | T051 | 25 | 25
+Biên Niên Ký Chim Vặn Dây Cót - Tập 3 | C003 | T051 | 25 | 25
+Phía Nam Biên Giới Phía Tây Mặt Trời | C000 | T052 | 25 | 25
+Cuộc Săn Cừu Hoang | C000 | T053 | 25 | 25
+Nghệ Thuật Tinh Tế Của Việc Đếch Quan Tâm | C000 | T054 | 25 | 25
+Nhà Giả Kim | C000 | T055 | 25 | 25
+Hoàng Tử Bé | C000 | T056 | 25 | 25
+Kẻ Trộm Sách | C000 | T057 | 25 | 25
+Suối Nguồn | C000 | T058 | 25 | 25
+Giết Con Chim Nhại | C000 | T059 | 25 | 25
+Mắt Biếc | C000 | T060 | 25 | 25
+Cho Tôi Xin Một Vé Đi Tuổi Thơ | C000 | T061 | 25 | 25
+Kính Vạn Hoa - Tập 1 | C001 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 2 | C002 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 3 | C003 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 4 | C004 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 5 | C005 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 6 | C006 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 7 | C007 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 8 | C008 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 9 | C009 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 10 | C010 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 11 | C011 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 12 | C012 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 13 | C013 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 14 | C014 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 15 | C015 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 16 | C016 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 17 | C017 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 18 | C018 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 19 | C019 | T062 | 25 | 25
+Kính Vạn Hoa - Tập 20 | C020 | T062 | 25 | 25
+Cô Gái Đến Từ Hôm Qua | C000 | T063 | 25 | 25
+Trại Hoa Vàng | C000 | T064 | 25 | 25
+Bồ Câu Không Đưa Thư | C000 | T065 | 25 | 25
+Thằng Quỷ Nhỏ | C000 | T066 | 25 | 25
+Bàn Có Năm Chỗ Ngồi | C000 | T067 | 25 | 25
+Hạ Đỏ | C000 | T068 | 25 | 25
+Thiên Thần Nhỏ Của Tôi | C000 | T069 | 25 | 25
+Bảy Bước Tới Mùa Hè | C000 | T070 | 25 | 25
+Con Chó Nhỏ Mang Giỏ Hoa Hồng | C000 | T071 | 25 | 25
+Cảm Ơn Người Lớn | C000 | T072 | 25 | 25
+Làm Bạn Với Bầu Trời | C000 | T073 | 25 | 25
+Đảo Mộng Mơ | C000 | T074 | 25 | 25
+Tôi Thấy Hoa Vàng Trên Cỏ Xanh | C000 | T075 | 25 | 25
+Ngồi Khóc Trên Cây | C000 | T076 | 25 | 25
+Chúc Một Ngày Tốt Lành | C000 | T077 | 25 | 25
+Ngày Xưa Có Một Chuyện Tình | C000 | T078 | 25 | 25
+Thiên Tài Bên Trái Kẻ Điên Bên Phải | C000 | T079 | 25 | 25
+Muôn Kiếp Nhân Sinh - Tập 1 | C001 | T080 | 25 | 25
+Muôn Kiếp Nhân Sinh - Tập 2 | C002 | T080 | 25 | 25
+Muôn Kiếp Nhân Sinh - Tập 3 | C003 | T080 | 25 | 25
+Hành Trình Về Phương Đông | C000 | T081 | 25 | 25
+Hiểu Về Trái Tim | C000 | T082 | 25 | 25
+Đắc Nhân Tâm | C000 | T083 | 25 | 25
+Quốc Gia Khởi Nghiệp | C000 | T084 | 25 | 25
+Từ Tốt Đến Vĩ Đại | C000 | T085 | 25 | 25
+Suy Nghĩ Nhanh Và Chậm | C000 | T086 | 25 | 25
+Lược Sử Loài Người | C000 | T087 | 25 | 25
+Lược Sử Tương Lai | C000 | T088 | 25 | 25
+21 Bài Học Cho Thế Kỷ 21 | C000 | T089 | 25 | 25
+Tôi Tự Học | C000 | T090 | 25 | 25
+Hải Thượng Y Tông Tâm Lĩnh | C000 | T091 | 25 | 25
+Tắt Đèn | C000 | T092 | 25 | 25
+Chí Phèo | C000 | T093 | 25 | 25
+Số Đỏ | C000 | T094 | 25 | 25
+Dế Mèn Phiêu Lưu Ký | C000 | T095 | 25 | 25
+Đất Rừng Phương Nam | C000 | T096 | 25 | 25
+Cánh Đồng Bất Tận | C000 | T097 | 25 | 25
+Tây Du Ký | C000 | T098 | 25 | 25
+Tam Quốc Diễn Nghĩa | C000 | T099 | 25 | 25
+Thủy Hử | C000 | T100 | 25 | 25
+Hồng Lâu Mộng | C000 | T101 | 25 | 25
+Xứ Cát | C000 | T102 | 25 | 25
+Gatsby Vĩ Đại | C000 | T103 | 25 | 25
+1984 | C000 | T104 | 25 | 25
+Trại Súc Vật | C000 | T105 | 25 | 25
+Bắt Trẻ Đồng Xanh | C000 | T106 | 25 | 25
+Mật Mã Da Vinci | C000 | T107 | 25 | 25
+Thiên Thần Và Ác Quỷ | C000 | T108 | 25 | 25
+Sự Im Lặng Của Bầy Cừu | C000 | T109 | 25 | 25
+Rồng Đỏ | C000 | T110 | 25 | 25
+Pháo Đài Số | C000 | T111 | 25 | 25
+Điểm Dối Lừa | C000 | T112 | 25 | 25
+Cuộc Đời Của Pi | C000 | T113 | 25 | 25
+Chúa Tể Những Chiếc Nhẫn - Tập 1 | C001 | T114 | 25 | 25
+Chúa Tể Những Chiếc Nhẫn - Tập 2 | C002 | T114 | 25 | 25
+Chúa Tể Những Chiếc Nhẫn - Tập 3 | C003 | T114 | 25 | 25
+Trò Chơi Vương Quyền - Tập 1 | C001 | T115 | 25 | 25
+Trò Chơi Vương Quyền - Tập 2 | C002 | T115 | 25 | 25
+Trò Chơi Vương Quyền - Tập 3 | C003 | T115 | 25 | 25
+Trò Chơi Vương Quyền - Tập 4 | C004 | T115 | 25 | 25
+Trò Chơi Vương Quyền - Tập 5 | C005 | T115 | 25 | 25
+Cây Cam Ngọt Của Tôi | C000 | T116 | 25 | 25
+Tiếng Chim Hót Trong Bụi Mận Gai | C000 | T117 | 25 | 25

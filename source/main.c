@@ -6,6 +6,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 // --- NHÚNG CÁC MODULE CỦA BRO VÀO ĐÂY ---
 #include "ManageUser.h"
@@ -22,7 +23,7 @@ AppState APP_STATE = LOGINAPP;
 
 int main(){
     InitWindow(1200, 800, "Library System - PBL1");
-    SetTargetFPS(60);
+    SetTargetFPS(250);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowMinSize(1000, 600);
 
@@ -167,8 +168,9 @@ int main(){
         // PHÂN HỆ NGHIỆP VỤ (CỦA BRO)
         // ==========================================
         else {
+             UpdateParticlesPosition(MainSize);
             BeginDrawing();
-            ClearBackground(GetColor(0xFFF0F5FF)); 
+            ClearBackground(AnimatedBackground()); 
 
             int tempState = APP_STATE; 
 

@@ -26,12 +26,13 @@ typedef struct {
     InputBox_BD cccd;
     InputBox_BD hanSD;
     bool showSuccess;    
-    float successTimer;  
+    float successTimer;
+    char errorSdt[64];   // Thông báo lỗi cho ô số điện thoại
+    char errorCccd[64];  // Thông báo lỗi cho ô căn cước công dân
 } Nhap;
  
 void InitForm(Nhap *form);
 void UpdateFormPosition(Nhap *form); 
-// Đã thêm int *currentState vào đây!
 void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *maThe, int *currentState); 
 void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font);
 void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer); 

@@ -1,355 +1,812 @@
 #include "libmanage.h"
 #include "Phieumuon.h"
-#include "menu.h" // Nhúng menu vào để dùng biến APP_MENU
+#include "menu.h"
 #include <stdio.h>
 #include "raylib.h"
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <time.h>
+
+// ============================================================
+// CẤU TRÚC NỘI BỘ
+// ============================================================
+#define MAX_TRUYEN_PM 200
+#define MAX_TAP_PM    800
+
+typedef struct {
+    char ma[16];
+    char ten[256];
+} TruyenInfo_PM;
+
+typedef struct {
+    char tenTap[256];
+    char maTap[16];
+    char maTruyen[16];
+    int  soLuong;
+} TapInfo_PM;
+
+static TruyenInfo_PM s_dsTruyen[MAX_TRUYEN_PM];
+static int           s_soTruyen = 0;
+static bool          s_loaded   = false;
+
+static TapInfo_PM    s_dsTap[MAX_TAP_PM];
+static int           s_soTap = 0;
+
+// Dropdown state
+static char s_filter[256]          = {0};
+static int  s_matchIdx[MAX_TRUYEN_PM];
+static int  s_matchCount           = 0;
+static bool s_showDropdown         = false;
+static bool s_showTapDropdown      = false;
+static int  s_dropScroll           = 0;
+static int  s_tapScroll            = 0;
+
+// Mã truyện & mã tập đã chọn
+static char s_selectedMaTruyen[16] = {0};
+static char s_selectedMaTap[16]    = {0};
+
+// ============================================================
+// Tiện ích
+// ============================================================
+static void TrimStr_PM(char *s) {
+    if (!s) return;
+    int len = (int)strlen(s);
+    while (len > 0 && (s[len-1]==' '||s[len-1]=='\r'||s[len-1]=='\n')) s[--len]='\0';
+    char *p = s;
+    while (*p == ' ') p++;
+    if (p != s) memmove(s, p, strlen(p)+1);
+}
+
+static bool ContainsCI(const char *hay, const char *needle) {
+    if (!hay||!needle||needle[0]=='\0') return true;
+    int nlen=(int)strlen(needle), hlen=(int)strlen(hay);
+    for (int i=0; i<=hlen-nlen; i++) {
+        int j;
+        for (j=0; j<nlen; j++)
+            if (tolower((unsigned char)hay[i+j])!=tolower((unsigned char)needle[j])) break;
+        if (j==nlen) return true;
+    }
+    return false;
+}
+
+static bool KiemTraCoTap(const char *maTruyen) {
+    if (!maTruyen || maTruyen[0] == '\0') return false;
+    for (int i = 0; i < s_soTap; i++) {
+        if (strcmp(s_dsTap[i].maTruyen, maTruyen) == 0) return true;
+    }
+    return false;
+}
+
+// ============================================================
+// Load file (1 lần duy nhất)
+// ============================================================
+static void LoadDuLieuTruyen_PM(void) {
+    if (s_loaded) return;
+    s_loaded = true; s_soTruyen = 0; s_soTap = 0;
+
+    FILE *f = fopen("data/ManageBooks/dataTruyen.txt", "r");
+    if (f) {
+        char line[1024];
+        while (fgets(line, sizeof(line), f) && s_soTruyen < MAX_TRUYEN_PM) {
+            char *p = line;
+            while (*p==' '||*p=='\t') p++;
+            if (*p != '|') continue;
+            char ma[64]={0}, slug[256]={0}, ten[256]={0};
+            if (sscanf(p," | %63[^|] | %255[^|] | %255[^|]", ma, slug, ten)==3) {
+                TrimStr_PM(ma); TrimStr_PM(ten);
+                strncpy(s_dsTruyen[s_soTruyen].ma,  ma,  15);
+                strncpy(s_dsTruyen[s_soTruyen].ten, ten, 255);
+                s_soTruyen++;
+            }
+        }
+        fclose(f);
+    }
+
+    FILE *f2 = fopen("data/ManageBooks/dataListTruyen.txt", "r");
+    if (f2) {
+        char line[512];
+        bool first = true;
+        while (fgets(line, sizeof(line), f2) && s_soTap < MAX_TAP_PM) {
+            if (first) { first=false; continue; }
+            char tenTap[256]={0}, maTap[16]={0}, maTruyen[16]={0};
+            int sl=0, slg=0;
+            if (sscanf(line," %255[^|] | %15[^|] | %15[^|] | %d | %d",
+                       tenTap, maTap, maTruyen, &sl, &slg) >= 3) {
+                TrimStr_PM(tenTap); TrimStr_PM(maTap); TrimStr_PM(maTruyen);
+                strncpy(s_dsTap[s_soTap].tenTap,   tenTap,   255);
+                strncpy(s_dsTap[s_soTap].maTap,    maTap,    15);
+                strncpy(s_dsTap[s_soTap].maTruyen, maTruyen, 15);
+                s_dsTap[s_soTap].soLuong = sl;
+                s_soTap++;
+            }
+        }
+        fclose(f2);
+    }
+}
+
+static void CapNhatMatch(void) {
+    s_matchCount=0; s_dropScroll=0; s_tapScroll=0;
+    for (int i=0; i<s_soTruyen && s_matchCount<MAX_TRUYEN_PM; i++)
+        if (ContainsCI(s_dsTruyen[i].ten, s_filter))
+            s_matchIdx[s_matchCount++] = i;
+}
 
 void TimTenTruyenTheoMa(const char *matruyen, char *tentruyen_out) {
     tentruyen_out[0] = '\0';
-
-    FILE *f = fopen("data/ManageBooks/dataTruyen.txt", "r");
-    if (f == NULL) return;
-
-    char line[1024];
-    while (fgets(line, sizeof(line), f)) {
-        char *p = line;
-        while (*p == ' ' || *p == '\t') p++;
-        if (*p != '|') continue;
-
-        char ma[64] = {0}, maphu[256] = {0}, ten[256] = {0};
-        if (sscanf(p, " | %63[^|] | %255[^|] | %255[^|]", ma, maphu, ten) == 3) {
-            int len = strlen(ma);
-            while (len > 0 && (ma[len-1] == ' ' || ma[len-1] == '\r' || ma[len-1] == '\n')) ma[--len] = '\0';
-            char *pMa = ma;
-            while (*pMa == ' ') pMa++;
-
-            if (strcmp(pMa, matruyen) == 0) {
-                len = strlen(ten);
-                while (len > 0 && (ten[len-1] == ' ' || ten[len-1] == '\r' || ten[len-1] == '\n')) ten[--len] = '\0';
-                char *pTen = ten;
-                while (*pTen == ' ') pTen++;
-                strcpy(tentruyen_out, pTen);
-                break;
-            }
-        }
-    }
-    fclose(f);
+    LoadDuLieuTruyen_PM();
+    for (int i=0; i<s_soTruyen; i++)
+        if (strcmp(s_dsTruyen[i].ma, matruyen)==0)
+            { strcpy(tentruyen_out, s_dsTruyen[i].ten); return; }
 }
 
 int DemSoPhieuMuon(PhieuMuonNode *head) {
-    int count = 0;
-    PhieuMuonNode *temp = head;
-    while (temp != NULL) {
-        count++;
-        temp = temp->next;
-    }
-    return count;
+    int c=0; for (PhieuMuonNode *t=head; t; t=t->next) c++; return c;
 }
 
+// ============================================================
+// Kiểm tra định dạng và tính hợp lệ của ngày d/m/yyyy hoặc dd/mm/yyyy
+// ============================================================
+bool KiemTraNgayHopLe(const char *ngay) {
+    if (!ngay || ngay[0] == '\0') return false;
+    int d = 0, m = 0, y = 0;
+    // Chấp nhận d/m/yyyy, dd/m/yyyy, d/mm/yyyy, dd/mm/yyyy
+    if (sscanf(ngay, "%d/%d/%d", &d, &m, &y) != 3) return false;
+    // Kiểm tra năm có 4 chữ số
+    if (y < 1000 || y > 9999) return false;
+    // Kiểm tra tháng
+    if (m < 1 || m > 12) return false;
+    // Kiểm tra ngày theo từng tháng
+    int ngayToiDa[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+    // Năm nhuận
+    if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) ngayToiDa[2] = 29;
+    if (d < 1 || d > ngayToiDa[m]) return false;
+    // Kiểm tra format đúng: phần ngày và tháng không có leading zero thừa
+    // (sscanf đã xử lý rồi, chỉ cần verify không có ký tự lạ)
+    char expected_full[12], expected_short1[12], expected_short2[12], expected_short3[12];
+    snprintf(expected_full,   sizeof(expected_full),   "%02d/%02d/%04d", d, m, y);
+    snprintf(expected_short1, sizeof(expected_short1), "%d/%02d/%04d",   d, m, y);
+    snprintf(expected_short2, sizeof(expected_short2), "%02d/%d/%04d",   d, m, y);
+    snprintf(expected_short3, sizeof(expected_short3), "%d/%d/%04d",     d, m, y);
+    return (strcmp(ngay, expected_full)   == 0 ||
+            strcmp(ngay, expected_short1) == 0 ||
+            strcmp(ngay, expected_short2) == 0 ||
+            strcmp(ngay, expected_short3) == 0);
+}
+
+// Cờ báo lỗi ngày trả
+static bool s_ngaytraLoi = false;
+
 void InitPhieumuon(FormPhieuMuon *Form) {
-    memset(Form->mathe.text, 0, 512);
+    memset(Form->mathe.text,     0, 512);
     memset(Form->tentruyen.text, 0, 512);
-    memset(Form->ngaymuon.text, 0, 512);
-    memset(Form->ngaytra.text, 0, 512);
-    memset(Form->matruyen.text, 0, 512);
-    Form->mathe.lettercount = 0;
-    Form->tentruyen.lettercount = 0;
-    Form->ngaymuon.lettercount = 0;
-    Form->ngaytra.lettercount = 0;
-    Form->matruyen.lettercount = 0;
-    Form->mathe.backspacecounter = 0;
-    Form->tentruyen.backspacecounter = 0;
-    Form->ngaymuon.backspacecounter = 0;
-    Form->ngaytra.backspacecounter = 0;
-    Form->matruyen.backspacecounter = 0;
-    Form->mathe.isfocused = true; 
-    Form->tentruyen.isfocused = false;
-    Form->ngaymuon.isfocused = false;
-    Form->ngaytra.isfocused = false;
-    Form->matruyen.isfocused = false;
-    Form->showsuccess = false;
-    Form->successtimer = 0;
+    memset(Form->ngaymuon.text,  0, 512);
+    memset(Form->ngaytra.text,   0, 512);
+    memset(Form->matruyen.text,  0, 512);
+    Form->mathe.lettercount=Form->tentruyen.lettercount=Form->ngaymuon.lettercount=
+    Form->ngaytra.lettercount=Form->matruyen.lettercount=0;
+    Form->mathe.backspacecounter=Form->tentruyen.backspacecounter=Form->ngaymuon.backspacecounter=
+    Form->ngaytra.backspacecounter=Form->matruyen.backspacecounter=0;
+    Form->mathe.isfocused=true;
+    Form->tentruyen.isfocused=Form->ngaymuon.isfocused=
+    Form->ngaytra.isfocused=Form->matruyen.isfocused=false;
+    Form->showsuccess=false; Form->successtimer=0;
+    s_ngaytraLoi = false;
+
+    memset(s_filter,0,sizeof(s_filter));
+    s_showDropdown=false; s_showTapDropdown=false;
+    s_matchCount=0; s_dropScroll=0; s_tapScroll=0;
+    s_selectedMaTruyen[0]='\0';
+    s_selectedMaTap[0]='\0';
+
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    snprintf(Form->ngaymuon.text, 511, "%02d/%02d/%04d",
+             t->tm_mday, t->tm_mon+1, t->tm_year+1900);
+    Form->ngaymuon.lettercount = (int)strlen(Form->ngaymuon.text);
 }
 
 void UpdateVitri(FormPhieuMuon *Form) {
-    float screenW = (float)GetScreenWidth();
-    float screenH = (float)GetScreenHeight();
-    float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
-    if (scale < 0.5f) scale = 0.5f;
+    float sw=(float)GetScreenWidth(), sh=(float)GetScreenHeight();
+    float sc=(sw/1100.0f<sh/750.0f)?sw/1100.0f:sh/750.0f;
+    if(sc<0.5f)sc=0.5f;
+    Rectangle card={(sw-800*sc)/2,(sh-550*sc)/2,800*sc,550*sc};
+    float ix=card.x+50*sc, iy=card.y+125*sc, iw=450*sc, ih=50*sc, sp=82*sc;
 
-    Rectangle card = { (screenW - 800*scale)/2, (screenH - 550*scale)/2, 800*scale, 550*scale };
-    
-    float inputX = card.x + 50 * scale;
-    float inputY = card.y + 125 * scale; 
-    float inputW = 450 * scale;
-    float inputH = 50 * scale;
-    float spacing = 82 * scale;
-    
-    Form->mathe.rec = (Rectangle){ inputX, inputY + (0 * spacing), inputW, inputH };
-    Form->matruyen.rec = (Rectangle){ inputX, inputY + (1 * spacing), inputW, inputH };
-    Form->tentruyen.rec   = (Rectangle){ inputX, inputY + (2 * spacing), inputW, inputH };
-    Form->ngaymuon.rec  = (Rectangle){ inputX, inputY + (3 * spacing), inputW, inputH };
-    Form->ngaytra.rec = (Rectangle){ inputX, inputY + (4 * spacing), inputW, inputH };
+    Form->mathe.rec     =(Rectangle){ix, iy+0*sp, iw, ih};
+    Form->tentruyen.rec =(Rectangle){ix, iy+1*sp, iw, ih};
+    Form->matruyen.rec  =(Rectangle){ix, iy+2*sp, iw, ih};
+    Form->ngaymuon.rec  =(Rectangle){ix, iy+3*sp, iw, ih};
+    Form->ngaytra.rec   =(Rectangle){ix, iy+4*sp, iw, ih};
 }
 
-void SinhMaPM(int currentcount, char *mathe){ 
-    sprintf(mathe, "PM%06d", currentcount + 1); 
+void SinhMaPM(int currentcount, char *mathe) {
+    sprintf(mathe,"PM%06d",currentcount+1);
 }
 
-// Đổi tên biến thứ 3 thành currentState cho dễ hiểu (Trong file .h cứ để currentTotalUsers ko sao cả)
+// ============================================================
+// UpdateInputPM
+// ============================================================
 void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState, char *mathe) {
-    
-    // 1. TỰ ĐỘNG SINH MÃ PM NẾU CHƯA CÓ
-    if (mathe[0] == '\0') {
-        int tongPhieu = DemSoPhieuMuon(*head);
-        SinhMaPM(tongPhieu, mathe); 
+    LoadDuLieuTruyen_PM();
+    if (mathe[0]=='\0') {
+        SinhMaPM(DemSoPhieuMuon(*head), mathe);
+        if (Form->ngaymuon.lettercount == 0) {
+            time_t now = time(NULL);
+            struct tm *t = localtime(&now);
+            snprintf(Form->ngaymuon.text, 511, "%02d/%02d/%04d",
+                     t->tm_mday, t->tm_mon+1, t->tm_year+1900);
+            Form->ngaymuon.lettercount = (int)strlen(Form->ngaymuon.text);
+        }
     }
 
-    // 2. LOGIC NÚT QUAY LẠI TỰ CHỦ
-    Rectangle btnBack = { 20, 20, 130, 40 };
-    bool isHoverBack = CheckCollisionPointRec(GetMousePosition(), btnBack);
-    if (IsKeyPressed(KEY_ESCAPE) || (isHoverBack && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
-        InitPhieumuon(Form);  // Dọn dẹp form
-        mathe[0] = '\0';      // Reset mã
-        *currentState = APP_MENU; // Quay về Menu an toàn
-        return; 
+    Rectangle btnBack={20,20,130,40};
+    if (IsKeyPressed(KEY_ESCAPE)||
+        (CheckCollisionPointRec(GetMousePosition(),btnBack)&&IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
+        InitPhieumuon(Form); mathe[0]='\0'; *currentState=APP_MENU; return;
     }
 
-    // 3. LOGIC SUCCESS
     if (Form->showsuccess) {
         Form->successtimer -= GetFrameTime();
-        if (Form->successtimer <= 0) {
-            Form->showsuccess = false;
+        if (Form->successtimer<=0) {
+            Form->showsuccess=false;
             InitPhieumuon(Form);
-            
-            // Sinh mã tiếp theo sau khi lưu thành công
-            int tongPhieu = DemSoPhieuMuon(*head);
-            SinhMaPM(tongPhieu, mathe);
+            SinhMaPM(DemSoPhieuMuon(*head), mathe);
         }
-        return; 
+        return;
     }
-    
-    InputBox_PM *boxes[] = {&Form->mathe, &Form->matruyen,&Form->tentruyen, &Form->ngaymuon, &Form->ngaytra};
-    
+
+    InputBox_PM *boxes[]={&Form->mathe,&Form->tentruyen,&Form->matruyen,&Form->ngaymuon,&Form->ngaytra};
+    Vector2 mp = GetMousePosition();
+    float sw=(float)GetScreenWidth(), sh=(float)GetScreenHeight();
+    float sc=(sw/1100.0f<sh/750.0f)?sw/1100.0f:sh/750.0f;
+    if(sc<0.5f)sc=0.5f;
+
+    // ── Xử lý click ──────────────────────────────────────────
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        Vector2 mousepoint = GetMousePosition();
-        for (int i = 0; i < 5; i++) {
-            if (i == 2) continue; // tentruyen bi lock
-            if (CheckCollisionPointRec(mousepoint, boxes[i]->rec)) {
-                for (int j = 0; j < 5; j++) boxes[j]->isfocused = false;
-                boxes[i]->isfocused = true;
-                break;
+        if (CheckCollisionPointRec(mp, boxes[1]->rec)) {
+            bool hasTaps = (s_selectedMaTruyen[0] != '\0' && KiemTraCoTap(s_selectedMaTruyen));
+            Rectangle arrowBtn = { boxes[1]->rec.x + boxes[1]->rec.width - 35*sc, boxes[1]->rec.y, 35*sc, boxes[1]->rec.height };
+
+            if (hasTaps && CheckCollisionPointRec(mp, arrowBtn)) {
+                s_showTapDropdown = !s_showTapDropdown;
+                s_showDropdown = false;
+                s_tapScroll = 0;
+            } else {
+                for(int j=0;j<5;j++) boxes[j]->isfocused=false;
+                boxes[1]->isfocused=true;
+                strncpy(s_filter, Form->tentruyen.text, 255);
+                CapNhatMatch();
+                s_showDropdown = true;
+                s_showTapDropdown = false;
             }
-        }
-    }
-    
-    for (int i = 0; i < 5; i++) {
-        if (i == 2) continue; // tentruyen bi lock hoan toan
-        if (boxes[i]->isfocused) {
-            int key = GetKeyPressed();
-            while (key > 0) {
-                if (key == KEY_BACKSPACE) {
-                    if (boxes[i]->lettercount > 0) {
-                        do { 
-                            boxes[i]->lettercount--; 
-                        } while (boxes[i]->lettercount > 0 && (boxes[i]->text[boxes[i]->lettercount] & 0xC0) == 0x80);
-                        boxes[i]->text[boxes[i]->lettercount] = '\0';
-                    }
-                }
-                key = GetKeyPressed();
-            }
-            
-            if (IsKeyDown(KEY_BACKSPACE)) {
-                boxes[i]->backspacecounter += GetFrameTime();
-                if (boxes[i]->backspacecounter >= 0.5f) { 
-                    if (boxes[i]->lettercount > 0) {
-                        do {
-                             boxes[i]->lettercount--; 
-                            } while (boxes[i]->lettercount > 0 && (boxes[i]->text[boxes[i]->lettercount] & 0xC0) == 0x80);
-                        boxes[i]->text[boxes[i]->lettercount] = '\0';
-                    }
-                }
-            } else boxes[i]->backspacecounter = 0;
-            
-            int charcode = GetCharPressed();
-            while (charcode > 0) {
-                if ((charcode >= 32) && (boxes[i]->lettercount < 250)) {
-                    int byteSize = 0;
-                    const char* utf8Char = CodepointToUTF8(charcode, &byteSize);
-                    if (boxes[i]->lettercount + byteSize < 255) {
-                        for (int j = 0; j < byteSize; j++) {
-                            boxes[i]->text[boxes[i]->lettercount] = utf8Char[j];
-                            boxes[i]->lettercount++;
+        } else {
+            bool inDropdown = false;
+            float dropX = Form->tentruyen.rec.x;
+            float dropY = Form->tentruyen.rec.y + Form->tentruyen.rec.height + 2;
+            float dropW = Form->tentruyen.rec.width;
+            float rowH = 40*sc;
+            int maxVis = 5;
+
+            if (s_showDropdown && s_matchCount > 0) {
+                int start = s_dropScroll, end = start + maxVis;
+                if(end > s_matchCount) end = s_matchCount;
+                float curY = dropY;
+                for (int vi=start; vi<end && !inDropdown; vi++) {
+                    int ti = s_matchIdx[vi];
+                    Rectangle rowRec = {dropX, curY, dropW, rowH};
+                    if (CheckCollisionPointRec(mp, rowRec)) {
+                        strncpy(Form->tentruyen.text, s_dsTruyen[ti].ten, 511);
+                        Form->tentruyen.lettercount = (int)strlen(Form->tentruyen.text);
+                        strncpy(s_filter, s_dsTruyen[ti].ten, 255);
+                        strncpy(Form->matruyen.text, s_dsTruyen[ti].ma, 511);
+                        Form->matruyen.lettercount = (int)strlen(Form->matruyen.text);
+                        strncpy(s_selectedMaTruyen, s_dsTruyen[ti].ma, 15);
+                        s_selectedMaTap[0] = '\0';
+                        s_showDropdown = false;
+                        if (KiemTraCoTap(s_selectedMaTruyen)) {
+                            boxes[1]->isfocused = true;
+                            s_showTapDropdown = true;
+                        } else {
+                            boxes[1]->isfocused = false;
+                            boxes[3]->isfocused = true;
                         }
-                        boxes[i]->text[boxes[i]->lettercount] = '\0';
+                        inDropdown = true;
+                    }
+                    curY += rowH;
+                }
+                if (!inDropdown) {
+                    Rectangle dropZone = {dropX, dropY, dropW, rowH*(end-start)};
+                    if (CheckCollisionPointRec(mp, dropZone)) inDropdown = true;
+                }
+            }
+
+            if (s_showTapDropdown && s_selectedMaTruyen[0] != '\0') {
+                TapInfo_PM tapBuf[MAX_TAP_PM];
+                int tapCount = 0;
+                for(int k=0; k<s_soTap; k++)
+                    if(strcmp(s_dsTap[k].maTruyen, s_selectedMaTruyen)==0)
+                        tapBuf[tapCount++] = s_dsTap[k];
+
+                float tapRowH = 36*sc;
+                float tapZoneY = dropY;
+                int tapMaxVis = 6;
+                int start = s_tapScroll, end = start + tapMaxVis;
+                if(end > tapCount) end = tapCount;
+
+                float curY = tapZoneY;
+                for(int ti2=start; ti2<end && !inDropdown; ti2++) {
+                    Rectangle tapRec = {dropX, curY, dropW, tapRowH};
+                    if(CheckCollisionPointRec(mp, tapRec)) {
+                        strncpy(Form->tentruyen.text, tapBuf[ti2].tenTap, 511);
+                        Form->tentruyen.lettercount = (int)strlen(Form->tentruyen.text);
+                        strncpy(s_filter, tapBuf[ti2].tenTap, 255);
+                        snprintf(Form->matruyen.text, 511, "%s%s", s_selectedMaTruyen, tapBuf[ti2].maTap);
+                        Form->matruyen.lettercount = (int)strlen(Form->matruyen.text);
+                        strncpy(s_selectedMaTap, tapBuf[ti2].maTap, 15);
+                        s_showTapDropdown = false;
+                        boxes[1]->isfocused = false;
+                        boxes[3]->isfocused = true;
+                        inDropdown = true;
+                    }
+                    curY += tapRowH;
+                }
+                if (!inDropdown) {
+                    Rectangle tapZone = {dropX, tapZoneY, dropW, tapRowH*(end-start)};
+                    if(CheckCollisionPointRec(mp, tapZone)) inDropdown = true;
+                }
+            }
+
+            if (!inDropdown) {
+                s_showDropdown = false;
+                s_showTapDropdown = false;
+                for(int j=0;j<5;j++) boxes[j]->isfocused=false;
+                for(int i=0;i<5;i++) {
+                    if(i==1||i==2) continue;
+                    if(CheckCollisionPointRec(mp,boxes[i]->rec)) {
+                        boxes[i]->isfocused=true; break;
                     }
                 }
-                charcode = GetCharPressed();
-            }
-            
-            if (IsKeyPressed(KEY_TAB)) {
-                boxes[i]->isfocused = false;
-                int next = (i == 1) ? 3 : (i + 1) % 5;
-                if (next == 2) next = 3;
-                boxes[next]->isfocused = true;
-                break;
             }
         }
     }
-    
-    // 3.5. TU DONG DIEN TEN TRUYEN
-    {
-        char tentruyen_tam[512] = {0};
-        if (Form->matruyen.lettercount > 0)
-            TimTenTruyenTheoMa(Form->matruyen.text, tentruyen_tam);
-        strncpy(Form->tentruyen.text, tentruyen_tam, 511);
-        Form->tentruyen.text[511] = '\0';
-        Form->tentruyen.lettercount = (int)strlen(Form->tentruyen.text);
-        Form->tentruyen.isfocused = false;
+
+    // ── Scroll wheel ─────────────────────────────────────────
+    float wheel = GetMouseWheelMove();
+    if (wheel != 0) {
+        if (s_showTapDropdown) {
+            s_tapScroll -= (int)wheel;
+            if(s_tapScroll < 0) s_tapScroll = 0;
+            int tapCount=0;
+            for(int k=0;k<s_soTap;k++) if(strcmp(s_dsTap[k].maTruyen, s_selectedMaTruyen)==0) tapCount++;
+            int maxVis = 6;
+            if(s_tapScroll > tapCount - maxVis) s_tapScroll = (tapCount > maxVis) ? tapCount - maxVis : 0;
+        } else if (s_showDropdown) {
+            s_dropScroll -= (int)wheel;
+            if(s_dropScroll < 0) s_dropScroll = 0;
+            int maxVis = 5;
+            if(s_dropScroll > s_matchCount - maxVis) s_dropScroll = (s_matchCount > maxVis) ? s_matchCount - maxVis : 0;
+        }
     }
 
-    // 4. XỬ LÝ NÚT XÁC NHẬN
-    float screenW = (float)GetScreenWidth();
-    float screenH = (float)GetScreenHeight();
-    float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
-    if (scale < 0.5f) scale = 0.5f;
+    // ── Input ô tentruyen (search) ───────────────────────────
+    if (boxes[1]->isfocused) {
+        int key=GetKeyPressed();
+        while(key>0) {
+            if(key==KEY_BACKSPACE) {
+                int len=(int)strlen(s_filter);
+                if(len>0) {
+                    do{ len--; } while(len>0&&(s_filter[len]&0xC0)==0x80);
+                    s_filter[len]='\0';
+                    Form->matruyen.text[0]='\0'; Form->matruyen.lettercount=0;
+                    s_selectedMaTruyen[0] = '\0';
+                    s_selectedMaTap[0] = '\0';
+                    CapNhatMatch();
+                    s_showDropdown = true;
+                    s_showTapDropdown = false;
+                }
+            }
+            key=GetKeyPressed();
+        }
+        if(IsKeyDown(KEY_BACKSPACE)) {
+            boxes[1]->backspacecounter+=GetFrameTime();
+            if(boxes[1]->backspacecounter>=0.5f) {
+                int len=(int)strlen(s_filter);
+                if(len>0) {
+                    do{ len--; } while(len>0&&(s_filter[len]&0xC0)==0x80);
+                    s_filter[len]='\0';
+                    Form->matruyen.text[0]='\0'; Form->matruyen.lettercount=0;
+                    s_selectedMaTruyen[0] = '\0';
+                    s_selectedMaTap[0] = '\0';
+                    CapNhatMatch();
+                    s_showDropdown = true;
+                    s_showTapDropdown = false;
+                }
+            }
+        } else boxes[1]->backspacecounter=0;
 
-    Rectangle cardright = { (screenW - 800*scale)/2 + 600*scale, (screenH - 550*scale)/2, 200*scale, 550*scale};
-    Rectangle Confirm = { (screenW - 800*scale)/2 + 630*scale, cardright.y + cardright.height + 30 * scale, 140*scale, 50*scale }; 
-    
-    if (IsKeyPressed(KEY_ENTER) || (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), Confirm))) {
-        if (Form->mathe.lettercount > 0 && Form->matruyen.lettercount > 0) {
-            if (LuuPhieuMuonVaoFile(mathe, Form)) {
-                ThemPhieuMuonVaoList(head, mathe, Form); 
-                Form->showsuccess = true;
-                Form->successtimer = 3.0f;
+        int ch=GetCharPressed();
+        while(ch>0) {
+            if(ch>=32) {
+                int bs=0; const char *u=CodepointToUTF8(ch,&bs);
+                int flen=(int)strlen(s_filter);
+                if(flen+bs<255) {
+                    for(int j=0;j<bs;j++) s_filter[flen+j]=u[j];
+                    s_filter[flen+bs]='\0';
+                    Form->matruyen.text[0]='\0'; Form->matruyen.lettercount=0;
+                    s_selectedMaTruyen[0] = '\0';
+                    s_selectedMaTap[0] = '\0';
+                    CapNhatMatch();
+                    s_showDropdown = true;
+                    s_showTapDropdown = false;
+                }
+            }
+            ch=GetCharPressed();
+        }
+        strncpy(Form->tentruyen.text, s_filter, 511);
+        Form->tentruyen.lettercount=(int)strlen(s_filter);
+
+        if(IsKeyPressed(KEY_ESCAPE)) { s_showDropdown=false; s_showTapDropdown=false; boxes[1]->isfocused=false; }
+        if(IsKeyPressed(KEY_TAB)) {
+            boxes[1]->isfocused=false; s_showDropdown=false; s_showTapDropdown=false;
+            boxes[3]->isfocused=true;
+        }
+    }
+
+    // ── Input các ô thường ──
+    for(int i=0;i<5;i++) {
+        if(i==1||i==2) continue;
+        if(!boxes[i]->isfocused) continue;
+        int key=GetKeyPressed();
+        while(key>0) {
+            if(key==KEY_BACKSPACE&&boxes[i]->lettercount>0) {
+                if(i == 4) {
+                    // Xóa 1 ký tự, nếu ký tự trước là '/' thì xóa luôn '/' đó
+                    boxes[i]->lettercount--;
+                    boxes[i]->text[boxes[i]->lettercount] = '\0';
+                    if(boxes[i]->lettercount > 0 && boxes[i]->text[boxes[i]->lettercount-1] == '/') {
+                        boxes[i]->lettercount--;
+                        boxes[i]->text[boxes[i]->lettercount] = '\0';
+                    }
+                    s_ngaytraLoi = false;
+                } else {
+                    do{ boxes[i]->lettercount--; }
+                    while(boxes[i]->lettercount>0&&(boxes[i]->text[boxes[i]->lettercount]&0xC0)==0x80);
+                    boxes[i]->text[boxes[i]->lettercount]='\0';
+                }
+            }
+            key=GetKeyPressed();
+        }
+        if(IsKeyDown(KEY_BACKSPACE)) {
+            boxes[i]->backspacecounter+=GetFrameTime();
+            if(boxes[i]->backspacecounter>=0.5f&&boxes[i]->lettercount>0) {
+                if(i == 4) {
+                    boxes[i]->lettercount--;
+                    boxes[i]->text[boxes[i]->lettercount] = '\0';
+                    if(boxes[i]->lettercount > 0 && boxes[i]->text[boxes[i]->lettercount-1] == '/') {
+                        boxes[i]->lettercount--;
+                        boxes[i]->text[boxes[i]->lettercount] = '\0';
+                    }
+                    s_ngaytraLoi = false;
+                } else {
+                    do{ boxes[i]->lettercount--; }
+                    while(boxes[i]->lettercount>0&&(boxes[i]->text[boxes[i]->lettercount]&0xC0)==0x80);
+                    boxes[i]->text[boxes[i]->lettercount]='\0';
+                }
+            }
+        } else boxes[i]->backspacecounter=0;
+
+        // ── FIX 1: Ô mã thẻ (i==0) chỉ nhận số, tối đa 8 ký tự ──
+        // ── Ô ngày trả dự kiến (i==4): chỉ số + '/', tự động thêm '/', max 10 ký tự ──
+        int ch=GetCharPressed();
+        while(ch>0) {
+            if(i == 0) {
+                if(ch >= '0' && ch <= '9' && boxes[i]->lettercount < 8) {
+                    boxes[i]->text[boxes[i]->lettercount++] = (char)ch;
+                    boxes[i]->text[boxes[i]->lettercount] = '\0';
+                }
+            } else if(i == 4) {
+                // Chỉ nhận chữ số, chặn tất cả ký tự khác (kể cả '/')
+                if(ch >= '0' && ch <= '9' && boxes[i]->lettercount < 10) {
+                    int len = boxes[i]->lettercount;
+                    boxes[i]->text[len++] = (char)ch;
+                    boxes[i]->text[len] = '\0';
+                    // Tự động thêm '/' sau phần ngày (vị trí 2) và phần tháng (vị trí 5)
+                    // Nhưng chỉ thêm nếu đây không phải ký tự cuối cùng của dd/mm/yyyy
+                    // Phân tích: dd/mm/yyyy => index 2 là '/', index 5 là '/'
+                    // Sau khi nhập ký tự thứ 2 → thêm '/' nếu chưa có
+                    // Sau khi nhập ký tự thứ 4 (tức vị trí 5) → thêm '/'
+                    if(len == 2 || len == 5) {
+                        if(len < 10) {
+                            boxes[i]->text[len++] = '/';
+                            boxes[i]->text[len] = '\0';
+                        }
+                    }
+                    boxes[i]->lettercount = len;
+                    s_ngaytraLoi = false;
+                }
+            } else {
+                if(ch>=32&&boxes[i]->lettercount<250) {
+                    int bs=0; const char *u=CodepointToUTF8(ch,&bs);
+                    if(boxes[i]->lettercount+bs<255) {
+                        for(int j=0;j<bs;j++) boxes[i]->text[boxes[i]->lettercount++]=u[j];
+                        boxes[i]->text[boxes[i]->lettercount]='\0';
+                    }
+                }
+            }
+            ch=GetCharPressed();
+        }
+
+        if(IsKeyPressed(KEY_TAB)) {
+            boxes[i]->isfocused=false;
+            int next=(i+1)%5;
+            if(next==1) {
+                boxes[1]->isfocused=true;
+                strncpy(s_filter,Form->tentruyen.text,255);
+                CapNhatMatch(); s_showDropdown=true;
+            } else if(next==2) { next=3; boxes[3]->isfocused=true; }
+            else boxes[next]->isfocused=true;
+            break;
+        }
+    }
+
+    // ── Nút Xác nhận ─────────────────────────────────────────
+    Rectangle cr2={(sw-800*sc)/2+600*sc,(sh-550*sc)/2,200*sc,550*sc};
+    Rectangle Confirm={(sw-800*sc)/2+630*sc, cr2.y+cr2.height+30*sc, 140*sc,50*sc};
+    if(IsKeyPressed(KEY_ENTER)||
+       (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)&&CheckCollisionPointRec(mp,Confirm))) {
+        // ── FIX 2: Bắt buộc mã thẻ đúng 8 số ──
+        if(Form->mathe.lettercount==8 && Form->matruyen.lettercount>0) {
+            // Kiểm tra ngày trả dự kiến hợp lệ
+            if(!KiemTraNgayHopLe(Form->ngaytra.text)) {
+                s_ngaytraLoi = true;
+            } else {
+                s_ngaytraLoi = false;
+                if(LuuPhieuMuonVaoFile(mathe,Form)) {
+                    ThemPhieuMuonVaoList(head,mathe,Form);
+                    Form->showsuccess=true; Form->successtimer=3.0f;
+                }
             }
         }
     }
 }
 
-// Vẽ giao diện:
+// ============================================================
+// DrawPM — vẽ toàn bộ giao diện
+// ============================================================
 void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
-    float screenW = (float)GetScreenWidth();
-    float screenH = (float)GetScreenHeight();
-    float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
-    if (scale < 0.5f) scale = 0.5f;
+    float sw=(float)GetScreenWidth(), sh=(float)GetScreenHeight();
+    float sc=(sw/1100.0f<sh/750.0f)?sw/1100.0f:sh/750.0f;
+    if(sc<0.5f)sc=0.5f;
 
-    // --- VẼ NÚT QUAY LẠI TẠI ĐÂY ---
-    Rectangle btnBack = { 20, 20, 130, 40 };
-    bool isHoverBack = CheckCollisionPointRec(GetMousePosition(), btnBack);
-    Color btnColor = isHoverBack ? MAROON : WHITE;
-    Color textColor = isHoverBack ? WHITE : MAROON;
-    DrawRectangleRounded(btnBack, 0.3f, 10, btnColor);
-    DrawRectangleRoundedLines(btnBack, 0.3f, 10, MAROON);
-    DrawTextEx(font, "< Quay lai", (Vector2){btnBack.x + 15, btnBack.y + 10}, 20, 1, textColor);
-    // -------------------------------
+    ClearBackground(AnimatedBackground());
+    DrawBackgroundParticles();
 
-    Rectangle cardleft = { (screenW - 800*scale)/2, (screenH - 550*scale)/2, 600*scale, 550*scale};
-    Rectangle cardright = { (screenW - 800*scale)/2 + 600*scale, (screenH - 550*scale)/2, 200*scale, 550*scale};
-    
-    DrawRectangleRec((Rectangle){cardleft.x + 6*scale, cardleft.y + 6*scale, cardleft.width, cardleft.height}, Fade(BLACK, 0.2f));
-    DrawRectangleRec((Rectangle){cardright.x + 6*scale, cardright.y + 6*scale, cardright.width, cardright.height}, Fade(BLACK, 0.2f));
-    DrawRectangleGradientEx(cardleft, GetColor(0xFF8BC3FF), GetColor(0xF98BC4FF), GetColor(0xFE81AAFF), GetColor(0xFFA8C5FF));
-    DrawRectangleGradientEx(cardright, GetColor(0xD6EDFFFF), GetColor(0xB5F4FEFF), GetColor(0xC2FAFFFF),GetColor(0xA4FBCFFF));
-    
-    DrawTextEx(font, "Phiếu mượn sách ", (Vector2){cardleft.x + 136*scale, cardright.y + 36*scale}, 36*scale, 1, MAROON);
-    DrawTextEx(font, TextFormat("IDPM: %s", mathe), (Vector2){cardright.x + 10*scale, cardright.y + 480*scale}, 24*scale, 1, GetColor(0x1E96FCFF));
-    
-    const char* labels[] = {"Mã thẻ bạn đọc:", "Mã truyện:", "Tên truyện:", "Ngày mượn:", "Ngày trả dự kiến:"};
-    InputBox_PM* boxes[] = {&Form->mathe, &Form->matruyen, &Form->tentruyen, &Form->ngaymuon, &Form->ngaytra};
-    
-    for (int i = 0; i < 5; i++) {
-        DrawTextEx(font, labels[i], (Vector2){boxes[i]->rec.x, boxes[i]->rec.y - 25*scale}, 18*scale, 1, MAROON);
-        DrawRectangleRounded(boxes[i]->rec, 0.2f, 10, WHITE);
-        DrawRectangleRoundedLines(boxes[i]->rec, 0.2f, 10, boxes[i]->isfocused ? MAROON : LIGHTGRAY);
-        
-        float fontSize = 20 * scale;
-        Vector2 textSize = MeasureTextEx(font, boxes[i]->text, fontSize, 1);
-        float textOffsetX = (textSize.x > (boxes[i]->rec.width - 20)) ? (textSize.x - (boxes[i]->rec.width - 20)) : 0;
-        
-        BeginScissorMode((int)boxes[i]->rec.x + 5, (int)boxes[i]->rec.y, (int)boxes[i]->rec.width - 10, (int)boxes[i]->rec.height);
-            Vector2 textpos = { boxes[i]->rec.x + 10 - textOffsetX, boxes[i]->rec.y + (boxes[i]->rec.height - fontSize)/2 };
-            DrawTextEx(font, boxes[i]->text, textpos, fontSize, 1, PINK);
+    Rectangle btnBack={20,20,130,40};
+    bool hoverBack=CheckCollisionPointRec(GetMousePosition(),btnBack);
+    DrawRectangleRounded(btnBack,0.3f,10, hoverBack?MAROON:WHITE);
+    DrawRectangleRoundedLines(btnBack,0.3f,10,MAROON);
+    DrawTextEx(font,"< QUAY LẠI",(Vector2){btnBack.x+15,btnBack.y+10},20,1,hoverBack?WHITE:SKYBLUE);
 
-            if (boxes[i]->isfocused && (((int)(GetTime() * 1.5f)) % 2 == 0)) {
-                DrawRectangleV((Vector2){ textpos.x + textSize.x + 2, textpos.y + 2 }, (Vector2){ 2, fontSize - 4 }, MAROON);
-            }
+    Rectangle cl={(sw-800*sc)/2,(sh-550*sc)/2,600*sc,550*sc};
+    Rectangle cr={(sw-800*sc)/2+600*sc,(sh-550*sc)/2,200*sc,550*sc};
+
+    DrawRectangleRec((Rectangle){cl.x+6*sc,cl.y+6*sc,cl.width,cl.height},Fade(BLACK,0.2f));
+    DrawRectangleRec((Rectangle){cr.x+6*sc,cr.y+6*sc,cr.width,cr.height},Fade(BLACK,0.2f));
+    DrawRectangleGradientEx(cl,GetColor(0x2f6690ff),GetColor(0x2f6690ff),GetColor(0x2f6690ff),GetColor(0x2f6690ff));
+    DrawRectangleGradientEx(cr,GetColor(0x81c3d7ff),GetColor(0x81c3d7ff),GetColor(0x81c3d7ff),GetColor(0x81c3d7ff));
+
+    DrawTextEx(font,"Phiếu mượn sách",(Vector2){cl.x+136*sc,cr.y+36*sc},36*sc,1, GetColor(0xeff2f1ff));
+    DrawTextEx(font,TextFormat("IDPM: %s",mathe),(Vector2){cr.x+10*sc,cr.y+480*sc},24*sc,1,WHITE);
+
+    const char *labels[]={"Mã thẻ bạn đọc:","Tên truyện:","Mã truyện:","Ngày mượn:","Ngày trả dự kiến:"};
+    InputBox_PM *boxes[]={&Form->mathe,&Form->tentruyen,&Form->matruyen,&Form->ngaymuon,&Form->ngaytra};
+
+    for(int i=0;i<5;i++) {
+        DrawTextEx(font,labels[i],(Vector2){boxes[i]->rec.x,boxes[i]->rec.y-25*sc},18*sc,1,GetColor(0xeff2f1ff));
+        bool rdonly=(i==2);
+        bool isNgaytraLoi = (i==4 && s_ngaytraLoi);
+        Color borderColor = rdonly ? LIGHTGRAY : (isNgaytraLoi ? RED : (boxes[i]->isfocused ? WHITE : LIGHTGRAY));
+        Color bgColor = rdonly ? GetColor(0xF0F0F0FF) : (isNgaytraLoi ? GetColor(0xFFF0F0FF) : WHITE);
+        DrawRectangleRounded(boxes[i]->rec,0.2f,10, bgColor);
+        DrawRectangleRoundedLines(boxes[i]->rec,0.2f,10, borderColor);
+        // Hint text cho ô ngày trả dự kiến khi rỗng
+        if(i==4 && boxes[i]->lettercount==0 && !boxes[i]->isfocused) {
+            DrawTextEx(font,"dd/mm/yyyy",
+                (Vector2){boxes[i]->rec.x+10, boxes[i]->rec.y+(boxes[i]->rec.height-18*sc)/2},
+                18*sc,1,LIGHTGRAY);
+        }
+        // Thông báo lỗi ngay dưới ô
+        if(isNgaytraLoi) {
+            DrawTextEx(font,"! Ngày không hợp lệ (dd/mm/yyyy)",
+                (Vector2){boxes[i]->rec.x, boxes[i]->rec.y+boxes[i]->rec.height+4*sc},
+                14*sc,1,RED);
+        }
+
+        float fs=20*sc;
+
+        bool hasTaps = false;
+        float scissorW = boxes[i]->rec.width - 10;
+
+        if (i == 1 && s_selectedMaTruyen[0] != '\0' && KiemTraCoTap(s_selectedMaTruyen)) {
+            hasTaps = true;
+            scissorW -= 35*sc;
+            Rectangle arrowBtn = { boxes[i]->rec.x + boxes[i]->rec.width - 35*sc, boxes[i]->rec.y, 35*sc, boxes[i]->rec.height };
+            DrawLineEx((Vector2){arrowBtn.x, arrowBtn.y + 8*sc}, (Vector2){arrowBtn.x, arrowBtn.y + arrowBtn.height - 8*sc}, 1.5f, LIGHTGRAY);
+            const char* arrowIcon = s_showTapDropdown ? "^" : "v";
+            Color arrowColor = s_showTapDropdown ? SKYBLUE : GRAY;
+            if (CheckCollisionPointRec(GetMousePosition(), arrowBtn)) arrowColor = SKYBLUE;
+            DrawTextEx(font, arrowIcon,
+                (Vector2){arrowBtn.x + 10*sc, arrowBtn.y + (arrowBtn.height - MeasureTextEx(font, arrowIcon, 20*sc, 1).y)/2},
+                20*sc, 1, arrowColor);
+        }
+
+        Vector2 tsz=MeasureTextEx(font,boxes[i]->text,fs,1);
+        float offX=(tsz.x > scissorW - 10) ? tsz.x - (scissorW - 10) : 0;
+
+        BeginScissorMode((int)boxes[i]->rec.x+5, (int)boxes[i]->rec.y, (int)scissorW, (int)boxes[i]->rec.height);
+            Vector2 tp={boxes[i]->rec.x+10-offX, boxes[i]->rec.y+(boxes[i]->rec.height-fs)/2};
+            DrawTextEx(font,boxes[i]->text,tp,fs,1, rdonly?GRAY:BLACK);
+            if(boxes[i]->isfocused&&!rdonly&&(((int)(GetTime()*1.5f))%2==0))
+                DrawRectangleV((Vector2){tp.x+tsz.x+2,tp.y+2},(Vector2){2,fs-4},BLACK);
         EndScissorMode();
     }
-    
-    Rectangle Confirm = { (screenW - 800*scale)/2 + 630*scale, cardright.y + cardright.height + 30 * scale, 140*scale, 50*scale };
-    bool ishover = CheckCollisionPointRec(GetMousePosition(), Confirm);
-    DrawRectangleRounded(Confirm, 0.3f, 10, ishover ? MAROON : PINK);
-    DrawTextEx(font, "XÁC NHẬN", (Vector2){Confirm.x + (Confirm.width - MeasureTextEx(font, "XÁC NHẬN", 20*scale, 1).x)/2, Confirm.y + (Confirm.height - 20*scale)/2}, 20*scale, 1, WHITE);
 
-    // GỌI THÔNG BÁO THÀNH CÔNG NGAY BÊN TRONG HÀM VẼ (giống ManageUser.c)
-    if (Form->showsuccess) {
-        DrawSuccess(font, (Texture2D){0}, Form->successtimer);
+    // ── Dropdown Tìm Kiếm Truyện ─────────────────────────────
+    if (s_showDropdown && s_matchCount>0) {
+        float dropX=Form->tentruyen.rec.x;
+        float dropY=Form->tentruyen.rec.y+Form->tentruyen.rec.height+2;
+        float dropW=Form->tentruyen.rec.width;
+        float rowH=40*sc;
+        int maxVis=5;
+        int start=s_dropScroll, end=start+maxVis;
+        if(end>s_matchCount) end=s_matchCount;
+
+        Vector2 mp=GetMousePosition();
+        float totalH=rowH*(end-start);
+
+        DrawRectangleRec((Rectangle){dropX+3,dropY+3,dropW,totalH},Fade(BLACK,0.15f));
+        DrawRectangleRec((Rectangle){dropX,dropY,dropW,totalH},WHITE);
+        DrawRectangleLinesEx((Rectangle){dropX,dropY,dropW,totalH},1.5f,SKYBLUE);
+
+        float curY=dropY;
+        for(int vi=start; vi<end; vi++) {
+            int ti=s_matchIdx[vi];
+            Rectangle rowRec={dropX,curY,dropW,rowH};
+            bool hoverRow=CheckCollisionPointRec(mp,rowRec);
+            DrawRectangleRec(rowRec, hoverRow?GetColor(0xceeaf7ff):WHITE);
+            DrawRectangleLinesEx(rowRec,0.5f,GetColor(0x386fa4ff));
+            BeginScissorMode((int)dropX+5,(int)curY,(int)(dropW-10*sc),(int)rowH);
+                DrawTextEx(font,s_dsTruyen[ti].ten,
+                           (Vector2){dropX+10,curY+(rowH-18*sc)/2},18*sc,1,GetColor(0x2f6690ff));
+            EndScissorMode();
+            curY+=rowH;
+        }
+        if(s_matchCount>maxVis) {
+            char hint[32]; snprintf(hint,sizeof(hint),"%d/%d",s_dropScroll+1,s_matchCount);
+            DrawTextEx(font,hint,(Vector2){dropX+dropW-60*sc,dropY-18*sc},13*sc,1,SKYBLUE);
+        }
     }
+
+    // ── Dropdown Danh Sách Tập ────────────────────────────────
+    if (s_showTapDropdown && s_selectedMaTruyen[0] != '\0') {
+        TapInfo_PM tapBuf[MAX_TAP_PM];
+        int tapCount=0;
+        for(int k=0;k<s_soTap&&tapCount<MAX_TAP_PM;k++)
+            if(strcmp(s_dsTap[k].maTruyen, s_selectedMaTruyen)==0)
+                tapBuf[tapCount++]=s_dsTap[k];
+
+        float dropX=Form->tentruyen.rec.x;
+        float dropY=Form->tentruyen.rec.y+Form->tentruyen.rec.height+2;
+        float dropW=Form->tentruyen.rec.width;
+        float tapRowH=36*sc;
+        int tapMaxVis=6;
+        if(s_tapScroll<0) s_tapScroll=0;
+        if(tapCount>tapMaxVis&&s_tapScroll>tapCount-tapMaxVis)
+            s_tapScroll=tapCount-tapMaxVis;
+
+        int start = s_tapScroll;
+        int end = start + tapMaxVis;
+        if(end > tapCount) end = tapCount;
+
+        float totalH = tapRowH * (end - start);
+        DrawRectangleRec((Rectangle){dropX+3,dropY+3,dropW,totalH},Fade(BLACK,0.15f));
+        DrawRectangleRec((Rectangle){dropX,dropY,dropW,totalH},GetColor(0x59a5d8ff));
+        DrawRectangleLinesEx((Rectangle){dropX,dropY,dropW,totalH},1.5f,GetColor(0x87f5fbff));
+
+        Vector2 mp=GetMousePosition();
+        float curY = dropY;
+        for(int ti2=start; ti2<end; ti2++) {
+            Rectangle tapRec={dropX,curY,dropW,tapRowH};
+            bool hoverTap=CheckCollisionPointRec(mp,tapRec);
+            if(hoverTap) DrawRectangleRec(tapRec,SKYBLUE);
+            DrawRectangleLinesEx(tapRec,0.5f,GetColor(0xfbf9ffff));
+
+            char badge[20];
+            snprintf(badge,sizeof(badge)," [%s]",tapBuf[ti2].maTap);
+            Vector2 bsz=MeasureTextEx(font,badge,13*sc,1);
+            DrawTextEx(font,badge,(Vector2){dropX+dropW-bsz.x-7,curY+(tapRowH-13*sc)/2},13*sc,1,WHITE);
+
+            char tapLine[512];
+            snprintf(tapLine,sizeof(tapLine),"  %s  (Còn: %d)", tapBuf[ti2].tenTap, tapBuf[ti2].soLuong);
+            BeginScissorMode((int)dropX+4, (int)curY, (int)(dropW-bsz.x-20), (int)tapRowH);
+                DrawTextEx(font,tapLine,(Vector2){dropX+8,curY+(tapRowH-16*sc)/2}, 16*sc,1, WHITE);
+            EndScissorMode();
+            curY+=tapRowH;
+        }
+
+        if(tapCount>tapMaxVis) {
+            char hint[32]; snprintf(hint,sizeof(hint),"%d/%d tập",s_tapScroll+1,tapCount);
+            DrawTextEx(font,hint,(Vector2){dropX+dropW-70*sc,dropY-18*sc},13*sc,1,SKYBLUE);
+        }
+    }
+
+    // Nút Xác nhận
+    Rectangle cr2={(sw-800*sc)/2+600*sc,(sh-550*sc)/2,200*sc,550*sc};
+    Rectangle Confirm={(sw-800*sc)/2+630*sc,cr2.y+cr2.height+30*sc,140*sc,50*sc};
+    bool isHover=CheckCollisionPointRec(GetMousePosition(),Confirm);
+    DrawRectangleRounded(Confirm,0.3f,10, isHover?DARKBLUE:SKYBLUE);
+    DrawTextEx(font,"XÁC NHẬN",
+               (Vector2){Confirm.x+(Confirm.width-MeasureTextEx(font,"XÁC NHẬN",20*sc,1).x)/2,
+                         Confirm.y+(Confirm.height-20*sc)/2},20*sc,1,WHITE);
+
+    if(Form->showsuccess) DrawSuccess(font,(Texture2D){0},Form->successtimer);
 }
 
-void DrawSuccess(Font font, Texture2D background2, float currenttimer) {
-    float screenW = (float)GetScreenWidth();
-    float screenH = (float)GetScreenHeight();
-
-    if (background2.id != 0) {
-        DrawTexturePro(background2, (Rectangle){0, 0, (float)background2.width, (float)background2.height}, (Rectangle){0, 0, screenW, screenH}, (Vector2){0, 0}, 0, WHITE);
-    }
-    DrawRectangle(0, 0, (int)screenW, (int)screenH, Fade(BLACK, 0.4f));
-    
-    Rectangle panel = { screenW/2 - 250, screenH/2 - 150, 500, 300 };
-    DrawRectangleGradientEx(panel, GetColor(0xA2D6F9FF), GetColor(0x82DDF0FF), GetColor(0xF6839CFF), GetColor(0xFF85D1FF));
-    DrawCircle((int)screenW/2, (int)screenH/2 - 60, 45, PINK);
-    DrawTextEx(font, "V", (Vector2){screenW/2 - 15, screenH/2 - 85}, 60, 1, WHITE);
-
-    const char* msg = "TẠO PHIẾU MƯỢN THÀNH CÔNG!";
-    Vector2 msgSize = MeasureTextEx(font, msg, 32, 1);
-    DrawTextEx(font, msg, (Vector2){(screenW - msgSize.x)/2, screenH/2 + 20}, 32, 1, GetColor(0x5171A5FF));
-    float progress = currenttimer / 3.0f; 
-    DrawRectangle((int)panel.x + 50, (int)panel.y + panel.height - 50, 400, 12, LIGHTGRAY);
-    DrawRectangle((int)panel.x + 50, (int)panel.y + panel.height - 50, (int)(400 * (1.0f - progress)), 12, GetColor(0x85C7F2FF));
+// ============================================================
+// DrawSuccess
+// ============================================================
+void DrawSuccess(Font font, Texture2D bg, float t) {
+    float sw=(float)GetScreenWidth(), sh=(float)GetScreenHeight();
+    if(bg.id!=0)
+        DrawTexturePro(bg,(Rectangle){0,0,(float)bg.width,(float)bg.height},
+                       (Rectangle){0,0,sw,sh},(Vector2){0,0},0,WHITE);
+    DrawRectangle(0,0,(int)sw,(int)sh,Fade(BLACK,0.4f));
+    Rectangle panel={sw/2-250,sh/2-150,500,300};
+    // ── FIX 3: Đổi nền banner thành SKYBLUE ──
+    DrawRectangleRec(panel, SKYBLUE);
+    DrawCircle((int)sw/2,(int)sh/2-60,45,WHITE);
+    DrawTextEx(font,"V",(Vector2){sw/2-15,sh/2-85},60,1,SKYBLUE);
+    const char *msg="TẠO PHIẾU MƯỢN THÀNH CÔNG!";
+    Vector2 ms=MeasureTextEx(font,msg,32,1);
+    DrawTextEx(font,msg,(Vector2){(sw-ms.x)/2,sh/2+20},32,1,WHITE);
+    float prog=t/3.0f;
+    DrawRectangle((int)panel.x+50,(int)panel.y+panel.height-50,400,12,Fade(WHITE,0.4f));
+    DrawRectangle((int)panel.x+50,(int)panel.y+panel.height-50,(int)(400*(1.0f-prog)),12,WHITE);
 }
 
+// ============================================================
+// Lưu & Thêm node
+// ============================================================
 bool LuuPhieuMuonVaoFile(char *maphieu, FormPhieuMuon *Form) {
-    FILE *f = fopen("data/Phieumuon/LSPhieumuon.txt", "a"); 
-    if (f == NULL) f = fopen("data/Phieumuon/LSPhieumuon.txt", "a");
-    
-    if (f == NULL) {
-        return false;
-    }
-    for (int i = strlen(Form->mathe.text)-1; i >= 0 && Form->mathe.text[i] == ' '; i--) Form->mathe.text[i] = '\0';
-    for (int i = strlen(Form->matruyen.text)-1; i >= 0 && Form->matruyen.text[i] == ' '; i--) Form->matruyen.text[i] = '\0';
-    for (int i = strlen(Form->tentruyen.text)-1; i >= 0 && Form->tentruyen.text[i] == ' '; i--) Form->tentruyen.text[i] = '\0';
-    for (int i = strlen(Form->ngaymuon.text)-1; i >= 0 && Form->ngaymuon.text[i] == ' '; i--) Form->ngaymuon.text[i] = '\0';
-    for (int i = strlen(Form->ngaytra.text)-1; i >= 0 && Form->ngaytra.text[i] == ' '; i--) Form->ngaytra.text[i] = '\0';
-
-    fprintf(f, "%-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %d\n",
-    UTF8Width(maphieu, 12),             maphieu,
-    UTF8Width(Form->mathe.text, 12),    Form->mathe.text,
-    UTF8Width(Form->matruyen.text, 19), Form->matruyen.text,
-    UTF8Width(Form->tentruyen.text, 50),Form->tentruyen.text,
-    UTF8Width(Form->ngaymuon.text, 19), Form->ngaymuon.text,
-    UTF8Width(Form->ngaytra.text, 19),  Form->ngaytra.text,
-    0);
-    fflush(f); 
-    fclose(f);
+    FILE *f=fopen("data/Phieumuon/LSPhieumuon.txt","a");
+    if(!f) return false;
+    for(int i=strlen(Form->mathe.text)-1;     i>=0&&Form->mathe.text[i]==' ';     i--) Form->mathe.text[i]='\0';
+    for(int i=strlen(Form->matruyen.text)-1;  i>=0&&Form->matruyen.text[i]==' ';  i--) Form->matruyen.text[i]='\0';
+    for(int i=strlen(Form->tentruyen.text)-1; i>=0&&Form->tentruyen.text[i]==' '; i--) Form->tentruyen.text[i]='\0';
+    for(int i=strlen(Form->ngaymuon.text)-1;  i>=0&&Form->ngaymuon.text[i]==' ';  i--) Form->ngaymuon.text[i]='\0';
+    for(int i=strlen(Form->ngaytra.text)-1;   i>=0&&Form->ngaytra.text[i]==' ';   i--) Form->ngaytra.text[i]='\0';
+    fprintf(f,"%-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %d\n",
+        UTF8Width(maphieu,12),              maphieu,
+        UTF8Width(Form->mathe.text,12),     Form->mathe.text,
+        UTF8Width(Form->matruyen.text,19),  Form->matruyen.text,
+        UTF8Width(Form->tentruyen.text,50), Form->tentruyen.text,
+        UTF8Width(Form->ngaymuon.text,19),  Form->ngaymuon.text,
+        UTF8Width(Form->ngaytra.text,19),   Form->ngaytra.text,
+        0);
+    fflush(f); fclose(f);
     return true;
 }
- 
+
 void ThemPhieuMuonVaoList(PhieuMuonNode **head, char *maPM, FormPhieuMuon *Form) {
-    PhieuMuonNode *newNode = (PhieuMuonNode*)malloc(sizeof(PhieuMuonNode));
-    if (newNode) {
-        strcpy(newNode->maPM, maPM);
-        strcpy(newNode->mathe, Form->mathe.text);
-        strcpy(newNode->matruyen, Form->matruyen.text);
-        strcpy(newNode->tentruyen, Form->tentruyen.text);
-        strcpy(newNode->ngaymuon, Form->ngaymuon.text);
-        strcpy(newNode->ngaytra, Form->ngaytra.text);
-        newNode->trangthai = 0;
-        newNode->next = *head;
-        *head = newNode;
+    PhieuMuonNode *n=(PhieuMuonNode*)malloc(sizeof(PhieuMuonNode));
+    if(n) {
+        strcpy(n->maPM,     maPM);
+        strcpy(n->mathe,    Form->mathe.text);
+        strcpy(n->matruyen, Form->matruyen.text);
+        strcpy(n->tentruyen,Form->tentruyen.text);
+        strcpy(n->ngaymuon, Form->ngaymuon.text);
+        strcpy(n->ngaytra,  Form->ngaytra.text);
+        n->trangthai=0; n->next=*head; *head=n;
     }
 }
