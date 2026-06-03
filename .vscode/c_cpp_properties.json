@@ -16,7 +16,8 @@
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-gcc-x64",
             "configurationProvider": "ms-vscode.makefile-tools",
-            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe"
+            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
+            "C_Cpp.clang_format_style": "{ BasedOnStyle: LLVM, BreakBeforeBraces: Allman }"
         }
     ],
     "version": 4
