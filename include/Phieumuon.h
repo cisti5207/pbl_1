@@ -28,6 +28,7 @@ typedef struct {
     bool showsuccess;
     float successtimer;
 } FormPhieuMuon;
+
 int DemSoPhieuMuon(PhieuMuonNode *head);
 void InitPhieumuon(FormPhieuMuon *Form);
 void UpdateVitri(FormPhieuMuon *Form);

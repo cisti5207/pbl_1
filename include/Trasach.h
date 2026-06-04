@@ -22,12 +22,13 @@ typedef struct {
     float scrollList;
     
     // Dùng cho Bước 3
-    PhieuMuonNode *phieuDangXuLy; // Con trỏ lưu cái phiếu vừa click vào
-    InputBox_BD nhapNgayTraThucTe; // Ô nhập ngày trả
+    PhieuMuonNode *phieuDangXuLy; 
+    InputBox_BD nhapNgayTraThucTe; 
     
-    int tienPhat; // Tiền phạt tính toán được
+    int tienPhat; 
     int tongTien;
     int daThanhToan;
+    bool ngayKhongHopLe;
 } FormTraSach;
 
 void InitFormTraSach(FormTraSach *form);

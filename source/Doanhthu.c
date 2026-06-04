@@ -103,13 +103,22 @@ int KhoangCachNgay(const char *ngayBatDau, const char *ngayKetThuc) {
     return (int)(diff / (60.0 * 60.0 * 24.0));
 }
 
-double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *ngayDuKien, const char *ngayTraThucTe) {
-    int soNgayGoc = KhoangCachNgay(ngayMuon, ngayDuKien);
+// LOGIC TÍNH TIỀN THUÊ & PHẠT CẬP NHẬT (Số ngày mượn)
+double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *soNgayMuonStr, const char *ngayTraThucTe) {
+    // 1. Lấy trực tiếp số ngày mượn gốc mà thủ thư đã nhập (VD: "7")
+    int soNgayGoc = atoi(soNgayMuonStr);
     if (soNgayGoc <= 0) soNgayGoc = 1;
     
     double tienGoc = (double)giaMotNgay * soNgayGoc;
-    int lechNgay = KhoangCachNgay(ngayDuKien, ngayTraThucTe);
     
+    // 2. Tính số ngày khách giữ sách trên thực tế
+    int soNgayThucTe = KhoangCachNgay(ngayMuon, ngayTraThucTe);
+    if (soNgayThucTe < 0) soNgayThucTe = 0; // Tránh lỗi logic nếu nhập ngày trả < ngày mượn
+    
+    // 3. Tính số ngày chênh lệch (Dương = Trễ hạn, Âm = Trả sớm)
+    int lechNgay = soNgayThucTe - soNgayGoc;
+    
+    // 4. Tính toán tiền phạt / giảm giá y như cũ
     if (lechNgay == 0) {
         return tienGoc;
     } 

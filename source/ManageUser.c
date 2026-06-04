@@ -417,8 +417,9 @@ void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer) {
     DrawRectangleRoundedLines(panel, 0.12f, 10, GetColor(0x8ecae6ff));   // viền sky pastel
 
     // Icon check
-    DrawCircle((int)screenW/2, (int)screenH/2 - 60, 45, GetColor(0x4fc3f7ff)); // xanh sky sáng
-    DrawTextEx(font, "✓", (Vector2){screenW/2 - 18, screenH/2 - 88}, 62, 1, WHITE);
+    DrawCircle((int)screenW/2, (int)screenH/2 - 60, 45, GetColor(0x4fc3f7ff));
+    Vector2 vSz = MeasureTextEx(font, "V", 58, 1);
+    DrawTextEx(font, "V", (Vector2){screenW/2 - vSz.x/2, screenH/2 - 60 - vSz.y/2}, 58, 1, WHITE);
 
     // Thông báo
     const char* msg = "TẠO THẺ THÀNH CÔNG!";
@@ -466,8 +467,15 @@ void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form) {
         strcpy(newNode->sdt,   form->sdt.text);
         strcpy(newNode->cccd,  form->cccd.text);
         strcpy(newNode->hanSD, form->hanSD.text);
-        newNode->next = *head;
-        *head = newNode;
+        newNode->next = NULL;
+        // Nối vào cuối list để giữ đúng thứ tự mã thẻ tăng dần
+        if (*head == NULL) {
+            *head = newNode;
+        } else {
+            BanDoc *temp = *head;
+            while (temp->next != NULL) temp = temp->next;
+            temp->next = newNode;
+        }
     }
 }
 

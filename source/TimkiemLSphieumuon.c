@@ -138,7 +138,7 @@ void DrawThePhieuMuon(PhieuMuonNode *pm, Font font, float x, float y, float scal
                20*scale, 1, mautrangthai);
 
     // 5 ô thông tin
-    labels[0] = "Mã thẻ bạn đọc:"; labels[1] = "Mã truyện:"; labels[2] = "Tên truyện:"; labels[3] = "Ngày mượn:"; labels[4] = "Ngày trả:";
+    labels[0] = "Mã thẻ bạn đọc:"; labels[1] = "Mã truyện:"; labels[2] = "Tên truyện:"; labels[3] = "Ngày mượn:"; labels[4] = "Số ngày mượn:";
     values[0] = pm->mathe; values[1] = pm->matruyen; values[2] = pm->tentruyen; values[3] = pm->ngaymuon; values[4] = pm->ngaytra;
 
     inputX  = cardleft.x + 50  * scale;
@@ -362,16 +362,16 @@ void DrawModalLichSuPhieuMuon(FormTimKiemThe *Form, PhieuMuonMang *mapPM, Font f
                         DrawRectangleLinesEx(itemRec, 1, hoverItem ? GetColor(0x274690ff) : LIGHTGRAY);
 
                         sprintf(line1, "Tên truyện: %s (Mã: %s)", tempNode->LSphieumuon->tentruyen, tempNode->LSphieumuon->matruyen);
-                        sprintf(line2, "Ngày mượn: %s   |   Hạn trả: %s", tempNode->LSphieumuon->ngaymuon, tempNode->LSphieumuon->ngaytra);
+                        sprintf(line2, "Ngày mượn: %s   |   Số ngày mượn: %s", tempNode->LSphieumuon->ngaymuon, tempNode->LSphieumuon->ngaytra);
 
                         DrawTextEx(font, line1, (Vector2){startX + 20*scale, startY + 15*scale}, 26*scale, 1, GetColor(0x274690ff));
                         DrawTextEx(font, line2, (Vector2){startX + 20*scale, startY + 55*scale}, 22*scale, 1, DARKGRAY);
 
                         statusColor = (tempNode->LSphieumuon->trangthai == 1) ? GREEN : RED;
                         statusText = (tempNode->LSphieumuon->trangthai == 1) ? "Đã trả" : "Chưa trả";
-                        DrawTextEx(font, statusText, (Vector2){startX + listW - 250*scale, startY + 35*scale}, 22*scale, 1, statusColor);
+                        DrawTextEx(font, statusText, (Vector2){startX + listW - 250*scale, startY + 42*scale}, 22*scale, 1, statusColor);
 
-                        DrawTextEx(font, "Chi tiết >", (Vector2){startX + listW - 120*scale, startY + 35*scale}, 22*scale, 1, BLUE);
+                        DrawTextEx(font, "Chi tiết >", (Vector2){startX + listW - 120*scale, startY + 42*scale}, 22*scale, 1, BLUE);
 
                         if (hoverItem && inScissor && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                             selectedPhieu = tempNode->LSphieumuon; 
