@@ -40,6 +40,7 @@
 #define MANAGEBOOKS_Func_5         "Tìm kiếm"
 #define MANAGEBOOKS_Avatar         "img/dut.png"
 
+
 // =========================================================================
 // ENUMERATIONS
 // =========================================================================
@@ -107,8 +108,6 @@ typedef struct {
     Book *theArray;
     int capacity;
     int count;
-    int stockBooks;
-    int totalImportBooks;
     int pos;
     int QuantityForOnePage;
     int currentPage;
