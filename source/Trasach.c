@@ -1,10 +1,8 @@
 #include "Trasach.h"
-#include "Phieumuon.h"
 #include "TimkiemLSphieumuon.h" 
 #include "menu.h"
 #include "Doanhthu.h"
 #include "libmanage.h"
-#include "Phieumuon.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -147,7 +145,7 @@ void CapNhatSoLuongSachTra(const char *maSachDayDu) {
         int slHT, slNhap;
         
         // Cắt chuỗi theo định dạng Tên | CXXX | TXXX | Số hiện tại | Số nhập vào
-        if (sscanf(line, "%[^|]|%[^|]|%[^|]| %d | %d", ten, tapDoc, truyenDoc, &slHT, &slNhap) == 5) {
+        if (sscanf(line, "%[^|]|%[^|]|%[^|]|%d|%d", ten, tapDoc, truyenDoc, &slHT, &slNhap) == 5) {
             TrimStringSpace(ten);
             TrimStringSpace(tapDoc);
             TrimStringSpace(truyenDoc);
@@ -203,6 +201,8 @@ void InitFormTraSach(FormTraSach *form) {
 // ==========================================
 // LOGIC NHẬP LIỆU CHUNG
 // ==========================================
+
+// Hàm nhập tìm kiếm bạn đọc (giữ nguyên, nhận mọi ký tự)
 void NhapLieuTraSach(InputBox_BD *box) {
     int key = GetKeyPressed();
     while (key > 0) {
@@ -239,6 +239,92 @@ void NhapLieuTraSach(InputBox_BD *box) {
         }
         charcode = GetCharPressed();
     }
+}
+
+// Hàm nhập ngày chuyên biệt: chỉ nhận số, tự chèn '/', giới hạn dd/mm/yyyy (10 ký tự)
+// Trả về true nếu nội dung thay đổi (để caller biết cần recheck lỗi)
+static bool NhapNgayTraThucTe(InputBox_BD *box) {
+    bool changed = false;
+
+    // --- Xóa ký tự ---
+    int key = GetKeyPressed();
+    while (key > 0) {
+        if (key == KEY_BACKSPACE && box->letterCount > 0) {
+            // Nếu ký tự trước con trỏ là '/', xóa thêm 1 nữa để xóa cả dấu '/' tự chèn
+            if (box->text[box->letterCount - 1] == '/') {
+                box->letterCount--;
+                box->text[box->letterCount] = '\0';
+            }
+            if (box->letterCount > 0) {
+                box->letterCount--;
+                box->text[box->letterCount] = '\0';
+            }
+            changed = true;
+        }
+        key = GetKeyPressed();
+    }
+
+    if (IsKeyDown(KEY_BACKSPACE)) {
+        box->backspaceCounter += GetFrameTime();
+        if (box->backspaceCounter >= 0.4f && box->letterCount > 0) {
+            if (box->text[box->letterCount - 1] == '/') {
+                box->letterCount--;
+                box->text[box->letterCount] = '\0';
+            }
+            if (box->letterCount > 0) {
+                box->letterCount--;
+                box->text[box->letterCount] = '\0';
+            }
+            changed = true;
+        }
+    } else {
+        box->backspaceCounter = 0;
+    }
+
+    // --- Nhập ký tự số ---
+    int charcode = GetCharPressed();
+    while (charcode > 0) {
+        if (charcode >= '0' && charcode <= '9' && box->letterCount < 10) {
+            // Tự chèn '/' sau vị trí 1 (dd/) và vị trí 4 (mm/)
+            int pos = box->letterCount;
+            if (pos == 2 || pos == 5) {
+                box->text[box->letterCount++] = '/';
+                box->text[box->letterCount] = '\0';
+            }
+            // Kiểm tra lại vì có thể vừa chèn '/' xong đủ 10 rồi
+            if (box->letterCount < 10) {
+                box->text[box->letterCount++] = (char)charcode;
+                box->text[box->letterCount] = '\0';
+                changed = true;
+            }
+        }
+        charcode = GetCharPressed();
+    }
+
+    return changed;
+}
+
+// Kiểm tra ngày dd/mm/yyyy có hợp lệ không
+static bool KiemTraNgayHopLe_Tra(const char *ngay) {
+    if (!ngay || strlen(ngay) < 8) return false;
+    int d = 0, m = 0, y = 0;
+    if (sscanf(ngay, "%d/%d/%d", &d, &m, &y) != 3) return false;
+    if (y < 2000 || y > 2100) return false;
+    if (m < 1 || m > 12) return false;
+    int maxDay[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+    if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) maxDay[2] = 29;
+    if (d < 1 || d > maxDay[m]) return false;
+    return true;
+}
+
+// So sánh 2 ngày dd/mm/yyyy: trả về <0 nếu a trước b, 0 nếu bằng, >0 nếu a sau b
+static int SoSanhNgay(const char *a, const char *b) {
+    int da,ma,ya, db,mb,yb;
+    if (sscanf(a, "%d/%d/%d", &da, &ma, &ya) != 3) return 0;
+    if (sscanf(b, "%d/%d/%d", &db, &mb, &yb) != 3) return 0;
+    if (ya != yb) return ya - yb;
+    if (ma != mb) return ma - mb;
+    return da - db;
 }
 
 // ==========================================
@@ -400,46 +486,61 @@ void UpdateLogicTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headPM
         }
         
         if (form->nhapNgayTraThucTe.isFocused) {
-            NhapLieuTraSach(&form->nhapNgayTraThucTe);
+            NhapNgayTraThucTe(&form->nhapNgayTraThucTe);
         }
-        
+
         int giaMotNgay = laygiathue(form->phieuDangXuLy->matruyen);
         int soNgayDuKien = atoi(form->phieuDangXuLy->ngaytra);
         if (soNgayDuKien <= 0) soNgayDuKien = 1;
-        int tienGoc = giaMotNgay * soNgayDuKien; 
+        int tienGoc = giaMotNgay * soNgayDuKien;
 
         // TÍNH TOÁN VÀ KIỂM TRA LỖI NGÀY
-        if (form->nhapNgayTraThucTe.letterCount >= 8) {
-            double ketQuaTinh = TinhTienThue(
-                giaMotNgay, 
-                form->phieuDangXuLy->ngaymuon, 
-                form->phieuDangXuLy->ngaytra,
-                form->nhapNgayTraThucTe.text
-            );
-            form->tongTien = (int)ketQuaTinh; // Nếu lỗi ketQuaTinh = -1.0
-            
-            if (form->tongTien != -1) {
-                form->tienPhat = form->tongTien - tienGoc; 
-            } else {
+        // Phải nhập đủ 10 ký tự (dd/mm/yyyy) và đúng format mới tính
+        if (form->nhapNgayTraThucTe.letterCount == 10 &&
+            KiemTraNgayHopLe_Tra(form->nhapNgayTraThucTe.text)) {
+            // Chặn ngay tại đây: ngày trả phải >= ngày mượn
+            if (SoSanhNgay(form->nhapNgayTraThucTe.text, form->phieuDangXuLy->ngaymuon) < 0) {
+                form->tongTien = -1;
                 form->tienPhat = 0;
+            } else {
+                double ketQuaTinh = TinhTienThue(
+                    giaMotNgay,
+                    form->phieuDangXuLy->ngaymuon,
+                    form->phieuDangXuLy->ngaytra,
+                    form->nhapNgayTraThucTe.text
+                );
+                form->tongTien = (int)ketQuaTinh;
+                if (form->tongTien != -1) {
+                    form->tienPhat = form->tongTien - tienGoc;
+                } else {
+                    form->tienPhat = 0;
+                }
             }
-        } else {
+        } else if (form->nhapNgayTraThucTe.letterCount > 0 &&
+                   form->nhapNgayTraThucTe.letterCount < 10) {
+            // Đang nhập dở — chưa đủ, không báo lỗi, hiện tiền gốc tạm
             form->tongTien = tienGoc;
+            form->tienPhat = 0;
+        } else if (form->nhapNgayTraThucTe.letterCount == 0) {
+            form->tongTien = tienGoc;
+            form->tienPhat = 0;
+        } else {
+            // Đủ 10 ký tự nhưng sai format (ngày/tháng không hợp lệ)
+            form->tongTien = -1;
             form->tienPhat = 0;
         }
 
         Rectangle btnThanhToan = { rightPaneX + 30, screenH - 70, rightPaneW - 60, 55 }; // Tọa độ đồng bộ UI
         
-        // CHỈ XỬ LÝ CLICK NẾU KHÔNG CÓ LỖI (tongTien != -1)
+        // CHỈ XỬ LÝ CLICK NẾU KHÔNG CÓ LỖI (tongTien != -1) VÀ ĐỦ 10 KÝ TỰ dd/mm/yyyy
         if (form->tongTien != -1 && CheckCollisionPointRec(GetMousePosition(), btnThanhToan) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            if (form->nhapNgayTraThucTe.letterCount >= 8) {
+            if (form->nhapNgayTraThucTe.letterCount == 10) {
                 form->phieuDangXuLy->trangthai = 1; 
                 CapNhatToanBoFilePhieuMuon(headPM); 
                 LuuDoanhThuVaoFile(form->nhapNgayTraThucTe.text, form->tongTien);
                 
                 // === THỰC HIỆN CỘNG SỐ LƯỢNG SÁCH TRỞ LẠI KHO ===
                 CapNhatSoLuongSachTra(form->phieuDangXuLy->matruyen);
-                ReloadDuLieuTruyen(); // Reset cache để lần tạo phiếu tiếp theo đọc lại từ file
                 // =================================================
 
                 form->daThanhToan = 1; 
@@ -829,7 +930,7 @@ void DrawGiaoDienTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headP
             DrawRectangleRoundedLines(warningBox, 0.2f, 10, Fade(RED, 0.6f));
             
             DrawTextEx(font, "CẢNH BÁO: Ngày trả không hợp lệ!", (Vector2){warningBox.x + 15, warningBox.y + 15}, 18, 1, RED);
-            DrawTextEx(font, "Vui lòng nhập ngày trả sau ngày mượn.", (Vector2){warningBox.x + 15, warningBox.y + 45}, 16, 1, MAROON);
+            DrawTextEx(font, "Ngày không tồn tại hoặc trước ngày mượn.", (Vector2){warningBox.x + 15, warningBox.y + 45}, 16, 1, MAROON);
 
             // Nút bấm bị xám đi, không cho bấm
             Rectangle btnThanhToan = { rightPaneX + 30, screenH - 70, rightPaneW - 60, 55 };

@@ -20,14 +20,12 @@ void GetWeekRange(int year, int week, char *outBuffer) {
     tm.tm_mday = 1;
     mktime(&tm);
     
-    // Tìm ngày đầu tuần
     int dayOfYear = (week - 1) * 7;
     tm.tm_mday += dayOfYear;
     mktime(&tm);
     
     int startD = tm.tm_mday, startM = tm.tm_mon + 1;
     
-    // Tìm ngày cuối tuần (cộng thêm 6 ngày)
     tm.tm_mday += 6;
     mktime(&tm);
     int endD = tm.tm_mday, endM = tm.tm_mon + 1;
@@ -35,7 +33,6 @@ void GetWeekRange(int year, int week, char *outBuffer) {
     sprintf(outBuffer, "%02d/%02d - %02d/%02d", startD, startM, endD, endM);
 }
 
-// Hàm hỗ trợ tính ngày thứ bao nhiêu trong năm
 static int LayNgayTrongNam(int d, int m, int y) {
     int daysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) daysInMonth[2] = 29;
@@ -46,7 +43,6 @@ static int LayNgayTrongNam(int d, int m, int y) {
 }
 
 int laygiathue(const char *masachcantim) {
-    // Tách TXXX từ TXXXCXXX (cắt tại ký tự 'C')
     char maBook[20] = {0};
     int i = 0;
     while (masachcantim[i] && masachcantim[i] != 'C' && i < 19) {
@@ -113,12 +109,14 @@ double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *soNgayMuon
     
     // 2. Tính số ngày khách giữ sách trên thực tế
     int soNgayThucTe = KhoangCachNgay(ngayMuon, ngayTraThucTe);
-    if (soNgayThucTe < 0) soNgayThucTe = 0; // Tránh lỗi logic nếu nhập ngày trả < ngày mượn
+
+    // FIX: Nếu ngày trả trước ngày mượn -> trả -1 báo lỗi, không tính tiền
+    if (soNgayThucTe < 0) return -1.0;
     
     // 3. Tính số ngày chênh lệch (Dương = Trễ hạn, Âm = Trả sớm)
     int lechNgay = soNgayThucTe - soNgayGoc;
     
-    // 4. Tính toán tiền phạt / giảm giá y như cũ
+    // 4. Tính toán tiền phạt / giảm giá
     if (lechNgay == 0) {
         return tienGoc;
     } 
@@ -195,7 +193,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
     float sw = (float)GetScreenWidth();
     float sh = (float)GetScreenHeight();
 
-    // 1. NỀN & NÚT QUAY LẠI TỰ CHỦ
     ClearBackground(GetColor(0xE8F4F8FF)); 
 
     Rectangle btnBack = { 20, 20, 130, 40 };
@@ -212,14 +209,12 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
     DrawRectangleRoundedLines(btnBack, 0.3f, 10, GetColor(0x507A9BFF));
     DrawTextEx(font, "< Quay lai", (Vector2){btnBack.x + 15, btnBack.y + 10}, 20, 1, textColor);
 
-    // 2. KHUNG DASHBOARD CHÍNH
     Rectangle board = { 50, 80, sw - 100, sh - 120 };
     DrawRectangleRounded(board, 0.05f, 10, WHITE);
     DrawRectangleRoundedLines(board, 0.05f, 10, GetColor(0x8AB6D6FF)); 
 
     DrawTextEx(font, "BÁO CÁO DOANH THU THƯ VIỆN", (Vector2){board.x + 30, board.y + 20}, 32, 1, GetColor(0x3B5998FF));
 
-    // 3. MENU TABS (Ngày/Tuần/Tháng/Quý/Năm)
     const char *tabs[] = {"Theo Ngày", "Theo Tuần", "Theo Tháng", "Theo Quý", "Theo Năm"};
     float tabX = board.x + 30;
     float tabY = board.y + 70;
@@ -244,7 +239,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         tabX += 140;
     }
 
-    // 4. Ô NHẬP LỌC THEO NĂM 
     DrawTextEx(font, "Lọc Năm:", (Vector2){board.x + board.width - 230, tabY + 11}, 20, 1, GetColor(0x507A9BFF));
     form->nhapNam.rec = (Rectangle){ board.x + board.width - 140, tabY, 100, 40 };
     
@@ -277,14 +271,12 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         DrawTextEx(font, "Tất cả", (Vector2){form->nhapNam.rec.x + 15, form->nhapNam.rec.y + 10}, 20, 1, LIGHTGRAY);
     }
 
-    // 5. THUẬT TOÁN GỘP DỮ LIỆU & CHUẨN BỊ KHUNG THỜI GIAN
     AggItem items[1000];
     int itemCount = 0;
     double tongTatCa = 0;
     
     int filterYear = (form->nhapNam.letterCount > 0) ? atoi(form->nhapNam.text) : 0;
 
-    // Thiết lập sẵn dải ngày tuần tháng quý nếu lọc năm cụ thể
     if (filterYear > 0) {
         if (form->currentView == VIEW_THANG) {
             for(int i = 1; i <= 12; i++) {
@@ -371,7 +363,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         }
     }
 
-    // Sắp xếp dữ liệu TĂNG DẦN (Vẽ từ trái sang phải)
     for (int i = 0; i < itemCount - 1; i++) {
         for (int j = i + 1; j < itemCount; j++) {
             if (items[i].sortKey > items[j].sortKey) {
@@ -382,7 +373,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         }
     }
 
-    // 6. VẼ BIỂU ĐỒ CỘT (BAR CHART BO TRÒN PASTEL VÀ MỐC TIỀN LÀM TRÒN THÔNG MINH)
     float chartX = board.x + 80;
     float chartY = tabY + 60;
     float chartW = board.width - 120;
@@ -397,7 +387,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         if (items[i].amount > maxAmount) maxAmount = items[i].amount;
     }
     
-    // Thuật toán "Nice Step" để làm tròn số tiền của trục Y
     if (maxAmount == 0) {
         maxAmount = 1000; 
     } else {
@@ -415,7 +404,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         maxAmount = lead * mag * 4.0;
     }
     
-    // Vẽ lưới và nhãn (Căn lề phải cực xịn)
     for (int i = 0; i <= 4; i++) {
         float yPos = chartY + chartH - (i * chartH / 4.0f);
         if (i > 0) DrawLine(chartX, yPos, chartX + chartW, yPos, Fade(GetColor(0x8AB6D6FF), 0.3f));
@@ -423,7 +411,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         char labelY[32];
         sprintf(labelY, "%.0f", maxAmount * i / 4.0f);
         float lblW = MeasureTextEx(font, labelY, 14, 1).x;
-        // Căn lề phải sao cho các số nằm sát mép trục Y
         DrawTextEx(font, labelY, (Vector2){chartX - lblW - 10, yPos - 8}, 14, 1, GetColor(0x507A9BFF));
     }
     
@@ -472,13 +459,11 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         }
     }
 
-    // 7. HEADER BẢNG DỮ LIỆU BÊN DƯỚI
     float listHeaderY = chartY + chartH + 35;
     DrawRectangle(board.x + 2, listHeaderY, board.width - 4, 40, GetColor(0xE4F1F9FF));
     DrawTextEx(font, "Thời gian", (Vector2){board.x + 50, listHeaderY + 10}, 20, 1, GetColor(0x3B5998FF));
     DrawTextEx(font, "Doanh Thu (VNĐ)", (Vector2){board.x + board.width - 250, listHeaderY + 10}, 20, 1, GetColor(0x3B5998FF));
     
-    // 8. XỬ LÝ CUỘN VÀ VẼ DANH SÁCH CHI TIẾT
     float listY = listHeaderY + 40;
     float rowHeight = 45.0f;
     float footerY = board.y + board.height - 60;
@@ -487,7 +472,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
     float maxScroll = 0;
     float minScroll = (totalH > contentH) ? (contentH - totalH) : 0;
 
-    // Cuộn bằng chuột lăn
     form->scroll += GetMouseWheelMove() * 30.0f;
     if (form->scroll > maxScroll) form->scroll = maxScroll;
     if (form->scroll < minScroll) form->scroll = minScroll;
@@ -495,7 +479,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
     BeginScissorMode((int)board.x, (int)listY, (int)board.width, (int)contentH);
     float startY = listY + form->scroll;
     
-    // Đảo ngược danh sách (mới nhất lên trên cùng bảng)
     int displayIndex = 0;
     for (int i = itemCount - 1; i >= 0; i--) {
         if (startY > listY - rowHeight && startY < listY + contentH) {
@@ -513,7 +496,6 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
     }
     EndScissorMode();
 
-    // 9. VẼ THANH SCROLLBAR (Kéo thả kéo mượt mà y chang Tìm kiếm)
     float sbW = 8.0f;
     float trackX = board.x + board.width - 15;
     if (totalH > contentH) {
@@ -553,14 +535,12 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
         }
     }
 
-    // 10. FOOTER TỔNG KẾT
     DrawRectangle(board.x + 2, footerY, board.width - 4, 58, GetColor(0xE4F1F9FF));
     DrawLine(board.x, footerY, board.x + board.width, footerY, GetColor(0x8AB6D6FF));
     
     DrawTextEx(font, "TỔNG CỘNG:", (Vector2){board.x + 50, footerY + 15}, 26, 1, GetColor(0x3B5998FF));
     DrawTextEx(font, TextFormat("%.0f VNĐ", tongTatCa), (Vector2){board.x + board.width - 300, footerY + 15}, 28, 1, RED);
 
-    // Vẽ Tooltip trên cùng nếu chuột Hover vào cột
     if (showTooltip) {
         float ttW = MeasureTextEx(font, tooltipText, 16, 1).x;
         DrawRectangleRounded((Rectangle){tooltipPos.x + 15, tooltipPos.y - 30, ttW + 20, 30}, 0.2f, 5, Fade(GetColor(0x3B5998FF), 0.9f));
