@@ -34,5 +34,4 @@ typedef struct {
 void InitFormTraSach(FormTraSach *form);
 void UpdateLogicTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headPM,int *currentState);
 void DrawGiaoDienTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headPM, Font font);
-
 #endif

@@ -66,6 +66,152 @@ void LuuDoanhThuVaoFile(const char *ngay, int tien) {
 }
 
 // ==========================================
+// CẬP NHẬT SỐ LƯỢNG TRUYỆN KHI TRẢ SÁCH
+// ==========================================
+// matruyen trong phiếu mượn có dạng "T001|C002"
+// File dataListTruyen: TênTruyện | CXXX | TXXX | SL hiện tại | SL nhập vào
+void CapNhatSoLuongTruyen(const char *matruyenPhieu) {
+    // Tách mã truyện thành phần TXXX và CXXX
+    char maTX[16] = {0}; // ví dụ "T001"
+    char maCX[16] = {0}; // ví dụ "C002"
+
+    // Định dạng matruyen: "T001|C002" hoặc "T001 | C002"
+    const char *pipe = strchr(matruyenPhieu, '|');
+    if (pipe == NULL) return; // không đúng định dạng
+
+    // Lấy phần trước dấu | (mã T) — trim khoảng trắng
+    int lenT = (int)(pipe - matruyenPhieu);
+    int startT = 0, endT = lenT - 1;
+    while (startT < lenT && matruyenPhieu[startT] == ' ') startT++;
+    while (endT > startT && matruyenPhieu[endT] == ' ') endT--;
+    if (endT - startT + 1 >= (int)sizeof(maTX)) return;
+    strncpy(maTX, matruyenPhieu + startT, endT - startT + 1);
+    maTX[endT - startT + 1] = '\0';
+
+    // Lấy phần sau dấu | (mã C) — trim khoảng trắng
+    const char *afterPipe = pipe + 1;
+    int lenC = (int)strlen(afterPipe);
+    int startC = 0, endC = lenC - 1;
+    while (startC < lenC && afterPipe[startC] == ' ') startC++;
+    while (endC > startC && afterPipe[endC] == ' ') endC--;
+    if (endC - startC + 1 >= (int)sizeof(maCX)) return;
+    strncpy(maCX, afterPipe + startC, endC - startC + 1);
+    maCX[endC - startC + 1] = '\0';
+
+    FILE *f = fopen("data/dataListTruyen.txt", "r");
+    if (f == NULL) return;
+
+    // Đọc toàn bộ file vào bộ nhớ
+    fseek(f, 0, SEEK_END);
+    long fileSize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    char *buffer = (char *)malloc(fileSize + 1);
+    if (buffer == NULL) { fclose(f); return; }
+    fread(buffer, 1, fileSize, f);
+    buffer[fileSize] = '\0';
+    fclose(f);
+
+    FILE *fw = fopen("data/dataListTruyen.txt", "w");
+    if (fw == NULL) { free(buffer); return; }
+
+    char *line = buffer;
+    bool firstLine = true;
+    while (*line) {
+        // Tìm cuối dòng
+        char *eol = strchr(line, '\n');
+        char lineBuf[1024] = {0};
+        int lineLen;
+        if (eol) {
+            lineLen = (int)(eol - line);
+            // Xử lý \r\n
+            if (lineLen > 0 && line[lineLen - 1] == '\r') lineLen--;
+        } else {
+            lineLen = (int)strlen(line);
+        }
+        if (lineLen >= (int)sizeof(lineBuf)) lineLen = (int)sizeof(lineBuf) - 1;
+        strncpy(lineBuf, line, lineLen);
+        lineBuf[lineLen] = '\0';
+
+        // Dòng header thì ghi nguyên
+        if (firstLine) {
+            fprintf(fw, "%s\r\n", lineBuf);
+            firstLine = false;
+        } else if (strlen(lineBuf) == 0) {
+            // Dòng trống
+            fprintf(fw, "\r\n");
+        } else {
+            // Phân tách dòng thành các cột theo dấu " | "
+            // Cột: [0]=tên | [1]=CXXX | [2]=TXXX | [3]=SL hiện tại | [4]=SL nhập vào
+            char cols[5][256] = {{0}};
+            int colCount = 0;
+            char tmp[1024];
+            strncpy(tmp, lineBuf, sizeof(tmp) - 1);
+            char *tok = tmp;
+            for (int i = 0; i < 5; i++) {
+                char *sep = strstr(tok, " | ");
+                if (sep && i < 4) {
+                    int clen = (int)(sep - tok);
+                    if (clen >= (int)sizeof(cols[i])) clen = (int)sizeof(cols[i]) - 1;
+                    strncpy(cols[i], tok, clen);
+                    cols[i][clen] = '\0';
+                    tok = sep + 3; // nhảy qua " | "
+                    colCount++;
+                } else {
+                    // cột cuối
+                    strncpy(cols[i], tok, sizeof(cols[i]) - 1);
+                    colCount++;
+                    break;
+                }
+            }
+
+            // Trim khoảng trắng ở mỗi cột để so sánh chính xác
+            // cols[1] = CXXX, cols[2] = TXXX
+            char c1trim[64] = {0}, c2trim[64] = {0};
+            {
+                const char *s = cols[1];
+                int l = (int)strlen(s);
+                int a = 0, b = l - 1;
+                while (a < l && s[a] == ' ') a++;
+                while (b > a && s[b] == ' ') b--;
+                int n = b - a + 1; if (n < 0) n = 0;
+                strncpy(c1trim, s + a, n < 63 ? n : 63);
+            }
+            {
+                const char *s = cols[2];
+                int l = (int)strlen(s);
+                int a = 0, b = l - 1;
+                while (a < l && s[a] == ' ') a++;
+                while (b > a && s[b] == ' ') b--;
+                int n = b - a + 1; if (n < 0) n = 0;
+                strncpy(c2trim, s + a, n < 63 ? n : 63);
+            }
+
+            // Kiểm tra khớp: CXXX == maCX và TXXX == maTX
+            if (colCount >= 5 &&
+                strcmp(c1trim, maCX) == 0 &&
+                strcmp(c2trim, maTX) == 0)
+            {
+                int slHienTai = atoi(cols[3]);
+                int slNhapVao = atoi(cols[4]);
+                slHienTai++;
+                if (slHienTai > slNhapVao) slHienTai = slNhapVao; // không vượt số lượng nhập
+                fprintf(fw, "%s | %s | %s | %d | %s\r\n",
+                    cols[0], cols[1], cols[2], slHienTai, cols[4]);
+            } else {
+                fprintf(fw, "%s\r\n", lineBuf);
+            }
+        }
+
+        if (eol) line = eol + 1;
+        else break;
+    }
+
+    fclose(fw);
+    free(buffer);
+}
+
+// ==========================================
 // KHỞI TẠO FORM
 // ==========================================
 void InitFormTraSach(FormTraSach *form) {
@@ -324,6 +470,7 @@ void UpdateLogicTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headPM
                 form->phieuDangXuLy->trangthai = 1; 
                 CapNhatToanBoFilePhieuMuon(headPM); 
                 LuuDoanhThuVaoFile(form->nhapNgayTraThucTe.text, form->tongTien);
+                CapNhatSoLuongTruyen(form->phieuDangXuLy->matruyen);
                 
                 form->daThanhToan = 1; 
                 form->state = TRA_B1_TIMKEM; 
