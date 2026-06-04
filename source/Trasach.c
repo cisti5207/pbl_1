@@ -2,6 +2,7 @@
 #include "TimkiemLSphieumuon.h" 
 #include "menu.h"
 #include "Doanhthu.h"
+#include "Phieumuon.h"
 #include "libmanage.h"
 #include <string.h>
 #include <stdio.h>
@@ -145,7 +146,7 @@ void CapNhatSoLuongSachTra(const char *maSachDayDu) {
         int slHT, slNhap;
         
         // Cắt chuỗi theo định dạng Tên | CXXX | TXXX | Số hiện tại | Số nhập vào
-        if (sscanf(line, "%[^|]|%[^|]|%[^|]|%d|%d", ten, tapDoc, truyenDoc, &slHT, &slNhap) == 5) {
+        if (sscanf(line, "%[^|]|%[^|]|%[^|]| %d | %d", ten, tapDoc, truyenDoc, &slHT, &slNhap) == 5) {
             TrimStringSpace(ten);
             TrimStringSpace(tapDoc);
             TrimStringSpace(truyenDoc);
@@ -542,7 +543,7 @@ void UpdateLogicTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headPM
                 // === THỰC HIỆN CỘNG SỐ LƯỢNG SÁCH TRỞ LẠI KHO ===
                 CapNhatSoLuongSachTra(form->phieuDangXuLy->matruyen);
                 // =================================================
-
+                ReloadDuLieuTruyen(); 
                 form->daThanhToan = 1; 
                 form->state = TRA_B1_TIMKEM; 
                 memset(form->maTheDaChon, 0, 15);

@@ -1,5 +1,5 @@
 Tên truyện có cả tập (Nếu không nó từ ghi lại y tên đầu tiên) | CXXX (ví dụ tập 1 là 001 nếu không có tập thì 000) | Mã truyện | Số lượng hiện tại | Số lượng nhập vào
-Doraemon - Tập 2 | C002 | T001 | 24 | 25
+Doraemon - Tập 2 | C002 | T001 | 25 | 25
 Doraemon - Tập 3 | C003 | T001 | 25 | 25
 Doraemon - Tập 4 | C004 | T001 | 25 | 25
 Doraemon - Tập 5 | C005 | T001 | 25 | 25
@@ -18,7 +18,7 @@ Doraemon - Tập 17 | C017 | T001 | 25 | 25
 Doraemon - Tập 18 | C018 | T001 | 25 | 25
 Doraemon - Tập 19 | C019 | T001 | 25 | 25
 Doraemon - Tập 20 | C020 | T001 | 25 | 25
-Thám tử lừng danh Conan - Tập 1 | C001 | T002 | 24 | 25
+Thám tử lừng danh Conan - Tập 1 | C001 | T002 | 25 | 25
 Thám tử lừng danh Conan - Tập 2 | C002 | T002 | 25 | 25
 Thám tử lừng danh Conan - Tập 3 | C003 | T002 | 25 | 25
 Thám tử lừng danh Conan - Tập 4 | C004 | T002 | 25 | 25
