@@ -1,3 +1,2 @@
 Phiếu mượn   | Mã thẻ       | Mã truyện           | Tên truyện                                         | Ngày mượn           | Ngày trả DK         | TT
-PM000002     | 00000001     | T010C005            | Jujutsu Kaisen - Tập 5                             | 04/06/2026          | 12                  | 1
-PM000001     | 00000001     | T008C005            | Death Note - Tập 5                                 | 04/06/2026          | 10                  | 0
+PM000001     | 00000001     | T001C002            | Doraemon - Tập 2                                   | 04/06/2026          | 12                  | 1
