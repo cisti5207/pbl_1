@@ -80,7 +80,7 @@ Naruto - Tập 19 | C019 | T004 | 25 | 25
 Naruto - Tập 20 | C020 | T004 | 25 | 25
 Bảy viên ngọc rồng - Tập 1 | C001 | T005 | 25 | 25
 Bảy viên ngọc rồng - Tập 2 | C002 | T005 | 25 | 25
-Bảy viên ngọc rồng - Tập 3 | C003 | T005 | 25 | 25
+Bảy viên ngọc rồng - Tập 3 | C003 | T005 | 24 | 25
 Bảy viên ngọc rồng - Tập 4 | C004 | T005 | 25 | 25
 Bảy viên ngọc rồng - Tập 5 | C005 | T005 | 24 | 25
 Bảy viên ngọc rồng - Tập 6 | C006 | T005 | 25 | 25
@@ -142,7 +142,7 @@ Death Note - Tập 1 | C001 | T008 | 25 | 25
 Death Note - Tập 2 | C002 | T008 | 25 | 25
 Death Note - Tập 3 | C003 | T008 | 25 | 25
 Death Note - Tập 4 | C004 | T008 | 25 | 25
-Death Note - Tập 5 | C005 | T008 | 25 | 25
+Death Note - Tập 5 | C005 | T008 | 24 | 25
 Death Note - Tập 6 | C006 | T008 | 25 | 25
 Death Note - Tập 7 | C007 | T008 | 25 | 25
 Death Note - Tập 8 | C008 | T008 | 25 | 25
@@ -174,7 +174,7 @@ Jujutsu Kaisen - Tập 1 | C001 | T010 | 25 | 25
 Jujutsu Kaisen - Tập 2 | C002 | T010 | 25 | 25
 Jujutsu Kaisen - Tập 3 | C003 | T010 | 25 | 25
 Jujutsu Kaisen - Tập 4 | C004 | T010 | 25 | 25
-Jujutsu Kaisen - Tập 5 | C005 | T010 | 25 | 25
+Jujutsu Kaisen - Tập 5 | C005 | T010 | 24 | 25
 Jujutsu Kaisen - Tập 6 | C006 | T010 | 25 | 25
 Jujutsu Kaisen - Tập 7 | C007 | T010 | 25 | 25
 Jujutsu Kaisen - Tập 8 | C008 | T010 | 25 | 25

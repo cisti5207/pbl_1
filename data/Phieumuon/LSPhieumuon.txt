@@ -1,17 +1,3 @@
 Phiếu mượn   | Mã thẻ       | Mã truyện           | Tên truyện                                         | Ngày mượn           | Ngày trả DK         | TT
-PM000015     | 00000001     | T038C000            | Your Name                                          | 04/06/2026          | 10                  | 0
-PM000014     | 00000001     | T041C000            | Suzume Khóa Chặt Cửa Nào                           | 04/06/2026          | 4                   | 1
-PM000013     | 00000002     | T083C000            | Đắc Nhân Tâm                                       | 04/06/2026          | 60                  | 0
-PM000012     | 00000002     | T044C010            | Thế Giới Hoàn Mỹ - Tập 10                          | 04/06/2026          | 3                   | 1
-PM000011     | 00000001     | T002C004            | Thám tử lừng danh Conan - Tập 4                    | 04/06/2026          | 14                  | 0
-PM000010     | 00000001     | T033C004            | Sword Art Online - Tập 4                           | 04/06/2026          | 10                  | 0
-PM000009     | 00000002     | T109C000            | Sự Im Lặng Của Bầy Cừu                             | 04/06/2026          | 20                  | 0
-PM000008     | 00000001     | T012C003            | Hunter x Hunter - Tập 3                            | 04/06/2026          | 9                   | 1
-PM000007     | 00000002     | T009C001            | Thanh gươm diệt quỷ - Tập 1                        | 04/06/2026          | 10                  | 1
-PM000006     | 00000002     | T017C005            | Classroom of the Elite - Tập 5                     | 04/06/2026          | 7                   | 1
-PM000005     | 00000001     | T013C006            | Fairy Tail - Tập 6                                 | 04/06/2026          | 12                  | 0
-PM000004     | 00000002     | T019C002            | 20th Century Boys - Tập 2                          | 04/06/2026          | 5                   | 0
-PM000003     | 00000001     | T014C005            | Black Clover - Tập 5                               | 04/06/2026          | 10                  | 0
-PM000002     | 00000002     | T117C000            | Tiếng Chim Hót Trong Bụi Mận Gai                   | 04/06/2026          | 30                  | 0
-PM000001     | 00000001     | T003C001            | One Piece - Tập 1                                  | 04/06/2026          | 10                  | 1
-PM000016     | 00000003     | T001C005            | Doraemon - Tập 5                                   | 04/06/2026          | 4                   | 0
+PM000002     | 00000001     | T010C005            | Jujutsu Kaisen - Tập 5                             | 04/06/2026          | 12                  | 1
+PM000001     | 00000001     | T008C005            | Death Note - Tập 5                                 | 04/06/2026          | 10                  | 0

@@ -18,7 +18,7 @@
 #define LEN_SHOW_DOB 21
 #define LEN_SHOW_ROLE 13
 
-#define FORM_LOGIN_IMG "img/image9.png"
+#define FORM_LOGIN_IMG "img/image1.png"
 #define WELCOME_TEXT "Welcome to HoanHoangLIB_DUT!"
 
 #define LOGIN_TEXT "LOGIN"
@@ -63,9 +63,9 @@ typedef enum {
 int InitLogin(Account *account_return);
 
 void LoginDrawForm(Rectangle Form, Texture2D Img_FormLogin, Font *_Font);
-void LoginDrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT);
+void LoginDrawLoginForm(InputBox *_loginBox, InputBox *_passwordBox, AccountList accounts, int accountCount, Texture2D _IconUsername, Texture2D _IconPassword, Font *_Font, Rectangle Form, Vector2 mouse, LoginResult *LOGIN_RESULT);
 void LoginDrawLoginUsername(InputBox *_LoginBox, Texture2D _IconUsername, Rectangle Form, Vector2 mouse, Font *_Font);
-void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Texture2D _ShowPasswordIcon, Rectangle Form, Font *_Font, Vector2 mouse);
+void LoginDrawLoginPassword(InputBox *_PasswordBox, Texture2D _IconPassword, Rectangle Form, Font *_Font, Vector2 mouse);
 LoginResult CheckLogin(AccountList accounts, const char *username, const char *password);
 
 int InsertAccount(AccountList pL, Account *e, AccountPosition p);
