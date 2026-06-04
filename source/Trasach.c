@@ -1,8 +1,10 @@
 #include "Trasach.h"
+#include "Phieumuon.h"
 #include "TimkiemLSphieumuon.h" 
 #include "menu.h"
 #include "Doanhthu.h"
 #include "libmanage.h"
+#include "Phieumuon.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +13,7 @@
 // Khai báo các hàm tính toán từ Doanhthu.c 
 int laygiathue(const char *masachcantim);
 int KhoangCachNgay(const char *ngayBatDau, const char *ngayKetThuc);
-double TienTienThue(int giaMotNgay, const char *ngayMuon, const char *soNgayMuonStr, const char *ngayTraThucTe);
+double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *soNgayMuonStr, const char *ngayTraThucTe);
 
 // Định nghĩa màu sắc giao diện đồng bộ với Tìm kiếm thẻ
 static Color COL_HEADER_BG   = { 43, 58, 103, 255 };  // Mã màu 0x2b3a67ff chủ đạo
@@ -65,150 +67,115 @@ void LuuDoanhThuVaoFile(const char *ngay, int tien) {
     }
 }
 
-// ==========================================
-// CẬP NHẬT SỐ LƯỢNG TRUYỆN KHI TRẢ SÁCH
-// ==========================================
-// matruyen trong phiếu mượn có dạng "T001|C002"
-// File dataListTruyen: TênTruyện | CXXX | TXXX | SL hiện tại | SL nhập vào
-void CapNhatSoLuongTruyen(const char *matruyenPhieu) {
-    // Tách mã truyện thành phần TXXX và CXXX
-    char maTX[16] = {0}; // ví dụ "T001"
-    char maCX[16] = {0}; // ví dụ "C002"
+// Hàm phụ trợ xóa khoảng trắng thừa cho chuỗi
+void TrimStringSpace(char *str) {
+    int start = 0, end = strlen(str) - 1;
+    while (start <= end && (str[start] == ' ' || str[start] == '\t' || str[start] == '\n' || str[start] == '\r')) start++;
+    while (end >= start && (str[end] == ' ' || str[end] == '\n' || str[end] == '\r' || str[end] == '\t')) end--;
+    int i;
+    for (i = 0; i <= end - start; i++) {
+        str[i] = str[start + i];
+    }
+    str[i] = '\0';
+}
 
-    // Định dạng matruyen: "T001|C002" hoặc "T001 | C002"
-    const char *pipe = strchr(matruyenPhieu, '|');
-    if (pipe == NULL) return; // không đúng định dạng
+// LOGIC CỘNG LẠI SỐ LƯỢNG SÁCH KHI TRẢ THÀNH CÔNG (ĐÃ FIX LỖI)
+void CapNhatSoLuongSachTra(const char *maSachDayDu) {
+    // 1. Phân tách mã (VD: "T001C002 " -> maTruyen="T001", maTap="C002") an toàn
+    char maTruyen[50] = {0};
+    char maTap[50] = {0};
+    char maTemp[100];
+    
+    strcpy(maTemp, maSachDayDu);
+    TrimStringSpace(maTemp); // Loại bỏ sạch sẽ khoảng trắng thừa
 
-    // Lấy phần trước dấu | (mã T) — trim khoảng trắng
-    int lenT = (int)(pipe - matruyenPhieu);
-    int startT = 0, endT = lenT - 1;
-    while (startT < lenT && matruyenPhieu[startT] == ' ') startT++;
-    while (endT > startT && matruyenPhieu[endT] == ' ') endT--;
-    if (endT - startT + 1 >= (int)sizeof(maTX)) return;
-    strncpy(maTX, matruyenPhieu + startT, endT - startT + 1);
-    maTX[endT - startT + 1] = '\0';
-
-    // Lấy phần sau dấu | (mã C) — trim khoảng trắng
-    const char *afterPipe = pipe + 1;
-    int lenC = (int)strlen(afterPipe);
-    int startC = 0, endC = lenC - 1;
-    while (startC < lenC && afterPipe[startC] == ' ') startC++;
-    while (endC > startC && afterPipe[endC] == ' ') endC--;
-    if (endC - startC + 1 >= (int)sizeof(maCX)) return;
-    strncpy(maCX, afterPipe + startC, endC - startC + 1);
-    maCX[endC - startC + 1] = '\0';
-
-    FILE *f = fopen("data/dataListTruyen.txt", "r");
-    if (f == NULL) return;
-
-    // Đọc toàn bộ file vào bộ nhớ
-    fseek(f, 0, SEEK_END);
-    long fileSize = ftell(f);
-    fseek(f, 0, SEEK_SET);
-
-    char *buffer = (char *)malloc(fileSize + 1);
-    if (buffer == NULL) { fclose(f); return; }
-    fread(buffer, 1, fileSize, f);
-    buffer[fileSize] = '\0';
-    fclose(f);
-
-    FILE *fw = fopen("data/dataListTruyen.txt", "w");
-    if (fw == NULL) { free(buffer); return; }
-
-    char *line = buffer;
-    bool firstLine = true;
-    while (*line) {
-        // Tìm cuối dòng
-        char *eol = strchr(line, '\n');
-        char lineBuf[1024] = {0};
-        int lineLen;
-        if (eol) {
-            lineLen = (int)(eol - line);
-            // Xử lý \r\n
-            if (lineLen > 0 && line[lineLen - 1] == '\r') lineLen--;
-        } else {
-            lineLen = (int)strlen(line);
-        }
-        if (lineLen >= (int)sizeof(lineBuf)) lineLen = (int)sizeof(lineBuf) - 1;
-        strncpy(lineBuf, line, lineLen);
-        lineBuf[lineLen] = '\0';
-
-        // Dòng header thì ghi nguyên
-        if (firstLine) {
-            fprintf(fw, "%s\r\n", lineBuf);
-            firstLine = false;
-        } else if (strlen(lineBuf) == 0) {
-            // Dòng trống
-            fprintf(fw, "\r\n");
-        } else {
-            // Phân tách dòng thành các cột theo dấu " | "
-            // Cột: [0]=tên | [1]=CXXX | [2]=TXXX | [3]=SL hiện tại | [4]=SL nhập vào
-            char cols[5][256] = {{0}};
-            int colCount = 0;
-            char tmp[1024];
-            strncpy(tmp, lineBuf, sizeof(tmp) - 1);
-            char *tok = tmp;
-            for (int i = 0; i < 5; i++) {
-                char *sep = strstr(tok, " | ");
-                if (sep && i < 4) {
-                    int clen = (int)(sep - tok);
-                    if (clen >= (int)sizeof(cols[i])) clen = (int)sizeof(cols[i]) - 1;
-                    strncpy(cols[i], tok, clen);
-                    cols[i][clen] = '\0';
-                    tok = sep + 3; // nhảy qua " | "
-                    colCount++;
-                } else {
-                    // cột cuối
-                    strncpy(cols[i], tok, sizeof(cols[i]) - 1);
-                    colCount++;
-                    break;
-                }
-            }
-
-            // Trim khoảng trắng ở mỗi cột để so sánh chính xác
-            // cols[1] = CXXX, cols[2] = TXXX
-            char c1trim[64] = {0}, c2trim[64] = {0};
-            {
-                const char *s = cols[1];
-                int l = (int)strlen(s);
-                int a = 0, b = l - 1;
-                while (a < l && s[a] == ' ') a++;
-                while (b > a && s[b] == ' ') b--;
-                int n = b - a + 1; if (n < 0) n = 0;
-                strncpy(c1trim, s + a, n < 63 ? n : 63);
-            }
-            {
-                const char *s = cols[2];
-                int l = (int)strlen(s);
-                int a = 0, b = l - 1;
-                while (a < l && s[a] == ' ') a++;
-                while (b > a && s[b] == ' ') b--;
-                int n = b - a + 1; if (n < 0) n = 0;
-                strncpy(c2trim, s + a, n < 63 ? n : 63);
-            }
-
-            // Kiểm tra khớp: CXXX == maCX và TXXX == maTX
-            if (colCount >= 5 &&
-                strcmp(c1trim, maCX) == 0 &&
-                strcmp(c2trim, maTX) == 0)
-            {
-                int slHienTai = atoi(cols[3]);
-                int slNhapVao = atoi(cols[4]);
-                slHienTai++;
-                if (slHienTai > slNhapVao) slHienTai = slNhapVao; // không vượt số lượng nhập
-                fprintf(fw, "%s | %s | %s | %d | %s\r\n",
-                    cols[0], cols[1], cols[2], slHienTai, cols[4]);
-            } else {
-                fprintf(fw, "%s\r\n", lineBuf);
-            }
-        }
-
-        if (eol) line = eol + 1;
-        else break;
+    char *c_pos = strchr(maTemp, 'C');
+    if (c_pos != NULL) {
+        *c_pos = '\0'; // Cắt đôi chuỗi tại vị trí chữ C
+        strcpy(maTruyen, maTemp);
+        strcpy(maTap, "C");
+        strcat(maTap, c_pos + 1);
+    } else {
+        strcpy(maTruyen, maTemp);
+        strcpy(maTap, "C000"); // Mặc định nếu không có chữ C
     }
 
-    fclose(fw);
-    free(buffer);
+    TrimStringSpace(maTruyen);
+    TrimStringSpace(maTap);
+
+    // 2. Tìm đúng đường dẫn file để mở
+    const char *filepath = "data/ManageBooks/dataListTruyen.txt";
+    FILE *fIn = fopen(filepath, "r");
+    if (fIn == NULL) {
+        filepath = "data/dataListTruyen.txt";
+        fIn = fopen(filepath, "r");
+        if (fIn == NULL) {
+            filepath = "dataListTruyen.txt"; // Fallback
+            fIn = fopen(filepath, "r");
+            if (fIn == NULL) return; 
+        }
+    }
+
+    // 3. Tạo file tạm ở CÙNG THƯ MỤC với file gốc (Chống lỗi Rename của Win/Mac)
+    char tempPath[256];
+    strcpy(tempPath, filepath);
+    char *lastSlash = strrchr(tempPath, '/');
+    if (lastSlash != NULL) {
+        strcpy(lastSlash + 1, "tempList.txt");
+    } else {
+        strcpy(tempPath, "tempList.txt");
+    }
+
+    FILE *fOut = fopen(tempPath, "w");
+    if (fOut == NULL) {
+        fclose(fIn);
+        return;
+    }
+
+    char line[1024];
+    int lineCount = 0;
+    bool isUpdated = false;
+
+    while (fgets(line, sizeof(line), fIn)) {
+        lineCount++;
+        if (lineCount == 1) { // Dòng Header giữ nguyên
+            fprintf(fOut, "%s", line);
+            continue;
+        }
+
+        char ten[256], tapDoc[50], truyenDoc[50];
+        int slHT, slNhap;
+        
+        // Cắt chuỗi theo định dạng Tên | CXXX | TXXX | Số hiện tại | Số nhập vào
+        if (sscanf(line, "%[^|]|%[^|]|%[^|]| %d | %d", ten, tapDoc, truyenDoc, &slHT, &slNhap) == 5) {
+            TrimStringSpace(ten);
+            TrimStringSpace(tapDoc);
+            TrimStringSpace(truyenDoc);
+
+            // Kiểm tra trùng khớp
+            if (strcmp(truyenDoc, maTruyen) == 0 && strcmp(tapDoc, maTap) == 0) {
+                slHT++; // CỘNG LẠI SỐ LƯỢNG KHI TRẢ SÁCH
+                if (slHT > slNhap) slHT = slNhap; // Tránh lỗi cộng lố số lượng nhập
+                isUpdated = true;
+            }
+            
+            // Ghi lại vào file với định dạng chuẩn
+            fprintf(fOut, "%s | %s | %s | %d | %d\n", ten, tapDoc, truyenDoc, slHT, slNhap);
+        } else {
+            fprintf(fOut, "%s", line); // Nếu dòng bị hỏng thì ghi lại y hệt
+        }
+    }
+
+    fclose(fIn);
+    fclose(fOut);
+
+    // 4. Đè file tạm lên file gốc (Xóa file cũ trước)
+    if (isUpdated) {
+        remove(filepath);
+        rename(tempPath, filepath);
+    } else {
+        remove(tempPath); // Hủy file tạm nếu không tìm thấy truyện để cộng
+    }
 }
 
 // ==========================================
@@ -441,37 +408,40 @@ void UpdateLogicTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headPM
         if (soNgayDuKien <= 0) soNgayDuKien = 1;
         int tienGoc = giaMotNgay * soNgayDuKien; 
 
+        // TÍNH TOÁN VÀ KIỂM TRA LỖI NGÀY
         if (form->nhapNgayTraThucTe.letterCount >= 8) {
-    int soNgayThucTe = KhoangCachNgay(form->phieuDangXuLy->ngaymuon, form->nhapNgayTraThucTe.text);
-    if (soNgayThucTe < 0) {
-        // Ngày trả nhỏ hơn ngày mượn → bật cờ lỗi, giữ nguyên tiền gốc
-        form->ngayKhongHopLe = true;
-        form->tongTien = tienGoc;
-        form->tienPhat = 0;
-    } else {
-        form->ngayKhongHopLe = false;
-        form->tongTien = (int)TinhTienThue(
-            giaMotNgay, 
-            form->phieuDangXuLy->ngaymuon, 
-            form->phieuDangXuLy->ngaytra,
-            form->nhapNgayTraThucTe.text
-        );
-        form->tienPhat = form->tongTien - tienGoc;
-    }
-    } else {
-    form->ngayKhongHopLe = false;
-    form->tongTien = tienGoc;
-    form->tienPhat = 0;
-}
+            double ketQuaTinh = TinhTienThue(
+                giaMotNgay, 
+                form->phieuDangXuLy->ngaymuon, 
+                form->phieuDangXuLy->ngaytra,
+                form->nhapNgayTraThucTe.text
+            );
+            form->tongTien = (int)ketQuaTinh; // Nếu lỗi ketQuaTinh = -1.0
+            
+            if (form->tongTien != -1) {
+                form->tienPhat = form->tongTien - tienGoc; 
+            } else {
+                form->tienPhat = 0;
+            }
+        } else {
+            form->tongTien = tienGoc;
+            form->tienPhat = 0;
+        }
 
-        Rectangle btnThanhToan = { rightPaneX + 40, screenH - 70, rightPaneW - 80, 55 };
-        if (CheckCollisionPointRec(GetMousePosition(), btnThanhToan) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                if (form->nhapNgayTraThucTe.letterCount >= 8 && !form->ngayKhongHopLe) {
+        Rectangle btnThanhToan = { rightPaneX + 30, screenH - 70, rightPaneW - 60, 55 }; // Tọa độ đồng bộ UI
+        
+        // CHỈ XỬ LÝ CLICK NẾU KHÔNG CÓ LỖI (tongTien != -1)
+        if (form->tongTien != -1 && CheckCollisionPointRec(GetMousePosition(), btnThanhToan) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (form->nhapNgayTraThucTe.letterCount >= 8) {
                 form->phieuDangXuLy->trangthai = 1; 
                 CapNhatToanBoFilePhieuMuon(headPM); 
                 LuuDoanhThuVaoFile(form->nhapNgayTraThucTe.text, form->tongTien);
-                CapNhatSoLuongTruyen(form->phieuDangXuLy->matruyen);
                 
+                // === THỰC HIỆN CỘNG SỐ LƯỢNG SÁCH TRỞ LẠI KHO ===
+                CapNhatSoLuongSachTra(form->phieuDangXuLy->matruyen);
+                ReloadDuLieuTruyen(); // Reset cache để lần tạo phiếu tiếp theo đọc lại từ file
+                // =================================================
+
                 form->daThanhToan = 1; 
                 form->state = TRA_B1_TIMKEM; 
                 memset(form->maTheDaChon, 0, 15);
@@ -835,10 +805,8 @@ void DrawGiaoDienTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headP
         DrawTextEx(font, "Nhập ngày trả thực tế (dd/mm/yyyy):",
             (Vector2){ form->nhapNgayTraThucTe.rec.x, 92.0f }, 17, 1, GetColor(0x507A9BFF));
         DrawRectangleRounded(form->nhapNgayTraThucTe.rec, 0.2f, 10, WHITE);
-        Color borderColor = form->ngayKhongHopLe 
-    ? GetColor(0xE74C3CFF)  // đỏ khi lỗi
-    : (form->nhapNgayTraThucTe.isFocused ? GetColor(0x8AB6D6FF) : GetColor(0xB3D1E8FF));
-DrawRectangleRoundedLines(form->nhapNgayTraThucTe.rec, 0.2f, 10, borderColor);
+        DrawRectangleRoundedLines(form->nhapNgayTraThucTe.rec, 0.2f, 10,
+            form->nhapNgayTraThucTe.isFocused ? GetColor(0x8AB6D6FF) : GetColor(0xB3D1E8FF));
 
         float fs = 20.0f;
         Vector2 textSz = MeasureTextEx(font, form->nhapNgayTraThucTe.text, fs, 1);
@@ -850,55 +818,69 @@ DrawRectangleRoundedLines(form->nhapNgayTraThucTe.rec, 0.2f, 10, borderColor);
                 (Vector2){ form->nhapNgayTraThucTe.rec.x + 15 + textSz.x + 2, form->nhapNgayTraThucTe.rec.y + 10 },
                 (Vector2){ 2, fs + 4 }, GetColor(0x2C5F8AFF));
         }
-        if (form->ngayKhongHopLe) {
-    DrawTextEx(font, "⚠ Ngày trả không hợp lệ!",
-        (Vector2){ form->nhapNgayTraThucTe.rec.x, form->nhapNgayTraThucTe.rec.y + form->nhapNgayTraThucTe.rec.height + 6 },
-        16, 1, GetColor(0xE74C3CFF));
-    DrawTextEx(font, "Ngày trả phải sau ngày mượn.",
-        (Vector2){ form->nhapNgayTraThucTe.rec.x, form->nhapNgayTraThucTe.rec.y + form->nhapNgayTraThucTe.rec.height + 26 },
-        15, 1, GetColor(0xE74C3CFF));
-}
-        Rectangle billRec = { rightPaneX + 30, 195, rightPaneW - 60, 250 };
-        DrawRectangleRounded(billRec, 0.1f, 10, GetColor(0xF0F8FCFF));
-        DrawRectangleRoundedLines(billRec, 0.1f, 10, GetColor(0x8AB6D6FF));
 
-        int giaGoc = form->tongTien - form->tienPhat;
+        // ==========================================
+        // VẼ KHUNG BÁO LỖI HOẶC VẼ BIÊN LAI (NẾU ĐÚNG)
+        // ==========================================
+        if (form->tongTien == -1 && form->nhapNgayTraThucTe.letterCount >= 8) {
+            // --- TRƯỜNG HỢP NHẬP SAI: BÁO LỖI ---
+            Rectangle warningBox = { rightPaneX + 30, 195, rightPaneW - 60, 80 };
+            DrawRectangleRounded(warningBox, 0.2f, 10, Fade(RED, 0.1f));
+            DrawRectangleRoundedLines(warningBox, 0.2f, 10, Fade(RED, 0.6f));
+            
+            DrawTextEx(font, "CẢNH BÁO: Ngày trả không hợp lệ!", (Vector2){warningBox.x + 15, warningBox.y + 15}, 18, 1, RED);
+            DrawTextEx(font, "Vui lòng nhập ngày trả sau ngày mượn.", (Vector2){warningBox.x + 15, warningBox.y + 45}, 16, 1, MAROON);
 
-        DrawTextEx(font, TextFormat("Tiền thuê sách: %d VNĐ", giaGoc),
-            (Vector2){ billRec.x + 20, billRec.y + 20 }, 20, 1, DARKGRAY);
-
-        if (form->tienPhat > 0) {
-            DrawTextEx(font, TextFormat("Phí trả chậm: +%d VNĐ", form->tienPhat),
-                (Vector2){ billRec.x + 20, billRec.y + 65 }, 20, 1, GetColor(0xE74C3CFF));
-        } else if (form->tienPhat < 0) {
-            DrawTextEx(font, TextFormat("Chiết khấu trả sớm: %d VNĐ", -form->tienPhat),
-                (Vector2){ billRec.x + 20, billRec.y + 65 }, 20, 1, GetColor(0x2ECC71FF));
+            // Nút bấm bị xám đi, không cho bấm
+            Rectangle btnThanhToan = { rightPaneX + 30, screenH - 70, rightPaneW - 60, 55 };
+            DrawRectangleRounded(btnThanhToan, 0.2f, 10, Fade(LIGHTGRAY, 0.6f));
+            Vector2 sizeBtn = MeasureTextEx(font, "ĐỒNG Ý TRẢ SÁCH", 20.0f, 1);
+            DrawTextEx(font, "ĐỒNG Ý TRẢ SÁCH",
+                (Vector2){ btnThanhToan.x + (btnThanhToan.width - sizeBtn.x)/2.0f,
+                           btnThanhToan.y + (btnThanhToan.height - sizeBtn.y)/2.0f },
+                20.0f, 1, GRAY);
         } else {
-            DrawTextEx(font, "Phí chênh lệch: 0 VNĐ",
-                (Vector2){ billRec.x + 20, billRec.y + 65 }, 20, 1, GetColor(0x507A9BFF));
+            // --- TRƯỜNG HỢP BÌNH THƯỜNG: VẼ BIÊN LAI ---
+            Rectangle billRec = { rightPaneX + 30, 195, rightPaneW - 60, 250 };
+            DrawRectangleRounded(billRec, 0.1f, 10, GetColor(0xF0F8FCFF));
+            DrawRectangleRoundedLines(billRec, 0.1f, 10, GetColor(0x8AB6D6FF));
+
+            int giaGoc = form->tongTien - form->tienPhat;
+
+            DrawTextEx(font, TextFormat("Tiền thuê sách: %d VNĐ", giaGoc),
+                (Vector2){ billRec.x + 20, billRec.y + 20 }, 20, 1, DARKGRAY);
+
+            if (form->tienPhat > 0) {
+                DrawTextEx(font, TextFormat("Phí trả chậm: +%d VNĐ", form->tienPhat),
+                    (Vector2){ billRec.x + 20, billRec.y + 65 }, 20, 1, GetColor(0xE74C3CFF));
+            } else if (form->tienPhat < 0) {
+                DrawTextEx(font, TextFormat("Chiết khấu trả sớm: %d VNĐ", -form->tienPhat),
+                    (Vector2){ billRec.x + 20, billRec.y + 65 }, 20, 1, GetColor(0x2ECC71FF));
+            } else {
+                DrawTextEx(font, "Phí chênh lệch: 0 VNĐ",
+                    (Vector2){ billRec.x + 20, billRec.y + 65 }, 20, 1, GetColor(0x507A9BFF));
+            }
+
+            DrawLine((int)(billRec.x + 15), (int)(billRec.y + 120),
+                     (int)(billRec.x + billRec.width - 15), (int)(billRec.y + 120),
+                     GetColor(0x8AB6D6FF));
+
+            DrawTextEx(font, "TỔNG CỘNG:",
+                (Vector2){ billRec.x + 20, billRec.y + 140 }, 20, 1, GetColor(0x507A9BFF));
+            DrawTextEx(font, TextFormat("%d VNĐ", form->tongTien),
+                (Vector2){ billRec.x + 20, billRec.y + 175 }, 30, 1, GetColor(0x2C5F8AFF));
+
+            // Nút bấm sáng lên, có hover
+            Rectangle btnThanhToan = { rightPaneX + 30, screenH - 70, rightPaneW - 60, 55 };
+            bool hoverBtn = CheckCollisionPointRec(GetMousePosition(), btnThanhToan);
+            DrawRectangleRounded(btnThanhToan, 0.2f, 10,
+                hoverBtn ? GetColor(0x507A9BFF) : GetColor(0x8AB6D6FF));
+            Vector2 sizeBtn = MeasureTextEx(font, "ĐỒNG Ý TRẢ SÁCH", 20.0f, 1);
+            DrawTextEx(font, "ĐỒNG Ý TRẢ SÁCH",
+                (Vector2){ btnThanhToan.x + (btnThanhToan.width - sizeBtn.x)/2.0f,
+                           btnThanhToan.y + (btnThanhToan.height - sizeBtn.y)/2.0f },
+                20.0f, 1, WHITE);
         }
-
-        DrawLine((int)(billRec.x + 15), (int)(billRec.y + 120),
-                 (int)(billRec.x + billRec.width - 15), (int)(billRec.y + 120),
-                 GetColor(0x8AB6D6FF));
-
-        DrawTextEx(font, "TỔNG CỘNG:",
-            (Vector2){ billRec.x + 20, billRec.y + 140 }, 20, 1, GetColor(0x507A9BFF));
-        DrawTextEx(font, TextFormat("%d VNĐ", form->tongTien),
-            (Vector2){ billRec.x + 20, billRec.y + 175 }, 30, 1, GetColor(0x2C5F8AFF));
-
-        DrawLine((int)rightPaneX, (int)(screenH - 80), (int)(rightPaneX + rightPaneW), (int)(screenH - 80),
-                 GetColor(0x8AB6D6FF));
-
-        Rectangle btnThanhToan = { rightPaneX + 30, screenH - 70, rightPaneW - 60, 55 };
-        bool hoverBtn = CheckCollisionPointRec(GetMousePosition(), btnThanhToan);
-        DrawRectangleRounded(btnThanhToan, 0.2f, 10,
-            hoverBtn ? GetColor(0x507A9BFF) : GetColor(0x8AB6D6FF));
-        Vector2 sizeBtn = MeasureTextEx(font, "ĐỒNG Ý TRẢ SÁCH", 20.0f, 1);
-        DrawTextEx(font, "ĐỒNG Ý TRẢ SÁCH",
-            (Vector2){ btnThanhToan.x + (btnThanhToan.width - sizeBtn.x)/2.0f,
-                       btnThanhToan.y + (btnThanhToan.height - sizeBtn.y)/2.0f },
-            20.0f, 1, WHITE);
     }
 
     // --- VẼ NÚT QUAY LẠI CHUNG ---

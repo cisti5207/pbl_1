@@ -142,7 +142,7 @@ Death Note - Tập 1 | C001 | T008 | 25 | 25
 Death Note - Tập 2 | C002 | T008 | 25 | 25
 Death Note - Tập 3 | C003 | T008 | 25 | 25
 Death Note - Tập 4 | C004 | T008 | 25 | 25
-Death Note - Tập 5 | C005 | T008 | 24 | 25
+Death Note - Tập 5 | C005 | T008 | 25 | 25
 Death Note - Tập 6 | C006 | T008 | 25 | 25
 Death Note - Tập 7 | C007 | T008 | 25 | 25
 Death Note - Tập 8 | C008 | T008 | 25 | 25
@@ -722,7 +722,7 @@ Muôn Kiếp Nhân Sinh - Tập 2 | C002 | T080 | 25 | 25
 Muôn Kiếp Nhân Sinh - Tập 3 | C003 | T080 | 25 | 25
 Hành Trình Về Phương Đông | C000 | T081 | 25 | 25
 Hiểu Về Trái Tim | C000 | T082 | 25 | 25
-Đắc Nhân Tâm | C000 | T083 | 24 | 25
+Đắc Nhân Tâm | C000 | T083 | 25 | 25
 Quốc Gia Khởi Nghiệp | C000 | T084 | 25 | 25
 Từ Tốt Đến Vĩ Đại | C000 | T085 | 25 | 25
 Suy Nghĩ Nhanh Và Chậm | C000 | T086 | 25 | 25

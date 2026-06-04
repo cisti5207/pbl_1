@@ -170,6 +170,11 @@ static void LoadDuLieuTruyen_PM(void) {
     }
 }
 
+// Hàm public để reset cache — gọi sau khi trả sách để lần sau load lại số lượng mới từ file
+void ReloadDuLieuTruyen(void) {
+    s_loaded = false;
+}
+
 static void CapNhatMatch(void) {
     s_matchCount=0; s_dropScroll=0; s_tapScroll=0;
     for (int i=0; i<s_soTruyen && s_matchCount<MAX_TRUYEN_PM; i++)

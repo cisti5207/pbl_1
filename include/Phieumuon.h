@@ -41,4 +41,5 @@ void ThemPhieuMuonVaoList(PhieuMuonNode **head, char *maPM, FormPhieuMuon *Form)
 int UTF8Width(const char *str, int displayWidth);
 void TimTenTruyenTheoMa(const char *matruyen, char *tentruyen_out);
 bool KiemTraNgayHopLe(const char *ngay);
+void ReloadDuLieuTruyen(void);
 #endif

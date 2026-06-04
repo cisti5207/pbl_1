@@ -350,7 +350,7 @@ void DrawModalLichSuPhieuMuon(FormTimKiemThe *Form, PhieuMuonMang *mapPM, Font f
                         Rectangle itemRec;
                         bool hoverItem;
                         bool inScissor;
-                        char line1[256], line2[256];
+                        char line1[512], line2[512];
                         Color statusColor;
                         const char* statusText;
                         

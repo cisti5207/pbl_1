@@ -1,1 +1,3 @@
-Phiếu mượn   | Mã thẻ       | Mã truyện           | Tên truyện                                         | Ngày mượn           | Số ngày mượn        | TT
+Phiếu mượn   | Mã thẻ       | Mã truyện           | Tên truyện                                         | Ngày mượn           | Ngày trả DK         | TT
+PM000002     | 00000002     | T001C002            | Doraemon - Tập 2                                   | 04/06/2026          | 5                   | 1
+PM000001     | 00000001     | T001C002            | Doraemon - Tập 2                                   | 04/06/2026          | 5                   | 1

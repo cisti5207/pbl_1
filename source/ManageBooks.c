@@ -31,6 +31,7 @@
 #define DRAW_SCROLLBAR(handle, hovered) \
     DrawRectangleRounded((handle), 1.0f, 10, (hovered) ? BW_SKY : Fade(BW_SCROLLBAR, 0.7f))
 
+
 static MANAGEBOOKS_STATE g_searchContext = MANAGEBOOKS_Dashboard;
 
 void InitManageBooks(Role _role)
@@ -2640,8 +2641,6 @@ BookList *Loadbooks(const char *filename)
     }
     bookList->capacity = MAX_BOOKS;
     fscanf(file, "Số quyển truyện: %d\n", &(bookList->count));
-    fscanf(file, "Số lượng truyện hiện tại: %d\n", &(bookList->stockBooks));
-    fscanf(file, "Số lượng truyện gốc: %d\n", &(bookList->totalImportBooks));
     bookList->pos = 0;
     bookList->QuantityForOnePage = QUANTITYFORONEPAGE;
     bookList->currentPage = 1;
@@ -2675,8 +2674,6 @@ bool Savebooks(BookList Books)
     if (f == NULL)
         return false;
     fprintf(f, "Số quyển truyện: %d\n", Books.count);
-    fprintf(f, "Số lượng truyện hiện tại: %d\n", Books.stockBooks);
-    fprintf(f, "Số lượng truyện gốc: %d\n", Books.totalImportBooks);
     for (int i = 0; i < Books.count; i++)
     {
         Book A = Books.theArray[i];

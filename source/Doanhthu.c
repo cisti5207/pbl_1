@@ -63,7 +63,7 @@ int laygiathue(const char *masachcantim) {
 
     while (fgets(line, sizeof(line), f)) {
         lineCount++;
-        if (lineCount <= 3) continue;
+        if (lineCount <= 1) continue;
 
         char ma[20];
         if (sscanf(line, " | %[^|]", ma) == 1) {

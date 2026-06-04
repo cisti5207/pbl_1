@@ -22,7 +22,6 @@ static bool  s_showModal         = false;
 static char  s_modalMaPM[16]     = {0};
 static float s_modalScroll       = 0.0f;
 static bool  s_modal_sb_drag     = false;
-static float s_modal_sb_dragY    = 0.0f;
 
 // Phân trang
 static int   s_currentPage       = 1;
@@ -247,7 +246,8 @@ void UpdateLogicInDanhSachPM(FormInDanhSachPM *form, PhieuMuonNode *headPM, int 
             } else {
                 float ny = mp.y - s_sb_dragStartY;
                 float r  = (ny - bodyTop) / (trackH - thumbH);
-                if (r < 0) r = 0; if (r > 1) r = 1;
+                if (r < 0) r = 0; 
+                if (r > 1) r = 1;
                 s_tableScroll = r * maxScroll;
             }
         } else if (mousePressed) {

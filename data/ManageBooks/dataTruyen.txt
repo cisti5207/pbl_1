@@ -1,6 +1,4 @@
 Số quyển truyện: 117
-Số lượng truyện hiện tại: 1124466688
-Số lượng truyện gốc: 0
 | T001 | Doraemon                                                       | Doraemon                                                       | Fujiko F. Fujio                | Truyện tranh                   | Kim Đồng                       | 2010 | 2000 |
 | T002 | tham-tu-lung-danh-conan                                        | Thám tử lừng danh Conan                                        | Gosho Aoyama                   | Trinh thám                     | Kim Đồng                       | 2012 | 2500 |
 | T003 | one-piece                                                      | One Piece                                                      | Eiichiro Oda                   | Phiêu lưu                      | Kim Đồng                       | 2015 | 3000 |
