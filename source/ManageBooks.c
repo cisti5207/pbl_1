@@ -31,7 +31,6 @@
 #define DRAW_SCROLLBAR(handle, hovered) \
     DrawRectangleRounded((handle), 1.0f, 10, (hovered) ? BW_SKY : Fade(BW_SCROLLBAR, 0.7f))
 
-
 static MANAGEBOOKS_STATE g_searchContext = MANAGEBOOKS_Dashboard;
 
 void InitManageBooks(Role _role)
@@ -348,6 +347,10 @@ void InitManageBooks(Role _role)
                     isEditMode = true;
                     tempEditBook = Books->theArray[selectedBookIndex];
                     volWheel = 0;
+
+                    // Reset focus toàn bộ trước khi load dữ liệu
+                    for (int i = 0; i < 8; i++)
+                        addInputs[i].isFocused = false;
 
                     strcpy(addInputs[0].text, tempEditBook.CodeBook);
                     addInputs[0].length = strlen(addInputs[0].text);
@@ -870,7 +873,41 @@ int ShowBookDetail_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font,
 }
 
 // =========================================================================
-// ShowAddBook_Panel
+// Sort Helper cho danh sách Tập
+// =========================================================================
+int extractVolumeNumber(const char *volName)
+{
+    int len = strlen(volName);
+    int i = len - 1;
+    // Bỏ qua các khoảng trắng ở cuối chuỗi
+    while (i >= 0 && isspace((unsigned char)volName[i]))
+    {
+        i--;
+    }
+    int end = i;
+    // Lấy lùi về trước các ký tự số
+    while (i >= 0 && isdigit((unsigned char)volName[i]))
+    {
+        i--;
+    }
+    // Nếu có tìm thấy số, chuyển thành int
+    if (i < end)
+    {
+        return atoi(&volName[i + 1]);
+    }
+    return 0;
+}
+
+int compareVolume(const void *a, const void *b)
+{
+    Volume *volA = (Volume *)a;
+    Volume *volB = (Volume *)b;
+    // Sắp xếp tăng dần theo con số ở cuối tên Volume
+    return extractVolumeNumber(volA->VolumeName) - extractVolumeNumber(volB->VolumeName);
+}
+
+// =========================================================================
+// ShowAddBook_Panel (Đã tối ưu giao diện và logic cảnh báo)
 // =========================================================================
 int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs, bool isEditMode, Book *editBook, float *volWheel)
 {
@@ -891,7 +928,10 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
     static bool showVolPopupError = false;
     static bool showAddVolPopup = false;
     static InputBox volNameIn = {0};
+    static InputBox volNumIn = {0};
     static InputBox volQtyIn = {0};
+    static int contentType = 0;      // 0 - Chưa chọn, 1 - Sách lẻ, 2 - Bộ
+    static float descScrollY = 0.0f; // Scroll offset for description textarea
 
     bool clickedAnywhere = IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !showAddVolPopup;
 
@@ -903,6 +943,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
     bool fieldError[8] = {false};
     bool hasTextArr[8] = {false};
 
+    // --- KIỂM TRA LOGIC BÁO LỖI (CHỈ BÁO KHI SAI, TRỐNG THÌ KHÔNG BÁO) ---
     for (int i = 1; i < 8; i++)
     {
         for (int j = 0; j < inputs[i].length; j++)
@@ -911,14 +952,20 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                 hasTextArr[i] = true;
                 break;
             }
+
         if (!hasTextArr[i])
         {
-            fieldError[i] = true;
-            isBasicInfoFilled = false;
+            // Trống không thông tin thì THÔI ĐỪNG BÁO LỖI định dạng
+            fieldError[i] = false;
+            // Các trường bắt buộc tối thiểu để lưu truyện
+            if (i == 1 || i == 2)
+            {
+                isBasicInfoFilled = false;
+            }
         }
         else
         {
-            if (i == 5)
+            if (i == 5) // Năm sản xuất phải là số và <= năm hiện tại
             {
                 bool isNum = true;
                 for (int k = 0; k < inputs[i].length; k++)
@@ -933,7 +980,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                     isBasicInfoFilled = false;
                 }
             }
-            if (i == 6)
+            if (i == 6) // Giá thuê phải là số và >= 500đ
             {
                 bool isNum = true;
                 for (int k = 0; k < inputs[i].length; k++)
@@ -982,9 +1029,11 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
     float inputTextSize = labelFontSize;
 
     float rowSpacing = panelArea.height * 0.11f;
-    float descBoxHeight = boxHeight * 2.0f;
-    if (descBoxHeight < boxHeight * 1.5f)
-        descBoxHeight = boxHeight * 1.5f;
+    float descBoxHeight = boxHeight * 4.5f;
+    if (descBoxHeight < boxHeight * 3.5f)
+        descBoxHeight = boxHeight * 3.5f;
+    if (descBoxHeight > 220.0f)
+        descBoxHeight = 220.0f;
 
     float itemHeight = panelArea.height * 0.055f;
     if (itemHeight < 40.0f)
@@ -1007,9 +1056,10 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
     if (btnWidth > 350.0f)
         btnWidth = 350.0f;
 
+    // --- ĐỊNH VỊ PHÂN KHU TỶ LỆ THEO HÀNG ĐỐI XỨNG CÂN BẰNG ---
     float abs_startY = panelArea.height * 0.13f;
-    float abs_descY = abs_startY + 3 * rowSpacing + labelFontSize + 6.0f + boxHeight + panelArea.height * 0.02f;
-    float abs_volLabelY = abs_descY + labelFontSize + 8.0f + descBoxHeight + 15.0f;
+    float abs_descY = abs_startY + 4 * rowSpacing; // Đẩy mô tả xuống sau 4 hàng thông tin chuẩn
+    float abs_volLabelY = abs_descY + labelFontSize + 6.0f + descBoxHeight + panelArea.height * 0.03f;
     float abs_listStartY = abs_volLabelY + labelFontSize + 8.0f;
     float abs_btnSaveY = abs_listStartY + fixedListHeight + 20.0f;
     float totalContentHeight = abs_btnSaveY + btnHeight_ + 40.0f;
@@ -1065,21 +1115,66 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
 
     const char *labels[] = {"Mã Truyện (Tự động):", "Tên Truyện:", "Tác Giả:", "Thể Loại:", "Nhà Xuất Bản:", "Năm Sản Xuất:", "Giá thuê (VND/ngày):"};
 
+    // --- TÍNH TOÁN VÀ PHÂN BỔ TOẠ ĐỘ THEO THIẾT KẾ MỚI ---
     for (int i = 0; i < 8; i++)
     {
-        float xPos = offsetX + (i % 2) * (colWidth + colGap);
-        float yPos = panelArea.y + masterScrollY + abs_startY + (i / 2) * rowSpacing;
+        float xPos = offsetX;
+        float yPos = panelArea.y + masterScrollY + abs_startY;
+        float currentBoxW = contentWidth;
         float currentBoxH = boxHeight;
 
-        if (i == 7)
+        if (i == 1) // Hàng 0: Tên Truyện (Full Width)
+        {
+            xPos = offsetX;
+            yPos += 0 * rowSpacing;
+            currentBoxW = contentWidth;
+        }
+        else if (i == 0) // Hàng 1 bên trái: Mã Truyện
+        {
+            xPos = offsetX;
+            yPos += 1 * rowSpacing;
+            currentBoxW = colWidth;
+        }
+        else if (i == 2) // Hàng 1 bên phải: Tác Giả
+        {
+            xPos = offsetX + colWidth + colGap;
+            yPos += 1 * rowSpacing;
+            currentBoxW = colWidth;
+        }
+        else if (i == 3) // Hàng 2 bên trái: Thể Loại
+        {
+            xPos = offsetX;
+            yPos += 2 * rowSpacing;
+            currentBoxW = colWidth;
+        }
+        else if (i == 4) // Hàng 2 bên phải: Nhà Xuất Bản
+        {
+            xPos = offsetX + colWidth + colGap;
+            yPos += 2 * rowSpacing;
+            currentBoxW = colWidth;
+        }
+        else if (i == 5) // Hàng 3 bên trái: Năm Sản Xuất
+        {
+            xPos = offsetX;
+            yPos += 3 * rowSpacing;
+            currentBoxW = colWidth;
+        }
+        else if (i == 6) // Hàng 3 bên phải: Giá Thuê
+        {
+            xPos = offsetX + colWidth + colGap;
+            yPos += 3 * rowSpacing;
+            currentBoxW = colWidth;
+        }
+        else if (i == 7) // Hàng cuối: Mô Tả (Full Width)
         {
             xPos = offsetX;
             yPos = panelArea.y + masterScrollY + abs_descY;
+            currentBoxW = contentWidth;
             currentBoxH = descBoxHeight;
         }
 
         float totalItemH = labelFontSize + 6.0f + currentBoxH;
-        inputs[i].box = (Rectangle){xPos, yPos + labelFontSize + 6.0f, (i == 7) ? contentWidth : colWidth, currentBoxH};
+        inputs[i].box = (Rectangle){xPos, yPos + labelFontSize + 6.0f, currentBoxW, currentBoxH};
 
         if (clickedAnywhere)
         {
@@ -1089,110 +1184,285 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                 inputs[i].isFocused = CheckCollisionPointRec(size.Mouse, inputs[i].box);
         }
 
+        // Xử lý input TRƯỚC khi kiểm tra visibility,
+        // để Ctrl+V, Ctrl+Backspace và gõ phím vẫn hoạt động
+        // kể cả khi ô đang bị scroll ra ngoài viewport.
+        if (inputs[i].isFocused && i != 0 && !showAddVolPopup)
+        {
+            UpdateInputBox(&inputs[i]);
+            if (i == 7)
+            {
+                // Cho phép Enter xuống dòng trong ô Mô Tả
+                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER))
+                {
+                    int len = inputs[7].length;
+                    if (len < (int)sizeof(inputs[7].text) - 2)
+                    {
+                        inputs[7].text[len] = '\n';
+                        inputs[7].text[len + 1] = '\0';
+                        inputs[7].length++;
+                    }
+                }
+                // Tab chuyển sang ô tiếp theo
+                if (IsKeyPressed(KEY_TAB))
+                {
+                    inputs[i].isFocused = false;
+                    inputs[1].isFocused = true;
+                    descScrollY = 0.0f;
+                }
+            }
+            else
+            {
+                if (IsKeyPressed(KEY_TAB))
+                {
+                    inputs[i].isFocused = false;
+                    if (i < 7)
+                        inputs[i + 1].isFocused = true;
+                    else
+                        inputs[1].isFocused = true;
+                }
+            }
+        }
+
         if (yPos + totalItemH < panelArea.y || yPos > panelArea.y + panelArea.height)
             continue;
 
         // Label
         DrawTextEx(_Font[0], (i == 7) ? "Mô Tả Truyện:" : labels[i],
-                   (Vector2){xPos, yPos},
-                   (i == 7) ? labelFontSize + 2.0f : labelFontSize, 1,
-                   (i == 7) ? BW_LABEL : BW_LABEL);
+                   (Vector2){xPos, yPos}, labelFontSize, 1, BW_LABEL);
 
+        // Hiển thị lỗi định dạng dữ liệu (Chỉ khi nhập sai định dạng thực sự)
         bool displayError = i > 0 && fieldError[i] && !inputs[i].isFocused && (isTouched[i] || forceShowAllErrors);
         if (displayError)
         {
             const char *errMsg = "(Không hợp lệ!)";
-            float errBoxW = (i == 7) ? contentWidth : colWidth;
+            float errBoxW = currentBoxW;
             float errW = MeasureTextEx(_Font[0], errMsg, labelFontSize * 0.8f, 1).x;
             DrawTextEx(_Font[0], errMsg,
                        (Vector2){xPos + errBoxW - errW, yPos + (labelFontSize - labelFontSize * 0.8f)},
                        labelFontSize * 0.8f, 1, RED);
         }
 
-        // Input box
+        // Input Box styling
         float roundness = (i == 7) ? 0.08f : 0.3f;
-        Color boxBgColor =
-            (i == 0) ? Fade(BW_DIVIDER, 0.6f)
-                     : ((inputs[i].isFocused || hasTextArr[i]) ? WHITE : BW_INPUT_BG);
-        Color boxOutlineColor =
-            (i == 0) ? BW_DIVIDER
-                     : (displayError ? RED : (inputs[i].isFocused ? BW_ACCENT : BW_DIVIDER));
+        Color boxBgColor = (i == 0) ? Fade(BW_DIVIDER, 0.6f) : ((inputs[i].isFocused || hasTextArr[i]) ? WHITE : BW_INPUT_BG);
+        Color boxOutlineColor = (i == 0) ? BW_DIVIDER : (displayError ? RED : (inputs[i].isFocused ? BW_ACCENT : BW_DIVIDER));
         float outlineThick = inputs[i].isFocused ? 2.5f : (displayError ? 2.5f : 1.5f);
 
-        // Input shadow
-        DrawRectangleRounded((Rectangle){inputs[i].box.x + 2, inputs[i].box.y + 2, inputs[i].box.width, inputs[i].box.height},
-                             roundness, 10, Fade(BW_LABEL, 0.12f));
+        DrawRectangleRounded((Rectangle){inputs[i].box.x + 2, inputs[i].box.y + 2, inputs[i].box.width, inputs[i].box.height}, roundness, 10, Fade(BW_LABEL, 0.12f));
         DrawRectangleRounded(inputs[i].box, roundness, 10, boxBgColor);
         DrawRectangleRoundedLinesEx(inputs[i].box, roundness, 10, outlineThick, boxOutlineColor);
 
-        if (inputs[i].isFocused && i != 0 && !showAddVolPopup)
-        {
-            UpdateInputBox(&inputs[i]);
-            if (IsKeyPressed(KEY_TAB))
-            {
-                inputs[i].isFocused = false;
-                if (i < 7)
-                    inputs[i + 1].isFocused = true;
-                else
-                    inputs[1].isFocused = true;
-            }
-        }
-
-        Rectangle textArea = (i < 7)
-                                 ? (Rectangle){inputs[i].box.x + 10, inputs[i].box.y, inputs[i].box.width - 20, inputs[i].box.height}
-                                 : (Rectangle){inputs[i].box.x + 15, inputs[i].box.y + 15, inputs[i].box.width - 30, inputs[i].box.height - 30};
+        Rectangle textArea = (i < 7) ? (Rectangle){inputs[i].box.x + 10, inputs[i].box.y, inputs[i].box.width - 20, inputs[i].box.height}
+                                     : (Rectangle){inputs[i].box.x + 15, inputs[i].box.y + 15, inputs[i].box.width - 30, inputs[i].box.height - 30};
         Rectangle clipArea = GetCollisionRec(textArea, panelArea);
 
-        if (clipArea.width > 0 && clipArea.height > 0)
+        if (i < 7)
         {
-            BeginScissorMode((int)clipArea.x, (int)clipArea.y, (int)clipArea.width, (int)clipArea.height);
-            if (i < 7)
+            // Normal single-line fields: use outer scissor
+            if (clipArea.width > 0 && clipArea.height > 0)
             {
-                float textW = MeasureTextEx(_Font[3], inputs[i].text, inputTextSize, 1).x;
-                float textX = textArea.x + 2;
-                if (textW > textArea.width - 4)
-                    textX = textArea.x + 2 - (textW - (textArea.width - 4));
-                float textY = textArea.y + (textArea.height - inputTextSize) / 2.0f;
-                DrawTextEx(_Font[3], inputs[i].text, (Vector2){textX, textY}, inputTextSize, 1,
-                           (i == 0) ? BW_ACCENT : BW_FORM_TITLE);
-                if (inputs[i].isFocused && !showAddVolPopup && ((int)(GetTime() * 2) % 2 == 0))
-                    DrawRectangle((int)(textX + textW + 2), (int)textY, 2, (int)(inputTextSize + 2), BW_ACCENT);
+                BeginScissorMode((int)clipArea.x, (int)clipArea.y, (int)clipArea.width, (int)clipArea.height);
+                {
+                    float textW = MeasureTextEx(_Font[3], inputs[i].text, inputTextSize, 1).x;
+                    float textX = textArea.x + 2;
+                    if (textW > textArea.width - 4)
+                        textX = textArea.x + 2 - (textW - (textArea.width - 4));
+                    float textY = textArea.y + (textArea.height - inputTextSize) / 2.0f;
+                    DrawTextEx(_Font[3], inputs[i].text, (Vector2){textX, textY}, inputTextSize, 1, (i == 0) ? BW_ACCENT : BW_FORM_TITLE);
+                    if (inputs[i].isFocused && !showAddVolPopup && ((int)(GetTime() * 2) % 2 == 0))
+                        DrawRectangle((int)(textX + textW + 2), (int)textY, 2, (int)(inputTextSize + 2), BW_ACCENT);
+                }
+                EndScissorMode();
+                BeginScissorMode((int)panelArea.x, (int)panelArea.y, (int)panelArea.width, (int)panelArea.height);
             }
-            else
+        }
+        else
+        {
+            // --- DESCRIPTION TEXTAREA: Scrollable multiline ---
+            Rectangle descClipArea = GetCollisionRec(inputs[i].box, panelArea);
+
+            // Handle mouse wheel scroll when hovering the description box
+            if (!showAddVolPopup && CheckCollisionPointRec(size.Mouse, inputs[i].box) &&
+                CheckCollisionPointRec(size.Mouse, descClipArea))
             {
-                char tempText[8192];
-                strcpy(tempText, inputs[i].text);
-                if (inputs[i].isFocused && !showAddVolPopup && ((int)(GetTime() * 2) % 2 == 0))
-                    strcat(tempText, "|");
-                DrawTextAutoWrap(_Font[3], tempText, textArea, inputTextSize, 1.0f, BW_FORM_TITLE);
+                descScrollY -= GetMouseWheelMove() * 20.0f;
             }
-            EndScissorMode();
-            BeginScissorMode((int)panelArea.x, (int)panelArea.y, (int)panelArea.width, (int)panelArea.height);
+
+            // Measure total content height for the description text
+            // We draw into a virtual area wider than the box to measure wrapped height
+            float descTextW = inputs[i].box.width - 30.0f;
+
+            // Build display text with cursor
+            char tempText[8192];
+            strcpy(tempText, inputs[i].text);
+            bool showCursor = inputs[i].isFocused && !showAddVolPopup && ((int)(GetTime() * 2) % 2 == 0);
+
+            // Measure number of wrapped lines for scroll clamping
+            // Use a rough estimate: count newlines + wrapped lines
+            int lineCount = 1;
+            float lineH = inputTextSize * 1.4f;
+            {
+                // Count explicit newlines
+                for (int ci = 0; ci < inputs[i].length; ci++)
+                    if (inputs[i].text[ci] == '\n')
+                        lineCount++;
+                // Rough estimate for word wrap — add lines for long runs
+                float currentLineW = 0.0f;
+                for (int ci = 0; ci < inputs[i].length; ci++)
+                {
+                    if (inputs[i].text[ci] == '\n')
+                    {
+                        currentLineW = 0.0f;
+                        continue;
+                    }
+                    char ch[2] = {inputs[i].text[ci], '\0'};
+                    currentLineW += MeasureTextEx(_Font[3], ch, inputTextSize, 1.0f).x;
+                    if (currentLineW > descTextW - 10.0f)
+                    {
+                        lineCount++;
+                        currentLineW = 0.0f;
+                    }
+                }
+            }
+            float totalDescH = lineCount * lineH + 20.0f;
+            float maxDescScroll = totalDescH - (inputs[i].box.height - 20.0f);
+            if (maxDescScroll < 0.0f)
+                maxDescScroll = 0.0f;
+            if (descScrollY < 0.0f)
+                descScrollY = 0.0f;
+            if (descScrollY > maxDescScroll)
+                descScrollY = maxDescScroll;
+
+            // Reset scroll when focus is lost
+            if (!inputs[i].isFocused)
+                descScrollY = 0.0f;
+
+            if (descClipArea.width > 0 && descClipArea.height > 0)
+            {
+                BeginScissorMode((int)descClipArea.x, (int)descClipArea.y,
+                                 (int)descClipArea.width, (int)descClipArea.height);
+
+                // Draw text with scroll offset applied
+                Rectangle descTextArea = {inputs[i].box.x + 15,
+                                          inputs[i].box.y + 10 - descScrollY,
+                                          inputs[i].box.width - 30,
+                                          totalDescH + 20.0f};
+                DrawTextAutoWrap(_Font[3], tempText, descTextArea, inputTextSize, 1.0f, BW_FORM_TITLE);
+
+                // Draw blinking cursor at end of text
+                if (showCursor)
+                {
+                    // Find cursor Y by measuring wrapped lines up to end of text
+                    // Find cursor Y by measuring wrapped lines up to end of text
+                    // LƯU Ý QUAN TRỌNG: Các tham số này phải khớp 100% với lúc bạn gọi hàm DrawTextAutoWrap
+                    float spacing = 1.0f;
+                    float lineH = inputTextSize + 2.0f;
+                    float wrapW = inputs[i].box.width - 30.0f; // Đây là bounds.width bên hàm vẽ
+
+                    float cursorX = descTextArea.x;
+                    float cursorY = descTextArea.y;
+
+                    const char *ptr = inputs[i].text;
+                    char wordBuffer[512];
+                    float spaceWidth = MeasureTextEx(_Font[3], " ", inputTextSize, spacing).x;
+
+                    while (*ptr != '\0')
+                    {
+                        if (*ptr == '\n')
+                        {
+                            cursorX = descTextArea.x;
+                            cursorY += lineH;
+                            ptr++;
+                            continue;
+                        }
+
+                        if (*ptr == ' ')
+                        {
+                            if (cursorX + spaceWidth > descTextArea.x + wrapW)
+                            {
+                                cursorX = descTextArea.x;
+                                cursorY += lineH;
+                            }
+                            else if (cursorX > descTextArea.x)
+                            {
+                                cursorX += spaceWidth;
+                            }
+                            ptr++;
+                            continue;
+                        }
+
+                        int idx = 0;
+                        while (ptr[idx] != ' ' && ptr[idx] != '\n' && ptr[idx] != '\0' && idx < sizeof(wordBuffer) - 1)
+                        {
+                            wordBuffer[idx] = ptr[idx];
+                            idx++;
+                        }
+                        wordBuffer[idx] = '\0';
+
+                        Vector2 wordSize = MeasureTextEx(_Font[3], wordBuffer, inputTextSize, spacing);
+
+                        if (cursorX + wordSize.x > descTextArea.x + wrapW)
+                        {
+                            cursorX = descTextArea.x;
+                            cursorY += lineH;
+                        }
+
+                        cursorX += wordSize.x;
+                        ptr += idx;
+                    }
+
+                    // Vẽ con trỏ nhấp nháy
+                    if (cursorX >= descClipArea.x && cursorY >= descClipArea.y &&
+                        cursorY + inputTextSize <= descClipArea.y + descClipArea.height)
+                    {
+                        DrawRectangle((int)cursorX + 2, (int)cursorY, 2, (int)(inputTextSize + 2), BW_ACCENT);
+                    }
+                }
+
+                EndScissorMode();
+                BeginScissorMode((int)panelArea.x, (int)panelArea.y, (int)panelArea.width, (int)panelArea.height);
+
+                // Draw scrollbar for description if content overflows
+                if (maxDescScroll > 0.0f)
+                {
+                    float sbW = 6.0f;
+                    Rectangle sbTrack = {inputs[i].box.x + inputs[i].box.width - sbW - 4,
+                                         inputs[i].box.y + 4,
+                                         sbW,
+                                         inputs[i].box.height - 8};
+                    float sbHandleH = (inputs[i].box.height / totalDescH) * sbTrack.height;
+                    if (sbHandleH < 20.0f)
+                        sbHandleH = 20.0f;
+                    float sbRatio = descScrollY / maxDescScroll;
+                    Rectangle sbHandle = {sbTrack.x,
+                                          sbTrack.y + sbRatio * (sbTrack.height - sbHandleH),
+                                          sbW, sbHandleH};
+                    // Clamp handle to track
+                    if (sbHandle.y + sbHandle.height > sbTrack.y + sbTrack.height)
+                        sbHandle.y = sbTrack.y + sbTrack.height - sbHandle.height;
+                    DrawRectangleRounded(sbTrack, 1.0f, 6, Fade(BW_DIVIDER, 0.5f));
+                    bool sbHov = CheckCollisionPointRec(size.Mouse, sbHandle);
+                    DRAW_SCROLLBAR(sbHandle, sbHov);
+                }
+            }
         }
     }
 
-    // ── "Tập truyện" section header ──────────────────────────────────────
+    // --- SECTION "TẬP TRUYỆN" HEADER ---
     float volLabelY = panelArea.y + masterScrollY + abs_volLabelY;
     if (volLabelY + labelFontSize + 10.0f >= panelArea.y && volLabelY <= panelArea.y + panelArea.height)
     {
         DrawTextEx(_Font[0], "Tập truyện:", (Vector2){offsetX, volLabelY}, labelFontSize + 2.0f, 1, BW_LABEL);
 
-        Rectangle btnAddVol = {
-            offsetX + MeasureTextEx(_Font[0], "Tập truyện:", labelFontSize + 2.0f, 1).x + 30,
-            volLabelY, 130, labelFontSize + 10.0f};
+        Rectangle btnAddVol = {offsetX + MeasureTextEx(_Font[0], "Tập truyện:", labelFontSize + 2.0f, 1).x + 30, volLabelY, 130, labelFontSize + 10.0f};
         bool hoverAddVol = CheckCollisionPointRec(size.Mouse, btnAddVol) && !showAddVolPopup;
-        Color btnAddVolColor = isBasicInfoFilled
-                                   ? (hoverAddVol ? BW_SKY : BW_ACCENT)
-                                   : Fade(BW_DIM, 0.5f);
+        Color btnAddVolColor = isBasicInfoFilled ? (hoverAddVol ? BW_SKY : BW_ACCENT) : Fade(BW_DIM, 0.5f);
 
-        DrawRectangleRounded((Rectangle){btnAddVol.x + 2, btnAddVol.y + 2, btnAddVol.width, btnAddVol.height},
-                             0.35f, 10, Fade(BLACK, 0.2f));
+        DrawRectangleRounded((Rectangle){btnAddVol.x + 2, btnAddVol.y + 2, btnAddVol.width, btnAddVol.height}, 0.35f, 10, Fade(BLACK, 0.2f));
         DrawRectangleRounded(btnAddVol, 0.35f, 10, btnAddVolColor);
         float addVolFont = labelFontSize * 0.9f;
-        DrawTextEx(_Font[3], "+ Thêm tập",
-                   (Vector2){btnAddVol.x + (130 - MeasureTextEx(_Font[3], "+ Thêm tập", addVolFont, 1).x) / 2,
-                             btnAddVol.y + (btnAddVol.height - addVolFont) / 2},
-                   addVolFont, 1, isBasicInfoFilled ? WHITE : (Color){100, 130, 170, 255});
+        DrawTextEx(_Font[3], "+ Thêm tập", (Vector2){btnAddVol.x + (130 - MeasureTextEx(_Font[3], "+ Thêm tập", addVolFont, 1).x) / 2, btnAddVol.y + (btnAddVol.height - addVolFont) / 2}, addVolFont, 1, isBasicInfoFilled ? WHITE : (Color){100, 130, 170, 255});
 
         if (hoverAddVol && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
@@ -1201,19 +1471,25 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                 showAddVolPopup = true;
                 showVolDuplicateError = false;
                 showVolPopupError = false;
+
                 memset(volNameIn.text, 0, sizeof(volNameIn.text));
                 volNameIn.length = 0;
+                memset(volNumIn.text, 0, sizeof(volNumIn.text));
+                volNumIn.length = 0;
                 memset(volQtyIn.text, 0, sizeof(volQtyIn.text));
                 volQtyIn.length = 0;
-                volNameIn.isFocused = true;
+
+                volNameIn.isFocused = false;
+                volNumIn.isFocused = false;
                 volQtyIn.isFocused = false;
+                contentType = 0;
             }
             else
                 showVolError = true;
         }
     }
 
-    // ── Volume list ──────────────────────────────────────────────────────
+    // --- RENDER DANH SÁCH TẬP ĐÃ THÊM ---
     float listStartY2 = panelArea.y + masterScrollY + abs_listStartY;
     Rectangle listArea2 = {offsetX, listStartY2, contentWidth, fixedListHeight};
     static int activeVolIndex = -1;
@@ -1221,7 +1497,6 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
 
     if (listArea2.y + listArea2.height >= panelArea.y && listArea2.y <= panelArea.y + panelArea.height)
     {
-        // List container
         DrawRectangleRec(listArea2, WHITE);
         DrawRectangleLinesEx(listArea2, 1.5f, BW_DIVIDER);
 
@@ -1242,14 +1517,10 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                     Rectangle itemRec = {listArea2.x + 10, yPos + itemSpacing / 2, listArea2.width - 20, itemHeight};
                     DrawRectangleRounded(itemRec, 0.3f, 10, (Color){240, 246, 255, 255});
                     DrawRectangleRoundedLinesEx(itemRec, 0.3f, 10, 1.0f, BW_DIVIDER);
-                    // Left accent
-                    DrawRectangleRounded((Rectangle){itemRec.x, itemRec.y + itemHeight * 0.2f, 3.5f, itemHeight * 0.6f},
-                                         1.0f, 6, BW_ACCENT);
+                    DrawRectangleRounded((Rectangle){itemRec.x, itemRec.y + itemHeight * 0.2f, 3.5f, itemHeight * 0.6f}, 1.0f, 6, BW_ACCENT);
 
                     float volNameFont = itemHeight * 0.45f;
-                    DrawTextEx(_Font[3], editBook->volumes[j].VolumeName,
-                               (Vector2){itemRec.x + 18, itemRec.y + (itemHeight - volNameFont) / 2},
-                               volNameFont, 1, BW_FORM_TITLE);
+                    DrawTextEx(_Font[3], editBook->volumes[j].VolumeName, (Vector2){itemRec.x + 18, itemRec.y + (itemHeight - volNameFont) / 2}, volNameFont, 1, BW_FORM_TITLE);
 
                     float btnSize = itemHeight * 0.65f;
                     float rightEdge = itemRec.x + itemRec.width - 15.0f;
@@ -1258,10 +1529,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                     bool hoverPlus = CheckCollisionPointRec(size.Mouse, btnPlus) && CheckCollisionPointRec(size.Mouse, clipListArea) && !showAddVolPopup;
                     DrawRectangleRounded(btnPlus, 0.35f, 5, hoverPlus ? (Color){60, 200, 100, 255} : BW_ACCENT);
                     float plusFont = btnSize * 0.8f;
-                    DrawTextEx(_Font[0], "+",
-                               (Vector2){btnPlus.x + (btnSize - MeasureTextEx(_Font[0], "+", plusFont, 1).x) / 2,
-                                         btnPlus.y + (btnSize - plusFont) / 2},
-                               plusFont, 1, WHITE);
+                    DrawTextEx(_Font[0], "+", (Vector2){btnPlus.x + (btnSize - MeasureTextEx(_Font[0], "+", plusFont, 1).x) / 2, btnPlus.y + (btnSize - plusFont) / 2}, plusFont, 1, WHITE);
 
                     if (hoverPlus && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
                     {
@@ -1326,8 +1594,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                         sprintf(stockStr, "Nhập: %d", editBook->volumes[j].ImportStock);
                         float textFont = btnSize * 0.6f;
                         float textW = MeasureTextEx(_Font[0], stockStr, textFont, 1).x;
-                        DrawTextEx(_Font[0], stockStr, (Vector2){stockBox.x + (stockBoxW - textW) / 2, stockBox.y + (btnSize - textFont) / 2}, textFont, 1,
-                                   editBook->volumes[j].ImportStock > 0 ? (Color){40, 170, 90, 255} : (Color){220, 80, 80, 255});
+                        DrawTextEx(_Font[0], stockStr, (Vector2){stockBox.x + (stockBoxW - textW) / 2, stockBox.y + (btnSize - textFont) / 2}, textFont, 1, editBook->volumes[j].ImportStock > 0 ? (Color){40, 170, 90, 255} : (Color){220, 80, 80, 255});
                     }
 
                     Rectangle btnMinus = {stockBox.x - btnSize - 10.0f, itemRec.y + (itemHeight - btnSize) / 2, btnSize, btnSize};
@@ -1355,7 +1622,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
             EndScissorMode();
             BeginScissorMode((int)panelArea.x, (int)panelArea.y, (int)panelArea.width, (int)panelArea.height);
 
-            // Local vol scrollbar
+            // Scrollbar phụ cho danh sách tập
             if (volContentHeight > fixedListHeight)
             {
                 float vTrackWidth = 8.0f;
@@ -1399,20 +1666,18 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         }
     }
 
-    // ── Save / Update button ──────────────────────────────────────────────
+    // --- NÚT LƯU TRUYỆN ---
     Rectangle btnSave = {panelArea.x + (panelArea.width - btnWidth) / 2.0f, panelArea.y + masterScrollY + abs_btnSaveY, btnWidth, btnHeight_};
     if (btnSave.y + btnSave.height >= panelArea.y && btnSave.y <= panelArea.y + panelArea.height)
     {
         bool hoverSave = CheckCollisionPointRec(size.Mouse, btnSave) && CheckCollisionPointRec(size.Mouse, panelArea) && !showAddVolPopup;
-        DrawRectangleRounded((Rectangle){btnSave.x + 3, btnSave.y + 3, btnSave.width, btnSave.height},
-                             0.45f, 12, Fade(BLACK, 0.22f));
+        DrawRectangleRounded((Rectangle){btnSave.x + 3, btnSave.y + 3, btnSave.width, btnSave.height}, 0.45f, 12, Fade(BLACK, 0.22f));
         DrawRectangleRounded(btnSave, 0.45f, 12, hoverSave ? (Color){55, 200, 100, 255} : SUCCESSGREEN);
         DrawRectangleRoundedLinesEx(btnSave, 0.45f, 12, 1.5f, Fade(WHITE, 0.3f));
         const char *btnLabel = isEditMode ? "CẬP NHẬT TRUYỆN" : "LƯU TRUYỆN";
         float wSave = MeasureTextEx(_Font[0], btnLabel, inputTextSize + 2.0f, 1).x;
-        DrawTextEx(_Font[0], btnLabel,
-                   (Vector2){btnSave.x + (btnSave.width - wSave) / 2, btnSave.y + (btnSave.height - (inputTextSize + 2.0f)) / 2},
-                   inputTextSize + 2.0f, 1, WHITE);
+        DrawTextEx(_Font[0], btnLabel, (Vector2){btnSave.x + (btnSave.width - wSave) / 2, btnSave.y + (btnSave.height - (inputTextSize + 2.0f)) / 2}, inputTextSize + 2.0f, 1, WHITE);
+
         if (hoverSave && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
             if (isBasicInfoFilled)
@@ -1437,15 +1702,12 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
         }
         if (forceShowAllErrors || showVolError)
         {
-            const char *errorMsg = "* Lỗi! Thông tin không hợp lệ";
-            DrawTextEx(_Font[0], errorMsg,
-                       (Vector2){panelArea.x + (panelArea.width - MeasureTextEx(_Font[0], errorMsg, 20.0f, 1).x) / 2.0f,
-                                 btnSave.y + btnSave.height + 10.0f},
-                       20.0f, 1, RED);
+            const char *errorMsg = "* Lỗi! Vui lòng điền đủ Tên Truyện và Tác Giả";
+            DrawTextEx(_Font[0], errorMsg, (Vector2){panelArea.x + (panelArea.width - MeasureTextEx(_Font[0], errorMsg, 20.0f, 1).x) / 2.0f, btnSave.y + btnSave.height + 10.0f}, 20.0f, 1, RED);
         }
     }
 
-    // Master scrollbar
+    // Scrollbar chính của Panel
     if (totalContentHeight > panelArea.height)
     {
         float scrollTrackWidth = 10.0f;
@@ -1483,108 +1745,228 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
     }
     EndScissorMode();
 
-    // ── Add Volume Popup ──────────────────────────────────────────────────
+    // ── POPUP THÊM CHI TIẾT TẬP (MỚI: SÁCH LẺ THÌ TẬP LUÔN ĐỂ TRỐNG) ──
     if (showAddVolPopup)
     {
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BW_TITLE_BG, 0.7f));
-        float popW = 480, popH = 290;
+        float popW = 500, popH = 350;
         Rectangle popRec = {(GetScreenWidth() - popW) / 2.0f, (GetScreenHeight() - popH) / 2.0f, popW, popH};
 
-        // Popup shadow
-        DrawRectangleRounded((Rectangle){popRec.x + 4, popRec.y + 4, popRec.width, popRec.height},
-                             0.12f, 12, Fade(BLACK, 0.35f));
+        DrawRectangleRounded((Rectangle){popRec.x + 4, popRec.y + 4, popRec.width, popRec.height}, 0.12f, 12, Fade(BLACK, 0.35f));
         DrawRectangleRounded(popRec, 0.12f, 12, BW_PANEL_BG);
         DrawRectangleRoundedLinesEx(popRec, 0.12f, 12, 2.5f, BW_DIVIDER);
-        // Top accent bar
         DrawRectangleRounded((Rectangle){popRec.x, popRec.y, popRec.width, 6}, 0.5f, 8, BW_ACCENT);
 
-        DrawTextEx(_Font[0], "THÊM TẬP TRUYỆN MỚI",
-                   (Vector2){popRec.x + (popW - MeasureTextEx(_Font[0], "THÊM TẬP TRUYỆN MỚI", 24, 1).x) / 2, popRec.y + 22},
-                   24, 1, BW_FORM_TITLE);
+        DrawTextEx(_Font[0], "THÊM CHI TIẾT TẬP/SÁCH", (Vector2){popRec.x + (popW - MeasureTextEx(_Font[0], "THÊM CHI TIẾT TẬP/SÁCH", 24, 1).x) / 2, popRec.y + 20}, 24, 1, BW_FORM_TITLE);
 
-        DrawTextEx(_Font[3], "Tên/Số tập (Nhập 0 nếu truyện lẻ):", (Vector2){popRec.x + 30, popRec.y + 78}, 18, 1, BW_LABEL);
-        volNameIn.box = (Rectangle){popRec.x + 328, popRec.y + 68, 110, 42};
-        DrawTextEx(_Font[3], "Số lượng nhập:", (Vector2){popRec.x + 30, popRec.y + 128}, 18, 1, BW_LABEL);
-        volQtyIn.box = (Rectangle){popRec.x + 185, popRec.y + 118, 255, 42};
+        // Nút chọn loại nội dung
+        DrawTextEx(_Font[3], "Loại nội dung:", (Vector2){popRec.x + 30, popRec.y + 70}, 18, 1, BW_LABEL);
+        Rectangle btnSingle = {popRec.x + 180, popRec.y + 60, 120, 35};
+        Rectangle btnSeries = {popRec.x + 320, popRec.y + 60, 120, 35};
+
+        bool hSingle = CheckCollisionPointRec(size.Mouse, btnSingle);
+        bool hSeries = CheckCollisionPointRec(size.Mouse, btnSeries);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            volNameIn.isFocused = CheckCollisionPointRec(size.Mouse, volNameIn.box);
-            volQtyIn.isFocused = CheckCollisionPointRec(size.Mouse, volQtyIn.box);
+            if (hSingle)
+            {
+                contentType = 1; // Sách lẻ
+                volNameIn.isFocused = true;
+                volNumIn.isFocused = false;
+                volQtyIn.isFocused = false;
+
+                // SÁCH LẺ: Lấy luôn tên sách tổng làm tên tập, XOÁ TRỐNG SỐ TẬP ĐÚNG YÊU CẦU
+                strcpy(volNameIn.text, inputs[1].text);
+                volNameIn.length = strlen(volNameIn.text);
+                memset(volNumIn.text, 0, sizeof(volNumIn.text));
+                volNumIn.length = 0;
+            }
+            if (hSeries)
+            {
+                contentType = 2; // Bộ truyện nhiều tập
+                volNumIn.isFocused = true;
+                volNameIn.isFocused = false;
+                volQtyIn.isFocused = false;
+                memset(volNumIn.text, 0, sizeof(volNumIn.text));
+                volNumIn.length = 0;
+            }
         }
 
-        bool isNameEmpty = (strlen(volNameIn.text) == 0);
-        bool isQtyEmpty = (atoi(volQtyIn.text) <= 0);
-        bool highlightNameRed = (showVolPopupError && isNameEmpty) || showVolDuplicateError;
-        bool highlightQtyRed = (showVolPopupError && isQtyEmpty);
+        // Vẽ 2 nút Loại nội dung
+        DrawRectangleRounded(btnSingle, 0.3f, 8, contentType == 1 ? BW_ACCENT : (hSingle ? Fade(BW_ACCENT, 0.4f) : BW_INPUT_BG));
+        DrawRectangleRoundedLinesEx(btnSingle, 0.3f, 8, 2.0f, contentType == 1 ? BW_SKY : BW_DIVIDER);
+        DrawTextEx(_Font[3], "Sách lẻ", (Vector2){btnSingle.x + (120 - MeasureTextEx(_Font[3], "Sách lẻ", 16, 1).x) / 2, btnSingle.y + 10}, 16, 1, contentType == 1 ? WHITE : BW_DIM);
 
-        Color nameLineCol = volNameIn.isFocused ? BW_ACCENT : (highlightNameRed ? RED : BW_DIVIDER);
-        Color qtyLineCol = volQtyIn.isFocused ? BW_ACCENT : (highlightQtyRed ? RED : BW_DIVIDER);
+        DrawRectangleRounded(btnSeries, 0.3f, 8, contentType == 2 ? BW_ACCENT : (hSeries ? Fade(BW_ACCENT, 0.4f) : BW_INPUT_BG));
+        DrawRectangleRoundedLinesEx(btnSeries, 0.3f, 8, 2.0f, contentType == 2 ? BW_SKY : BW_DIVIDER);
+        DrawTextEx(_Font[3], "Bộ truyện", (Vector2){btnSeries.x + (120 - MeasureTextEx(_Font[3], "Bộ truyện", 16, 1).x) / 2, btnSeries.y + 10}, 16, 1, contentType == 2 ? WHITE : BW_DIM);
 
-        // Input boxes in popup
-        DrawRectangleRounded(volNameIn.box, 0.3f, 8, volNameIn.isFocused ? WHITE : BW_INPUT_BG);
-        DrawRectangleRoundedLinesEx(volNameIn.box, 0.3f, 8, 2.0f, nameLineCol);
-        DrawRectangleRounded(volQtyIn.box, 0.3f, 8, volQtyIn.isFocused ? WHITE : BW_INPUT_BG);
-        DrawRectangleRoundedLinesEx(volQtyIn.box, 0.3f, 8, 2.0f, qtyLineCol);
+        // Khởi tạo các ô Textbox nhập liệu
+        volNameIn.box = (Rectangle){popRec.x + 180, popRec.y + 110, 280, 40};
+        volNumIn.box = (Rectangle){popRec.x + 180, popRec.y + 160, 120, 40};
+        volQtyIn.box = (Rectangle){popRec.x + 180, popRec.y + 210, 120, 40};
 
-        if (volNameIn.isFocused)
+        DrawTextEx(_Font[3], "Tên Sách/Tập:", (Vector2){popRec.x + 30, popRec.y + 120}, 18, 1, (contentType != 0) ? BW_LABEL : Fade(BW_LABEL, 0.4f));
+        DrawTextEx(_Font[3], "Số Tập:", (Vector2){popRec.x + 30, popRec.y + 170}, 18, 1, (contentType == 2) ? BW_LABEL : Fade(BW_LABEL, 0.4f));
+        DrawTextEx(_Font[3], "Số lượng nhập:", (Vector2){popRec.x + 30, popRec.y + 220}, 18, 1, (contentType != 0) ? BW_LABEL : Fade(BW_LABEL, 0.4f));
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            UpdateInputBox(&volNameIn);
-            if (IsKeyPressed(KEY_TAB))
+            if (contentType == 1) // Sách lẻ: khóa không cho nhấn Số Tập
+            {
+                volNameIn.isFocused = CheckCollisionPointRec(size.Mouse, volNameIn.box);
+                volQtyIn.isFocused = CheckCollisionPointRec(size.Mouse, volQtyIn.box);
+                volNumIn.isFocused = false;
+            }
+            else if (contentType == 2) // Theo bộ
+            {
+                volNumIn.isFocused = CheckCollisionPointRec(size.Mouse, volNumIn.box);
+                volQtyIn.isFocused = CheckCollisionPointRec(size.Mouse, volQtyIn.box);
+                volNameIn.isFocused = false;
+            }
+            else
             {
                 volNameIn.isFocused = false;
-                volQtyIn.isFocused = true;
-            }
-        }
-        if (volQtyIn.isFocused)
-        {
-            int key = GetCharPressed();
-            while (key > 0)
-            {
-                if (key >= '0' && key <= '9' && volQtyIn.length < 6)
-                {
-                    volQtyIn.text[volQtyIn.length++] = (char)key;
-                    volQtyIn.text[volQtyIn.length] = '\0';
-                }
-                key = GetCharPressed();
-            }
-            if (IsKeyPressed(KEY_BACKSPACE) && volQtyIn.length > 0)
-                volQtyIn.text[--volQtyIn.length] = '\0';
-            if (IsKeyPressed(KEY_TAB))
-            {
+                volNumIn.isFocused = false;
                 volQtyIn.isFocused = false;
-                volNameIn.isFocused = true;
             }
         }
 
+        // Xử lý nhập text
+        if (contentType == 1)
+        {
+            if (volNameIn.isFocused)
+            {
+                UpdateInputBox(&volNameIn);
+                if (IsKeyPressed(KEY_TAB))
+                {
+                    volNameIn.isFocused = false;
+                    volQtyIn.isFocused = true;
+                }
+            }
+        }
+        else if (contentType == 2)
+        {
+            if (volNumIn.isFocused)
+            {
+                int key = GetCharPressed();
+                while (key > 0)
+                {
+                    if (key >= '0' && key <= '9' && volNumIn.length < 5)
+                    {
+                        volNumIn.text[volNumIn.length++] = (char)key;
+                        volNumIn.text[volNumIn.length] = '\0';
+                    }
+                    key = GetCharPressed();
+                }
+                if (IsKeyPressed(KEY_BACKSPACE) && volNumIn.length > 0)
+                    volNumIn.text[--volNumIn.length] = '\0';
+                if (IsKeyPressed(KEY_TAB))
+                {
+                    volNumIn.isFocused = false;
+                    volQtyIn.isFocused = true;
+                }
+            }
+
+            // Theo bộ truyện: Auto-fill tên định dạng "Tên sách - Tập X"
+            if (volNumIn.length > 0)
+                sprintf(volNameIn.text, "%s - Tập %s", inputs[1].text, volNumIn.text);
+            else
+                strcpy(volNameIn.text, inputs[1].text);
+            volNameIn.length = strlen(volNameIn.text);
+        }
+
+        if (contentType != 0)
+        {
+            if (volQtyIn.isFocused)
+            {
+                int key = GetCharPressed();
+                while (key > 0)
+                {
+                    if (key >= '0' && key <= '9' && volQtyIn.length < 6)
+                    {
+                        volQtyIn.text[volQtyIn.length++] = (char)key;
+                        volQtyIn.text[volQtyIn.length] = '\0';
+                    }
+                    key = GetCharPressed();
+                }
+                if (IsKeyPressed(KEY_BACKSPACE) && volQtyIn.length > 0)
+                    volQtyIn.text[--volQtyIn.length] = '\0';
+                if (IsKeyPressed(KEY_TAB))
+                {
+                    volQtyIn.isFocused = false;
+                    if (contentType == 1)
+                        volNameIn.isFocused = true;
+                    if (contentType == 2)
+                        volNumIn.isFocused = true;
+                }
+            }
+        }
+
+        // Render box đồ hoạ (Sách lẻ thì hộp Số tập sẽ bị xám mờ và trống không)
+        bool isNameErr = (showVolPopupError && contentType == 1 && volNameIn.length == 0) || showVolDuplicateError;
+        Color nameBg = (contentType == 1) ? (volNameIn.isFocused ? WHITE : BW_INPUT_BG) : Fade(BW_INPUT_BG, 0.4f);
+        Color nameBdr = (contentType == 1) ? (volNameIn.isFocused ? BW_ACCENT : BW_DIVIDER) : Fade(BW_DIVIDER, 0.4f);
+        if (isNameErr)
+            nameBdr = RED;
+        DrawRectangleRounded(volNameIn.box, 0.3f, 8, nameBg);
+        DrawRectangleRoundedLinesEx(volNameIn.box, 0.3f, 8, 2.0f, nameBdr);
+
+        bool isNumErr = (showVolPopupError && contentType == 2 && volNumIn.length == 0);
+        Color numBg = (contentType == 2) ? (volNumIn.isFocused ? WHITE : BW_INPUT_BG) : Fade(BW_INPUT_BG, 0.4f);
+        Color numBdr = (contentType == 2) ? (volNumIn.isFocused ? BW_ACCENT : BW_DIVIDER) : Fade(BW_DIVIDER, 0.4f);
+        if (isNumErr)
+            numBdr = RED;
+        DrawRectangleRounded(volNumIn.box, 0.3f, 8, numBg);
+        DrawRectangleRoundedLinesEx(volNumIn.box, 0.3f, 8, 2.0f, numBdr);
+
+        bool isQtyErr = (showVolPopupError && contentType != 0 && atoi(volQtyIn.text) <= 0);
+        Color qtyBg = (contentType != 0) ? (volQtyIn.isFocused ? WHITE : BW_INPUT_BG) : Fade(BW_INPUT_BG, 0.4f);
+        Color qtyBdr = (contentType != 0) ? (volQtyIn.isFocused ? BW_ACCENT : BW_DIVIDER) : Fade(BW_DIVIDER, 0.4f);
+        if (isQtyErr)
+            qtyBdr = RED;
+        DrawRectangleRounded(volQtyIn.box, 0.3f, 8, qtyBg);
+        DrawRectangleRoundedLinesEx(volQtyIn.box, 0.3f, 8, 2.0f, qtyBdr);
+
+        Color textCol = (contentType != 0) ? BW_FORM_TITLE : Fade(BW_FORM_TITLE, 0.4f);
+
         BeginScissorMode((int)volNameIn.box.x, (int)volNameIn.box.y, (int)volNameIn.box.width, (int)volNameIn.box.height);
-        DrawTextEx(_Font[3], volNameIn.text, (Vector2){volNameIn.box.x + 10, volNameIn.box.y + 10}, 18, 1, BW_FORM_TITLE);
-        if (volNameIn.isFocused && (int)(GetTime() * 2) % 2 == 0)
+        DrawTextEx(_Font[3], volNameIn.text, (Vector2){volNameIn.box.x + 10, volNameIn.box.y + 10}, 18, 1, textCol);
+        if (volNameIn.isFocused && contentType == 1 && (int)(GetTime() * 2) % 2 == 0)
             DrawRectangle((int)(volNameIn.box.x + 12 + MeasureTextEx(_Font[3], volNameIn.text, 18, 1).x), (int)(volNameIn.box.y + 5), 2, 30, BW_ACCENT);
         EndScissorMode();
+
+        BeginScissorMode((int)volNumIn.box.x, (int)volNumIn.box.y, (int)volNumIn.box.width, (int)volNumIn.box.height);
+        DrawTextEx(_Font[3], volNumIn.text, (Vector2){volNumIn.box.x + 10, volNumIn.box.y + 10}, 18, 1, contentType == 2 ? BW_FORM_TITLE : Fade(BW_FORM_TITLE, 0.4f));
+        if (volNumIn.isFocused && contentType == 2 && (int)(GetTime() * 2) % 2 == 0)
+            DrawRectangle((int)(volNumIn.box.x + 12 + MeasureTextEx(_Font[3], volNumIn.text, 18, 1).x), (int)(volNumIn.box.y + 5), 2, 30, BW_ACCENT);
+        EndScissorMode();
+
         BeginScissorMode((int)volQtyIn.box.x, (int)volQtyIn.box.y, (int)volQtyIn.box.width, (int)volQtyIn.box.height);
-        DrawTextEx(_Font[3], volQtyIn.text, (Vector2){volQtyIn.box.x + 10, volQtyIn.box.y + 10}, 18, 1, BW_FORM_TITLE);
-        if (volQtyIn.isFocused && (int)(GetTime() * 2) % 2 == 0)
+        DrawTextEx(_Font[3], volQtyIn.text, (Vector2){volQtyIn.box.x + 10, volQtyIn.box.y + 10}, 18, 1, textCol);
+        if (volQtyIn.isFocused && contentType != 0 && (int)(GetTime() * 2) % 2 == 0)
             DrawRectangle((int)(volQtyIn.box.x + 12 + MeasureTextEx(_Font[3], volQtyIn.text, 18, 1).x), (int)(volQtyIn.box.y + 5), 2, 30, BW_ACCENT);
         EndScissorMode();
 
         if (showVolDuplicateError)
-            DrawTextEx(_Font[0], "* Tên tập truyện này đã tồn tại!", (Vector2){popRec.x + 115, popRec.y + 170}, 16, 1, RED);
+            DrawTextEx(_Font[0], "* Tên sách/tập này đã tồn tại!", (Vector2){popRec.x + 115, popRec.y + 260}, 16, 1, RED);
+        if (showVolPopupError && contentType == 0)
+            DrawTextEx(_Font[0], "* Vui lòng chọn loại nội dung!", (Vector2){popRec.x + 115, popRec.y + 260}, 16, 1, RED);
 
-        Rectangle btnConf = {popRec.x + 70, popRec.y + 210, 130, 44};
-        Rectangle btnCanc = {popRec.x + 275, popRec.y + 210, 130, 44};
+        // Nút Hủy bỏ / Xác nhận của Popup
+        Rectangle btnConf = {popRec.x + 80, popRec.y + 285, 130, 44};
+        Rectangle btnCanc = {popRec.x + 290, popRec.y + 285, 130, 44};
         bool hConf = CheckCollisionPointRec(size.Mouse, btnConf);
         bool hCanc = CheckCollisionPointRec(size.Mouse, btnCanc);
 
         DrawRectangleRounded((Rectangle){btnConf.x + 2, btnConf.y + 2, btnConf.width, btnConf.height}, 0.4f, 10, Fade(BLACK, 0.2f));
         DrawRectangleRounded(btnConf, 0.4f, 10, hConf ? (Color){55, 200, 100, 255} : (Color){40, 170, 80, 255});
-        DrawTextEx(_Font[3], "Xác nhận",
-                   (Vector2){btnConf.x + (130 - MeasureTextEx(_Font[3], "Xác nhận", 18, 1).x) / 2, btnConf.y + 12}, 18, 1, WHITE);
+        DrawTextEx(_Font[3], "Xác nhận", (Vector2){btnConf.x + (130 - MeasureTextEx(_Font[3], "Xác nhận", 18, 1).x) / 2, btnConf.y + 12}, 18, 1, WHITE);
 
         DrawRectangleRounded((Rectangle){btnCanc.x + 2, btnCanc.y + 2, btnCanc.width, btnCanc.height}, 0.4f, 10, Fade(BLACK, 0.2f));
         DrawRectangleRounded(btnCanc, 0.4f, 10, hCanc ? MAROON : Fade(ERRORRED, 0.9f));
-        DrawTextEx(_Font[3], "Hủy bỏ",
-                   (Vector2){btnCanc.x + (130 - MeasureTextEx(_Font[3], "Hủy bỏ", 18, 1).x) / 2, btnCanc.y + 12}, 18, 1, WHITE);
+        DrawTextEx(_Font[3], "Hủy bỏ", (Vector2){btnCanc.x + (130 - MeasureTextEx(_Font[3], "Hủy bỏ", 18, 1).x) / 2, btnCanc.y + 12}, 18, 1, WHITE);
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
@@ -1596,43 +1978,58 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
             }
             else if (hConf)
             {
-                if (isNameEmpty || isQtyEmpty)
+                if (contentType == 0)
                     showVolPopupError = true;
                 else
                 {
-                    char tempName[256];
-                    if (strcmp(volNameIn.text, "0") == 0)
-                        strcpy(tempName, "Truyện lẻ (0)");
-                    else
-                        strcpy(tempName, volNameIn.text);
-                    bool isDuplicate = false;
-                    for (int k = 0; k < editBook->volumeCount; k++)
-                        if (strcmp(editBook->volumes[k].VolumeName, tempName) == 0)
-                        {
-                            isDuplicate = true;
-                            break;
-                        }
-                    if (isDuplicate)
+                    bool isNameEmpty = (contentType == 1 && volNameIn.length == 0);
+                    bool isNumEmpty = (contentType == 2 && volNumIn.length == 0);
+                    bool isQtyEmpty = (atoi(volQtyIn.text) <= 0);
+
+                    if (isNameEmpty || isNumEmpty || isQtyEmpty)
                     {
-                        showVolDuplicateError = true;
-                        showVolPopupError = false;
+                        showVolPopupError = true;
                     }
                     else
                     {
-                        if (editBook->volumeCount < 200)
+                        char tempName[256];
+                        strcpy(tempName, volNameIn.text);
+
+                        bool isDuplicate = false;
+                        for (int k = 0; k < editBook->volumeCount; k++)
                         {
-                            Volume *newVol = &editBook->volumes[editBook->volumeCount];
-                            strcpy(newVol->VolumeName, tempName);
-                            sprintf(newVol->VolumeCode, "C%03d", editBook->volumeCount + 1);
-                            strcpy(newVol->BookCode, inputs[0].text);
-                            newVol->ImportStock = atoi(volQtyIn.text);
-                            newVol->Stock = newVol->ImportStock;
-                            editBook->volumeCount++;
-                            editBook->TotalStock += newVol->Stock;
+                            if (strcmp(editBook->volumes[k].VolumeName, tempName) == 0)
+                            {
+                                isDuplicate = true;
+                                break;
+                            }
                         }
-                        showAddVolPopup = false;
-                        showVolDuplicateError = false;
-                        showVolPopupError = false;
+
+                        if (isDuplicate)
+                        {
+                            showVolDuplicateError = true;
+                            showVolPopupError = false;
+                        }
+                        else
+                        {
+                            if (editBook->volumeCount < 200)
+                            {
+                                Volume *newVol = &editBook->volumes[editBook->volumeCount];
+                                strcpy(newVol->VolumeName, tempName);
+                                sprintf(newVol->VolumeCode, "C%03d", editBook->volumeCount + 1);
+                                strcpy(newVol->BookCode, inputs[0].text);
+                                newVol->ImportStock = atoi(volQtyIn.text);
+                                newVol->Stock = newVol->ImportStock;
+                                editBook->volumeCount++;
+                                editBook->TotalStock += newVol->Stock;
+
+                                // Sắp xếp lại mảng các tập truyện từ bé đến lớn
+                                qsort(editBook->volumes, editBook->volumeCount, sizeof(Volume), compareVolume);
+                            }
+                            showAddVolPopup = false;
+                            showVolDuplicateError = false;
+                            showVolPopupError = false;
+                        }
                     }
                 }
             }
@@ -1641,7 +2038,6 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
 
     return result;
 }
-
 // =========================================================================
 // ShowBooks_Panel
 // =========================================================================

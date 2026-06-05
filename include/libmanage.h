@@ -3,7 +3,7 @@
 
 #include "raylib.h"
 
-#define MAX_INPUT 256
+#define MAX_INPUT 8192
 #define MAX_PARTICLE 256 
 
 #define BRIGHTWHITE     (Color){255, 255, 255, 255}
