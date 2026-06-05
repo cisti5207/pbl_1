@@ -1754,10 +1754,8 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
 
         DrawRectangleRounded((Rectangle){popRec.x + 4, popRec.y + 4, popRec.width, popRec.height}, 0.12f, 12, Fade(BLACK, 0.35f));
         DrawRectangleRounded(popRec, 0.12f, 12, BW_PANEL_BG);
-        DrawRectangleRoundedLinesEx(popRec, 0.12f, 12, 2.5f, BW_DIVIDER);
-        DrawRectangleRounded((Rectangle){popRec.x, popRec.y, popRec.width, 6}, 0.5f, 8, BW_ACCENT);
 
-        DrawTextEx(_Font[0], "THÊM CHI TIẾT TẬP/SÁCH", (Vector2){popRec.x + (popW - MeasureTextEx(_Font[0], "THÊM CHI TIẾT TẬP/SÁCH", 24, 1).x) / 2, popRec.y + 20}, 24, 1, BW_FORM_TITLE);
+        DrawTextEx(_Font[0], "THÊM TẬP/SÁCH", (Vector2){popRec.x + (popW - MeasureTextEx(_Font[0], "THÊM TẬP/SÁCH", 24, 1).x) / 2, popRec.y + 20}, 24, 1, BW_FORM_TITLE);
 
         // Nút chọn loại nội dung
         DrawTextEx(_Font[3], "Loại nội dung:", (Vector2){popRec.x + 30, popRec.y + 70}, 18, 1, BW_LABEL);
