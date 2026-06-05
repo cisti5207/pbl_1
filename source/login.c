@@ -513,8 +513,8 @@ int LoginSaveAccountData(const char *filename, AccountList accounts, int account
                 acc->username, LEN_SHOW_USERNAME - lenStringUTF8(acc->username), "",
                 acc->password, LEN_SHOW_PASSWORD - lenStringUTF8(acc->password), "",
                 acc->realName, LEN_SHOW_REALNAME - lenStringUTF8(acc->realName), "",
-                acc->cccd, LEN_SHOW_CCCD - lenStringUTF8(acc->cccd), "",
                 acc->dateOfBirth, LEN_SHOW_DOB - lenStringUTF8(acc->dateOfBirth), "",
+                acc->cccd, LEN_SHOW_CCCD - lenStringUTF8(acc->cccd), "",
                 acc->role, LEN_SHOW_ROLE - lenStringUTF8(acc->role), "");
         current = current->prev;
     }
