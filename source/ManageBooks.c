@@ -81,6 +81,12 @@ void InitManageBooks(Role _role)
     int selectedBookIndex = -1;
     int requestDeleteIndex = -1;
 
+    // --- VARIABLES CHO CHỨC NĂNG CẢNH BÁO XÓA SÁCH ---
+    bool showBookDelPopup = false;
+    double bookDelTimer = 0;
+    int pendingBookDelIndex = -1;
+    // ------------------------------------------------
+
     InputBox addInputs[8] = {0};
     bool isEditMode = false;
     Book tempEditBook = {0};
@@ -101,6 +107,12 @@ void InitManageBooks(Role _role)
         }
 
         ManageBooksSize.Mouse = GetMousePosition();
+        Vector2 realMouse = ManageBooksSize.Mouse; // Lưu lại vị trí chuột thật để thao tác với Popup
+
+        // Nếu Popup Xóa đang mở, vô hiệu hóa tương tác chuột với các UI bên dưới
+        if (showBookDelPopup) {
+            ManageBooksSize.Mouse = (Vector2){-1000, -1000};
+        }
 
         BeginDrawing();
         ClearBackground(AnimatedBackground());
@@ -374,45 +386,14 @@ void InitManageBooks(Role _role)
                 }
             }
 
+            // Ghi nhận tín hiệu yêu cầu xóa từ ShowBooks_Panel
             if (requestDeleteIndex != -1)
             {
-                char authorToCheck[256];
-                strcpy(authorToCheck, Books->theArray[requestDeleteIndex].AuthorBook);
-                char imgPath[512];
-                sprintf(imgPath, "img/img_books/%s.jpg", Books->theArray[requestDeleteIndex].CodeBook);
-                remove(imgPath);
-
-                for (int k = requestDeleteIndex; k < Books->count - 1; k++)
-                    Books->theArray[k] = Books->theArray[k + 1];
-
-                Books->count--;
-                Savebooks(*Books);
-                requestDeleteIndex = -1;
-
-                bool hasBooksLeft = false;
-                for (int i = 0; i < Books->count; i++)
-                {
-                    if (strcmp(Books->theArray[i].AuthorBook, authorToCheck) == 0)
-                    {
-                        hasBooksLeft = true;
-                        break;
-                    }
-                }
-
-                if (!hasBooksLeft)
-                {
-                    for (int i = 0; i < Authors->count; i++)
-                    {
-                        if (strcmp(Authors->Author[i].name, authorToCheck) == 0)
-                        {
-                            for (int j = i; j < Authors->count - 1; j++)
-                                Authors->Author[j] = Authors->Author[j + 1];
-                            Authors->count--;
-                            SaveAuthor(*Authors);
-                            break;
-                        }
-                    }
-                }
+                pendingBookDelIndex = requestDeleteIndex;
+                showBookDelPopup = true;
+                bookDelTimer = GetTime();
+                requestDeleteIndex = -1; 
+                ManageBooksSize.Mouse = (Vector2){-1000, -1000}; // Chặn thao tác ngay lập tức
             }
         }
 
@@ -563,6 +544,113 @@ void InitManageBooks(Role _role)
             break;
         }
 
+        // ── VẼ POPUP XÓA TRUYỆN Ở LỚP TRÊN CÙNG CỦA MÀN HÌNH ──────────────────
+        if (showBookDelPopup)
+        {
+            // Làm mờ toàn màn hình
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BW_TITLE_BG, 0.7f));
+            
+            float pW = 550, pH = 300;
+            Rectangle pRec = { (GetScreenWidth() - pW) / 2.0f, (GetScreenHeight() - pH) / 2.0f, pW, pH };
+
+            // Box shadow & Box background
+            DrawRectangleRounded((Rectangle){pRec.x+4, pRec.y+4, pRec.width, pRec.height}, 0.12f, 12, Fade(BLACK, 0.35f));
+            DrawRectangleRounded(pRec, 0.12f, 12, BW_PANEL_BG);
+
+            // Tiêu đề cảnh báo
+            DrawTextEx(_Font[0], "CẢNH BÁO XÓA TRUYỆN", (Vector2){pRec.x + (pW - MeasureTextEx(_Font[0], "CẢNH BÁO XÓA TRUYỆN", 26, 1).x) / 2.0f, pRec.y + 25}, 26, 1, MAROON);
+
+            // Nội dung
+            char warnMsg[512];
+            sprintf(warnMsg, "Bạn đang yêu cầu xóa truyện:\n\n%s\n\nHành động này không thể hoàn tác!", Books->theArray[pendingBookDelIndex].NameBook);
+            DrawTextEx(_Font[3], warnMsg, (Vector2){pRec.x + 30, pRec.y + 80}, 20, 1, BW_FORM_TITLE);
+
+            // Đếm ngược thời gian (5 giây)
+            float timeLeft = 5.0f - (GetTime() - bookDelTimer);
+            bool canClick = (timeLeft <= 0);
+
+            // Nút Hủy và Đồng Ý
+            Rectangle btnCancel = { pRec.x + 50, pRec.y + 230, 200, 45 };
+            Rectangle btnConfirm = { pRec.x + pW - 250, pRec.y + 230, 200, 45 };
+
+            bool hCancel = CheckCollisionPointRec(realMouse, btnCancel);
+            bool hConfirm = CheckCollisionPointRec(realMouse, btnConfirm);
+
+            // Nút "Chưa chắc chắn" luôn sáng và bấm được, nút "Chắc chắn" phụ thuộc vào canClick
+            Color colCancel = hCancel ? BW_SKY : BW_ACCENT;
+            Color colConfirm = canClick ? (hConfirm ? MAROON : ERRORRED) : Fade(ERRORRED, 0.3f);
+
+            // Nút Chưa chắc chắn (Hủy)
+            DrawRectangleRounded((Rectangle){btnCancel.x+2, btnCancel.y+2, btnCancel.width, btnCancel.height}, 0.3f, 10, Fade(BLACK, 0.2f));
+            DrawRectangleRounded(btnCancel, 0.3f, 10, colCancel);
+            DrawTextEx(_Font[3], "Hủy", (Vector2){btnCancel.x + (btnCancel.width - MeasureTextEx(_Font[3], "Hủy", 20, 1).x) / 2, btnCancel.y + 12}, 20, 1, WHITE);
+
+            // Text của nút Chắc chắn xóa (Đồng ý) hiển thị đếm ngược nếu chưa hết giờ
+            char confirmText[64];
+            if (!canClick) {
+                sprintf(confirmText, "Xóa (%ds)", (int)ceil(timeLeft));
+            } else {
+                strcpy(confirmText, "Xóa");
+            }
+
+            DrawRectangleRounded((Rectangle){btnConfirm.x+2, btnConfirm.y+2, btnConfirm.width, btnConfirm.height}, 0.3f, 10, Fade(BLACK, 0.2f));
+            DrawRectangleRounded(btnConfirm, 0.3f, 10, colConfirm);
+            DrawTextEx(_Font[3], confirmText, (Vector2){btnConfirm.x + (btnConfirm.width - MeasureTextEx(_Font[3], confirmText, 20, 1).x) / 2, btnConfirm.y + 12}, 20, 1, WHITE);
+
+            // Xử lý sự kiện (Hủy luôn bấm được, Đồng ý phải đợi canClick)
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            {
+                if (hCancel)
+                {
+                    showBookDelPopup = false;
+                    pendingBookDelIndex = -1;
+                }
+                else if (hConfirm && canClick)
+                {
+                    // Thực thi thuật toán xóa truyện bản gốc
+                    char authorToCheck[256];
+                    strcpy(authorToCheck, Books->theArray[pendingBookDelIndex].AuthorBook);
+                    char imgPath[512];
+                    sprintf(imgPath, "img/img_books/%s.jpg", Books->theArray[pendingBookDelIndex].CodeBook);
+                    remove(imgPath);
+
+                    for (int k = pendingBookDelIndex; k < Books->count - 1; k++)
+                        Books->theArray[k] = Books->theArray[k + 1];
+
+                    Books->count--;
+                    Savebooks(*Books);
+
+                    bool hasBooksLeft = false;
+                    for (int i = 0; i < Books->count; i++)
+                    {
+                        if (strcmp(Books->theArray[i].AuthorBook, authorToCheck) == 0)
+                        {
+                            hasBooksLeft = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasBooksLeft)
+                    {
+                        for (int i = 0; i < Authors->count; i++)
+                        {
+                            if (strcmp(Authors->Author[i].name, authorToCheck) == 0)
+                            {
+                                for (int j = i; j < Authors->count - 1; j++)
+                                    Authors->Author[j] = Authors->Author[j + 1];
+                                Authors->count--;
+                                SaveAuthor(*Authors);
+                                break;
+                            }
+                        }
+                    }
+                    showBookDelPopup = false;
+                    pendingBookDelIndex = -1;
+                }
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────────────
+
         EndDrawing();
         if (State == MANAGEBOOKS_Main)
             break;
@@ -602,6 +690,17 @@ int ShowBookDetail_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font,
     int signalReturn = 0;
     Book book = Books->theArray[bookIndex];
     Rectangle detailArea = {UI.Panel.x, UI.Panel.y, UI.Panel.width, UI.Panel.height};
+
+    // --- VARIABLES CHO CHỨC NĂNG CẢNH BÁO XÓA TẬP ---
+    static bool showVolDelPopup = false;
+    static double volDelTimer = 0.0;
+    static int pendingVolDelIndex = -1;
+    
+    Vector2 realMouse = size.Mouse; // Lưu vị trí thực để dùng ở popup
+    if (showVolDelPopup) {
+        size.Mouse = (Vector2){-1000, -1000}; // Chặn thao tác với list nếu Popup đang bật
+    }
+    // -------------------------------------------------
 
     // Deep-navy background
     DrawRectangleRec(detailArea, BW_DETAIL_BG);
@@ -724,150 +823,219 @@ int ShowBookDetail_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font,
     if (displayCount == 0)
     {
         DrawTextEx(_Font[0], "Truyện này chưa có tập nào.", (Vector2){listArea.x + 20, listArea.y + 20}, 20, 1, BW_DIM);
-        return signalReturn;
-    }
-
-    float TotalContentHeight = displayCount * (itemHeight + itemSpacing);
-    if (TotalContentHeight > listArea.height)
-    {
-        if (CheckCollisionPointRec(size.Mouse, listArea))
-        {
-            float wheelMove = GetMouseWheelMove();
-            if (wheelMove != 0)
-                *wheel += wheelMove * 40.0f;
-        }
-        if (*wheel > 0)
-            *wheel = 0;
-        if (*wheel < listArea.height - TotalContentHeight)
-            *wheel = listArea.height - TotalContentHeight;
+        // Không dùng popup nếu ko có danh sách
     }
     else
-        *wheel = 0;
-
-    BeginScissorMode((int)listArea.x, (int)listArea.y, (int)listArea.width, (int)listArea.height);
-
-    for (int j = 0; j < displayCount; j++)
     {
-        float yPos = listArea.y + *wheel + j * (itemHeight + itemSpacing);
-        if (yPos + itemHeight < listArea.y || yPos > listArea.y + listArea.height)
-            continue;
-
-        Rectangle itemRec = {listArea.x, yPos, listArea.width, itemHeight};
-        bool isHoverItem = CheckCollisionPointRec(size.Mouse, itemRec);
-
-        // Card shadow
-        DrawRectangleRounded((Rectangle){itemRec.x + 2, itemRec.y + 2, itemRec.width, itemRec.height},
-                             0.35f, 10, Fade(BLACK, 0.3f));
-        DrawRectangleRounded(itemRec, 0.35f, 10,
-                             isHoverItem ? BW_CARD_HOVER : BW_CARD);
-        // Left accent bar
-        DrawRectangleRounded((Rectangle){itemRec.x, itemRec.y + itemHeight * 0.18f, 4.0f, itemHeight * 0.64f},
-                             1.0f, 8, BW_ACCENT);
-
-        // Number badge
-        float numBoxSize = itemHeight * 0.6f;
-        Rectangle numBox = {itemRec.x + 18, itemRec.y + (itemHeight - numBoxSize) / 2, numBoxSize * 1.3f, numBoxSize};
-        DrawRectangleRounded(numBox, 0.4f, 10, Fade(BW_ACCENT, 0.22f));
-        DrawRectangleRoundedLinesEx(numBox, 0.4f, 10, 1.5f, Fade(BW_SKY, 0.55f));
-
-        char numStr[16];
-        snprintf(numStr, sizeof(numStr), "%d", j + 1);
-        float numFont = numBoxSize * 0.6f;
-        float nw = MeasureTextEx(_Font[0], numStr, numFont, 1).x;
-        DrawTextEx(_Font[0], numStr, (Vector2){numBox.x + (numBox.width - nw) / 2, numBox.y + (numBox.height - numFont) / 2}, numFont, 1, BW_DIM);
-
-        // Volume name
-        float volNameFont = itemHeight * 0.4f;
-        DrawTextEx(_Font[3], book.volumes[j].VolumeName,
-                   (Vector2){numBox.x + numBox.width + 15, itemRec.y + (itemHeight - volNameFont) / 2},
-                   volNameFont, 1, isHoverItem ? BW_SKY : (Color){220, 235, 255, 255});
-
-        // Stock info + delete button
-        char stockText[64];
-        Color stCol;
-        if (book.volumes[j].Stock > 0)
+        float TotalContentHeight = displayCount * (itemHeight + itemSpacing);
+        if (TotalContentHeight > listArea.height)
         {
-            sprintf(stockText, "SL Tồn: %d", book.volumes[j].Stock);
-            stCol = BW_DIM;
+            if (CheckCollisionPointRec(size.Mouse, listArea))
+            {
+                float wheelMove = GetMouseWheelMove();
+                if (wheelMove != 0)
+                    *wheel += wheelMove * 40.0f;
+            }
+            if (*wheel > 0)
+                *wheel = 0;
+            if (*wheel < listArea.height - TotalContentHeight)
+                *wheel = listArea.height - TotalContentHeight;
         }
         else
+            *wheel = 0;
+
+        BeginScissorMode((int)listArea.x, (int)listArea.y, (int)listArea.width, (int)listArea.height);
+
+        for (int j = 0; j < displayCount; j++)
         {
-            strcpy(stockText, "Hết hàng");
-            stCol = (Color){255, 100, 100, 255};
+            float yPos = listArea.y + *wheel + j * (itemHeight + itemSpacing);
+            if (yPos + itemHeight < listArea.y || yPos > listArea.y + listArea.height)
+                continue;
+
+            Rectangle itemRec = {listArea.x, yPos, listArea.width, itemHeight};
+            bool isHoverItem = CheckCollisionPointRec(size.Mouse, itemRec);
+
+            // Card shadow
+            DrawRectangleRounded((Rectangle){itemRec.x + 2, itemRec.y + 2, itemRec.width, itemRec.height},
+                                 0.35f, 10, Fade(BLACK, 0.3f));
+            DrawRectangleRounded(itemRec, 0.35f, 10,
+                                 isHoverItem ? BW_CARD_HOVER : BW_CARD);
+            // Left accent bar
+            DrawRectangleRounded((Rectangle){itemRec.x, itemRec.y + itemHeight * 0.18f, 4.0f, itemHeight * 0.64f},
+                                 1.0f, 8, BW_ACCENT);
+
+            // Number badge
+            float numBoxSize = itemHeight * 0.6f;
+            Rectangle numBox = {itemRec.x + 18, itemRec.y + (itemHeight - numBoxSize) / 2, numBoxSize * 1.3f, numBoxSize};
+            DrawRectangleRounded(numBox, 0.4f, 10, Fade(BW_ACCENT, 0.22f));
+            DrawRectangleRoundedLinesEx(numBox, 0.4f, 10, 1.5f, Fade(BW_SKY, 0.55f));
+
+            char numStr[16];
+            snprintf(numStr, sizeof(numStr), "%d", j + 1);
+            float numFont = numBoxSize * 0.6f;
+            float nw = MeasureTextEx(_Font[0], numStr, numFont, 1).x;
+            DrawTextEx(_Font[0], numStr, (Vector2){numBox.x + (numBox.width - nw) / 2, numBox.y + (numBox.height - numFont) / 2}, numFont, 1, BW_DIM);
+
+            // Volume name
+            float volNameFont = itemHeight * 0.4f;
+            DrawTextEx(_Font[3], book.volumes[j].VolumeName,
+                       (Vector2){numBox.x + numBox.width + 15, itemRec.y + (itemHeight - volNameFont) / 2},
+                       volNameFont, 1, isHoverItem ? BW_SKY : (Color){220, 235, 255, 255});
+
+            // Stock info + delete button
+            char stockText[64];
+            Color stCol;
+            if (book.volumes[j].Stock > 0)
+            {
+                sprintf(stockText, "SL Tồn: %d", book.volumes[j].Stock);
+                stCol = BW_DIM;
+            }
+            else
+            {
+                strcpy(stockText, "Hết hàng");
+                stCol = (Color){255, 100, 100, 255};
+            }
+
+            float rightEdge = itemRec.x + itemRec.width - 15;
+            if (_role == ADMINISTRATOR)
+            {
+                float btnSz = itemHeight * 0.52f;
+                Rectangle btnDel = {rightEdge - btnSz, itemRec.y + (itemHeight - btnSz) / 2.0f, btnSz, btnSz};
+                bool hoverDel = CheckCollisionPointRec(size.Mouse, btnDel) && CheckCollisionPointRec(size.Mouse, listArea);
+                DrawRectangleRounded(btnDel, 0.35f, 10, hoverDel ? MAROON : Fade(ERRORRED, 0.85f));
+                float pad = btnSz * 0.22f;
+                DrawLineEx((Vector2){btnDel.x + pad, btnDel.y + pad}, (Vector2){btnDel.x + btnSz - pad, btnDel.y + btnSz - pad}, 2.0f, WHITE);
+                DrawLineEx((Vector2){btnDel.x + btnSz - pad, btnDel.y + pad}, (Vector2){btnDel.x + pad, btnDel.y + btnSz - pad}, 2.0f, WHITE);
+                
+                // MỞ POPUP XÓA KHI ẤN VÀO NÚT DEL
+                if (hoverDel && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+                {
+                    pendingVolDelIndex = j;
+                    showVolDelPopup = true;
+                    volDelTimer = GetTime();
+                    size.Mouse = (Vector2){-1000, -1000}; // Chặn thao tác
+                }
+                rightEdge = btnDel.x - 8;
+            }
+
+            float stockFont = itemHeight * 0.36f;
+            float sw = MeasureTextEx(_Font[0], stockText, stockFont, 1).x;
+            DrawTextEx(_Font[0], stockText, (Vector2){rightEdge - sw - 10.0f, itemRec.y + (itemHeight - stockFont) / 2}, stockFont, 1, stCol);
+            DrawLineEx((Vector2){itemRec.x + 10, itemRec.y + itemHeight + itemSpacing / 2},
+                       (Vector2){itemRec.x + itemRec.width - 10, itemRec.y + itemHeight + itemSpacing / 2},
+                       1.0f, Fade(BW_CARD_HOVER, 0.4f));
         }
 
-        float rightEdge = itemRec.x + itemRec.width - 15;
-        if (_role == ADMINISTRATOR)
+        EndScissorMode();
+
+        if (TotalContentHeight > listArea.height)
         {
-            float btnSz = itemHeight * 0.52f;
-            Rectangle btnDel = {rightEdge - btnSz, itemRec.y + (itemHeight - btnSz) / 2.0f, btnSz, btnSz};
-            bool hoverDel = CheckCollisionPointRec(size.Mouse, btnDel) && CheckCollisionPointRec(size.Mouse, listArea);
-            DrawRectangleRounded(btnDel, 0.35f, 10, hoverDel ? MAROON : Fade(ERRORRED, 0.85f));
-            float pad = btnSz * 0.22f;
-            DrawLineEx((Vector2){btnDel.x + pad, btnDel.y + pad}, (Vector2){btnDel.x + btnSz - pad, btnDel.y + btnSz - pad}, 2.0f, WHITE);
-            DrawLineEx((Vector2){btnDel.x + btnSz - pad, btnDel.y + pad}, (Vector2){btnDel.x + pad, btnDel.y + btnSz - pad}, 2.0f, WHITE);
-            if (hoverDel && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            float sWidth = 8.0f;
+            Rectangle sTrack = {listArea.x + listArea.width - sWidth, listArea.y, sWidth, listArea.height};
+            DrawRectangleRounded(sTrack, 1.0f, 10, Fade(BW_CARD_HOVER, 0.3f));
+            float sHandleH = (listArea.height / TotalContentHeight) * sTrack.height;
+            if (sHandleH < 30.0f)
+                sHandleH = 30.0f;
+            float sRatio = -(*wheel) / (TotalContentHeight - listArea.height);
+            Rectangle sHandle = {sTrack.x, sTrack.y + sRatio * (sTrack.height - sHandleH), sWidth, sHandleH};
+
+            static bool isDraggingDetailVol = false;
+            static float dragOffsetDetailVolY = 0.0f;
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(size.Mouse, sHandle))
+            {
+                isDraggingDetailVol = true;
+                dragOffsetDetailVolY = size.Mouse.y - sHandle.y;
+            }
+            if (isDraggingDetailVol)
+            {
+                if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+                {
+                    float newY = size.Mouse.y - dragOffsetDetailVolY;
+                    if (newY < sTrack.y)
+                        newY = sTrack.y;
+                    if (newY > sTrack.y + sTrack.height - sHandleH)
+                        newY = sTrack.y + sTrack.height - sHandleH;
+                    float newRatio = (newY - sTrack.y) / (sTrack.height - sHandleH);
+                    *wheel = -(newRatio * (TotalContentHeight - listArea.height));
+                    sHandle.y = newY;
+                }
+                else
+                    isDraggingDetailVol = false;
+            }
+            bool isHoveredScroll = CheckCollisionPointRec(size.Mouse, sHandle) || isDraggingDetailVol;
+            DRAW_SCROLLBAR(sHandle, isHoveredScroll);
+        }
+    }
+
+    // ── VẼ POPUP XÓA TẬP Ở LỚP TRÊN CÙNG ───────────────────────────────────
+    if (showVolDelPopup)
+    {
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BW_TITLE_BG, 0.7f));
+        float pW = 550, pH = 300;
+        Rectangle pRec = { (GetScreenWidth() - pW) / 2.0f, (GetScreenHeight() - pH) / 2.0f, pW, pH };
+
+        DrawRectangleRounded((Rectangle){pRec.x+4, pRec.y+4, pRec.width, pRec.height}, 0.12f, 12, Fade(BLACK, 0.35f));
+        DrawRectangleRounded(pRec, 0.12f, 12, BW_PANEL_BG);
+
+        DrawTextEx(_Font[0], "CẢNH BÁO XÓA TẬP TRUYỆN", (Vector2){pRec.x + (pW - MeasureTextEx(_Font[0], "CẢNH BÁO XÓA TẬP TRUYỆN", 24, 1).x) / 2.0f, pRec.y + 25}, 24, 1, MAROON);
+
+        char warnMsg[512];
+        sprintf(warnMsg, "Bạn đang yêu cầu xóa:\n\n%s\n\nHành động này không thể hoàn tác!", book.volumes[pendingVolDelIndex].VolumeName);
+        DrawTextEx(_Font[3], warnMsg, (Vector2){pRec.x + 30, pRec.y + 80}, 20, 1, BW_FORM_TITLE);
+
+        float timeLeft = 5.0f - (GetTime() - volDelTimer);
+        bool canClick = (timeLeft <= 0);
+
+        Rectangle btnCancel = { pRec.x + 50, pRec.y + 230, 200, 45 };
+        Rectangle btnConfirm = { pRec.x + pW - 250, pRec.y + 230, 200, 45 };
+
+        bool hCancel = CheckCollisionPointRec(realMouse, btnCancel);
+        bool hConfirm = CheckCollisionPointRec(realMouse, btnConfirm);
+
+        // Nút Hủy luôn hoạt động
+        Color colCancel = hCancel ? BW_SKY : BW_ACCENT;
+        Color colConfirm = canClick ? (hConfirm ? MAROON : ERRORRED) : Fade(ERRORRED, 0.3f);
+
+        DrawRectangleRounded((Rectangle){btnCancel.x+2, btnCancel.y+2, btnCancel.width, btnCancel.height}, 0.3f, 10, Fade(BLACK, 0.2f));
+        DrawRectangleRounded(btnCancel, 0.3f, 10, colCancel);
+        DrawTextEx(_Font[3], "Hủy", (Vector2){btnCancel.x + (btnCancel.width - MeasureTextEx(_Font[3], "Hủy", 20, 1).x) / 2, btnCancel.y + 12}, 20, 1, WHITE);
+
+        // Chèn thời gian đếm ngược vào nút Xác nhận
+        char confirmText[64];
+        if (!canClick) {
+            sprintf(confirmText, "Xóa (%ds)", (int)ceil(timeLeft));
+        } else {
+            strcpy(confirmText, "Xóa");
+        }
+
+        DrawRectangleRounded((Rectangle){btnConfirm.x+2, btnConfirm.y+2, btnConfirm.width, btnConfirm.height}, 0.3f, 10, Fade(BLACK, 0.2f));
+        DrawRectangleRounded(btnConfirm, 0.3f, 10, colConfirm);
+        DrawTextEx(_Font[3], confirmText, (Vector2){btnConfirm.x + (btnConfirm.width - MeasureTextEx(_Font[3], confirmText, 20, 1).x) / 2, btnConfirm.y + 12}, 20, 1, WHITE);
+
+        // Xử lý sự kiện click
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        {
+            if (hCancel)
+            {
+                showVolDelPopup = false;
+                pendingVolDelIndex = -1;
+            }
+            else if (hConfirm && canClick)
             {
                 Book *bk = &Books->theArray[bookIndex];
-                bk->TotalStock -= bk->volumes[j].Stock;
-                for (int k = j; k < bk->volumeCount - 1; k++)
+                bk->TotalStock -= bk->volumes[pendingVolDelIndex].Stock;
+                for (int k = pendingVolDelIndex; k < bk->volumeCount - 1; k++)
                     bk->volumes[k] = bk->volumes[k + 1];
                 bk->volumeCount--;
                 SaveVolumes(*Books, LIST_BOOKS_FILE);
-                book = Books->theArray[bookIndex];
-                displayCount = book.volumeCount;
-                signalReturn = 2;
+
+                signalReturn = 2; // Cập nhật lại UI detail
+                showVolDelPopup = false;
+                pendingVolDelIndex = -1;
             }
-            rightEdge = btnDel.x - 8;
         }
-
-        float stockFont = itemHeight * 0.36f;
-        float sw = MeasureTextEx(_Font[0], stockText, stockFont, 1).x;
-        DrawTextEx(_Font[0], stockText, (Vector2){rightEdge - sw - 10.0f, itemRec.y + (itemHeight - stockFont) / 2}, stockFont, 1, stCol);
-        DrawLineEx((Vector2){itemRec.x + 10, itemRec.y + itemHeight + itemSpacing / 2},
-                   (Vector2){itemRec.x + itemRec.width - 10, itemRec.y + itemHeight + itemSpacing / 2},
-                   1.0f, Fade(BW_CARD_HOVER, 0.4f));
     }
-
-    EndScissorMode();
-
-    if (TotalContentHeight > listArea.height)
-    {
-        float sWidth = 8.0f;
-        Rectangle sTrack = {listArea.x + listArea.width - sWidth, listArea.y, sWidth, listArea.height};
-        DrawRectangleRounded(sTrack, 1.0f, 10, Fade(BW_CARD_HOVER, 0.3f));
-        float sHandleH = (listArea.height / TotalContentHeight) * sTrack.height;
-        if (sHandleH < 30.0f)
-            sHandleH = 30.0f;
-        float sRatio = -(*wheel) / (TotalContentHeight - listArea.height);
-        Rectangle sHandle = {sTrack.x, sTrack.y + sRatio * (sTrack.height - sHandleH), sWidth, sHandleH};
-
-        static bool isDraggingDetailVol = false;
-        static float dragOffsetDetailVolY = 0.0f;
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(size.Mouse, sHandle))
-        {
-            isDraggingDetailVol = true;
-            dragOffsetDetailVolY = size.Mouse.y - sHandle.y;
-        }
-        if (isDraggingDetailVol)
-        {
-            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
-            {
-                float newY = size.Mouse.y - dragOffsetDetailVolY;
-                if (newY < sTrack.y)
-                    newY = sTrack.y;
-                if (newY > sTrack.y + sTrack.height - sHandleH)
-                    newY = sTrack.y + sTrack.height - sHandleH;
-                float newRatio = (newY - sTrack.y) / (sTrack.height - sHandleH);
-                *wheel = -(newRatio * (TotalContentHeight - listArea.height));
-                sHandle.y = newY;
-            }
-            else
-                isDraggingDetailVol = false;
-        }
-        bool isHoveredScroll = CheckCollisionPointRec(size.Mouse, sHandle) || isDraggingDetailVol;
-        DRAW_SCROLLBAR(sHandle, isHoveredScroll);
-    }
+    // ───────────────────────────────────────────────────────────────────────
 
     return signalReturn;
 }
