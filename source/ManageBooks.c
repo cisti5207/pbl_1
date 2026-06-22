@@ -887,7 +887,7 @@ int ShowBookDetail_Panel(Size size, ManageBooksUI UI, float *wheel, Font *_Font,
             Color stCol;
             if (book.volumes[j].Stock > 0)
             {
-                sprintf(stockText, "SL Tồn: %d", book.volumes[j].Stock);
+                sprintf(stockText, "SL: %d|%d", book.volumes[j].Stock, book.volumes[j].ImportStock);
                 stCol = BW_DIM;
             }
             else
@@ -1759,7 +1759,7 @@ int ShowAddBook_Panel(Size size, ManageBooksUI UI, Font *_Font, InputBox *inputs
                         DrawRectangleRounded(stockBox, 0.3f, 5, (Color){240, 246, 255, 255});
                         DrawRectangleRoundedLinesEx(stockBox, 0.3f, 5, 1.0f, BW_DIVIDER);
                         char stockStr[32];
-                        sprintf(stockStr, "Nhập: %d", editBook->volumes[j].ImportStock);
+                        sprintf(stockStr, "%d", editBook->volumes[j].ImportStock);
                         float textFont = btnSize * 0.6f;
                         float textW = MeasureTextEx(_Font[0], stockStr, textFont, 1).x;
                         DrawTextEx(_Font[0], stockStr, (Vector2){stockBox.x + (stockBoxW - textW) / 2, stockBox.y + (btnSize - textFont) / 2}, textFont, 1, editBook->volumes[j].ImportStock > 0 ? (Color){40, 170, 90, 255} : (Color){220, 80, 80, 255});
