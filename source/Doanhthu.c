@@ -373,12 +373,12 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
     // =========================================================
     // Ô năm: label "Nam:" + ô 80px, cách mép phải 20px
     float namBoxW    = 80.0f;
-    float namLabelW  = MeasureTextEx(font, "Nam:", 18, 1).x;
+    float namLabelW  = MeasureTextEx(font, "Năm:", 18, 1).x;
     float namGap     = 8.0f;
     float namRightPad = 20.0f;
     form->nhapNam.rec = (Rectangle){ board.x + board.width - namRightPad - namBoxW, tabY, namBoxW, 40 };
     float namLabelX   = form->nhapNam.rec.x - namGap - namLabelW;
-    DrawTextEx(font, "Nam:", (Vector2){ namLabelX, tabY + 11 }, 18, 1, GetColor(0x507A9BFF));
+    DrawTextEx(font, "Năm:", (Vector2){ namLabelX, tabY + 11 }, 18, 1, GetColor(0x507A9BFF));
 
     bool mousePressed = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 
@@ -500,7 +500,7 @@ void DrawDashboardDoanhThu(DoanhThuMap *map, FormDoanhThu *form, Font font, int 
             bool clearHov = CheckCollisionPointRec(GetMousePosition(), btnClear);
             DrawRectangleRounded(btnClear, 0.25f, 8,
                 clearHov ? GetColor(0xE74C3CFF) : GetColor(0xFFCDD2FF));
-            DrawTextEx(font, "Xoa loc",
+            DrawTextEx(font, "Xóa lọc",
                 (Vector2){ btnClear.x + 10, btnClear.y + 10 },
                 16, 1, clearHov ? WHITE : GetColor(0xC0392BFF));
 

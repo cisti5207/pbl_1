@@ -117,7 +117,7 @@ void DrawThePhieuMuon(PhieuMuonNode *pm, Font font, float x, float y, float scal
     DrawRectangleGradientEx(cardright, clrRight, clrRight, clrRight, clrRight);
 
     // Tiêu đề
-    DrawTextEx(font, "Phiếu mượn sách",
+    DrawTextEx(font, "Phiếu mượn truyện",
                (Vector2){cardleft.x + 150*scale, cardleft.y + 20*scale},
                36*scale, 1, clrText);
 
@@ -216,7 +216,7 @@ void DrawModalLichSuPhieuMuon(FormTimKiemThe *Form, PhieuMuonMang *mapPM, Font f
     DrawRectangleRounded(modalRec, 0.05f, 10, WHITE);
     DrawRectangleRoundedLines(modalRec, 0.05f, 10, GetColor(0x324376FF));
     
-    title = TextFormat("LỊCH SỬ MƯỢN SÁCH - BẠN ĐỌC: %s", Form->dachonmathe);
+    title = TextFormat("LỊCH SỬ MƯỢN TRUYỆN - BẠN ĐỌC: %s", Form->dachonmathe);
     DrawTextEx(font, title,
                (Vector2){modalX + 30*scale, modalY + 25*scale},
                30*scale, 1, GetColor(0x274690ff));

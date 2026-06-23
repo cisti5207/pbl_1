@@ -33,7 +33,7 @@ void CapNhatToanBoFilePhieuMuon(PhieuMuonNode *head) {
     if (f == NULL) return;
 
     const char *h1="Phiếu mượn", *h2="Mã thẻ", *h3="Mã truyện",
-               *h4="Tên truyện", *h5="Ngày mượn", *h6="Ngày trả DK", *h7="TT";
+               *h4="Tên truyện", *h5="Ngày mượn", *h6="Số ngày mượn", *h7="Trạng thái";
     fprintf(f, "%-*s | %-*s | %-*s | %-*s | %-*s | %-*s | %s\n",
         UTF8Width(h1,12), h1,
         UTF8Width(h2,12), h2,
@@ -717,8 +717,8 @@ void DrawGiaoDienTraSach(FormTraSach *form, BanDoc *headBD, PhieuMuonNode *headP
         DrawRectangleGradientEx((Rectangle){ 0, 0, screenW, 115 }, GetColor(0x2b3a67ff), GetColor(0x2b3a67ff), GetColor(0x2b3a67ff), GetColor(0x2b3a67ff));
         DrawRectangle(0, 113, (int)screenW, 2, GetColor(0x4A80FF70));
 
-        Vector2 mT = MeasureTextEx(font, "CHỌN THẺ BẠN ĐỌC ĐỂ TRẢ SÁCH", 32.0f, 1);
-        DrawTextEx(font, "CHỌN THẺ BẠN ĐỌC ĐỂ TRẢ SÁCH", (Vector2){ (screenW - mT.x)/2.0f, (115 - mT.y)/2.0f }, 32.0f, 1, WHITE);
+        Vector2 mT = MeasureTextEx(font, "CHỌN THẺ BẠN ĐỌC ĐỂ TRẢ TRUYỆN", 32.0f, 1);
+        DrawTextEx(font, "CHỌN THẺ BẠN ĐỌC ĐỂ TRẢ TRUYỆN", (Vector2){ (screenW - mT.x)/2.0f, (115 - mT.y)/2.0f }, 32.0f, 1, WHITE);
 
         DrawRectangleRounded(form->nhapTimKiem.rec, 0.25f, 10, GetColor(0xFFFFFF15));
         DrawRectangleRoundedLines(form->nhapTimKiem.rec, 0.25f, 10, form->nhapTimKiem.isFocused ? GetColor(0x4A80FFFF) : GetColor(0x4A80FF77));

@@ -61,7 +61,7 @@ AppState DrawAndHandleMenu(Font font, float screenW, float screenH) {
 
     const char *labels[5] = {
         "1. Tạo Thẻ Thư Viện", "2. Tạo Phiếu Mượn",
-        "3. Xem Danh Sách PM", "4. Lịch Sử Phiếu Mượn", "5. Xử Lý Trả Sách"
+        "3. Xem Danh Sách PM", "4. Lịch Sử Phiếu Mượn", "5. Xử Lý Trả Truyện"
     };
 
     AppState nextState = APP_MENU;

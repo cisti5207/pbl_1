@@ -824,7 +824,7 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
     DrawRectangleGradientEx(cl,GetColor(0x2f6690ff),GetColor(0x2f6690ff),GetColor(0x2f6690ff),GetColor(0x2f6690ff));
     DrawRectangleGradientEx(cr,GetColor(0x81c3d7ff),GetColor(0x81c3d7ff),GetColor(0x81c3d7ff),GetColor(0x81c3d7ff));
 
-    DrawTextEx(font,"Phiếu mượn sách",(Vector2){cl.x+136*sc,cr.y+36*sc},36*sc,1, GetColor(0xeff2f1ff));
+    DrawTextEx(font,"Phiếu mượn truyện",(Vector2){cl.x+136*sc,cr.y+36*sc},36*sc,1, GetColor(0xeff2f1ff));
 
     // IDPM — 1 dòng căn giữa panel phải cr
     char idLine[32];
@@ -998,7 +998,7 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
 
     // Thông báo hết sách
     if(s_hetSachLoi) {
-        const char *hetMsg = "! Sách đã hết, không thể mượn!";
+        const char *hetMsg = "! Truyện đã hết, không thể mượn!";
         Vector2 hmSz = MeasureTextEx(font, hetMsg, 15*sc, 1);
         DrawTextEx(font, hetMsg,
                    (Vector2){Confirm.x + (Confirm.width - hmSz.x)/2, Confirm.y - 24*sc},

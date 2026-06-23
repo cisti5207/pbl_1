@@ -10,6 +10,7 @@
 // Cờ lỗi hạn sử dụng (static nội bộ)
 // ============================================================
 static bool s_hanSDLoi    = false;  // true = ngày không hợp lệ hoặc là quá khứ
+static bool s_daFillHanSD = false;  // true = đã fill ngày mặc định 1 lần rồi, không fill lại
 
 // ============================================================
 // Tiện ích kiểm tra ngày
@@ -85,7 +86,8 @@ void InitForm(Nhap *form) {
     form->errorCccd[0]  = '\0';
 
     // Reset cờ lỗi hạn sử dụng
-    s_hanSDLoi = false;
+    s_hanSDLoi    = false;
+    s_daFillHanSD = false;  // cho phép fill lại khi mở form mới
 }
 
 void UpdateFormPosition(Nhap *form) {
@@ -108,22 +110,45 @@ void UpdateFormPosition(Nhap *form) {
     form->hanSD.rec = (Rectangle){ inputX, inputY + (3 * spacing), inputW, inputH };
 }
 
+// ============================================================
+// Hàm tiện ích xóa 1 ký tự (hỗ trợ UTF-8) và reset lỗi
+// ============================================================
+static void DeleteOneChar(InputBox_BD *box, int fieldIndex, Nhap *form) {
+    if (box->letterCount <= 0) return;
+    // Với ô ASCII-only (SDT, CCCD, hạn SD) thì xóa thẳng 1 byte
+    // Với ô UTF-8 (họ tên) thì lùi qua continuation bytes
+    do { box->letterCount--; }
+    while (box->letterCount > 0 &&
+           (box->text[box->letterCount] & 0xC0) == 0x80);
+    box->text[box->letterCount] = '\0';
+
+    if (fieldIndex == 0) form->errorHoTen[0] = '\0';
+    if (fieldIndex == 1) form->errorSdt[0]   = '\0';
+    if (fieldIndex == 2) form->errorCccd[0]  = '\0';
+    if (fieldIndex == 3) s_hanSDLoi = false;
+}
+
 void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *maThe, int *currentState) {
 
     // 1. Tự động sinh ID khi vừa mở form
     if (maThe[0] == '\0') {
         LayMaTheTiepTheo(*head, maThe);
     }
-    if (form->hanSD.letterCount == 0) {
+
+    // Fill ngày hệ thống +1 năm 1 lần duy nhất khi mở form
+    // Sau đó người dùng có thể xóa/sửa thoải mái, không bị fill lại
+    if (!s_daFillHanSD) {
         time_t now = time(NULL);
         struct tm *t = localtime(&now);
-        t->tm_year += 1;   // +1 năm
+        t->tm_year += 1;
         mktime(t);
         snprintf(form->hanSD.text, 256, "%02d/%02d/%04d",
                  t->tm_mday, t->tm_mon + 1, t->tm_year + 1900);
         form->hanSD.letterCount = (int)strlen(form->hanSD.text);
-        s_hanSDLoi = false;  // ngày mặc định luôn hợp lệ
+        s_hanSDLoi    = false;
+        s_daFillHanSD = true;
     }
+
 
     // 2. Logic nút Quay Lại
     Rectangle btnBack = { 20, 20, 130, 40 };
@@ -165,41 +190,24 @@ void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *ma
     for (int i = 0; i < 4; i++) {
         if (!boxes[i]->isFocused) continue;
 
-        // --- Backspace (nhấn 1 lần) ---
+        // --- Backspace nhấn 1 lần ---
         int key = GetKeyPressed();
         while (key > 0) {
             if (key == KEY_BACKSPACE) {
-                if (boxes[i]->letterCount > 0) {
-                    do { boxes[i]->letterCount--; }
-                    while (boxes[i]->letterCount > 0 &&
-                           (boxes[i]->text[boxes[i]->letterCount] & 0xC0) == 0x80);
-                    boxes[i]->text[boxes[i]->letterCount] = '\0';
-
-                    if (i == 0) form->errorHoTen[0] = '\0';
-                    if (i == 1) form->errorSdt[0]   = '\0';
-                    if (i == 2) form->errorCccd[0]  = '\0';
-                    // Ô hạn SD (i==3): reset cờ lỗi khi xóa
-                    if (i == 3) s_hanSDLoi = false;
-                }
+                DeleteOneChar(boxes[i], i, form);
+                // Reset counter để delay trước khi repeat
+                boxes[i]->backspaceCounter = 0;
             }
             key = GetKeyPressed();
         }
 
-        // --- Backspace (giữ phím) ---
+        // --- Backspace giữ phím: delay 0.5s rồi repeat mỗi 0.05s ---
         if (IsKeyDown(KEY_BACKSPACE)) {
             boxes[i]->backspaceCounter += GetFrameTime();
             if (boxes[i]->backspaceCounter >= 0.5f) {
-                if (boxes[i]->letterCount > 0) {
-                    do { boxes[i]->letterCount--; }
-                    while (boxes[i]->letterCount > 0 &&
-                           (boxes[i]->text[boxes[i]->letterCount] & 0xC0) == 0x80);
-                    boxes[i]->text[boxes[i]->letterCount] = '\0';
-
-                    if (i == 0) form->errorHoTen[0] = '\0';
-                    if (i == 1) form->errorSdt[0]   = '\0';
-                    if (i == 2) form->errorCccd[0]  = '\0';
-                    if (i == 3) s_hanSDLoi = false;
-                }
+                DeleteOneChar(boxes[i], i, form);
+                // Lùi lại 0.05s để tạo repeat rate ~20 ký tự/giây
+                boxes[i]->backspaceCounter -= 0.05f;
             }
         } else {
             boxes[i]->backspaceCounter = 0;
@@ -229,11 +237,16 @@ void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *ma
                     boxes[i]->text[boxes[i]->letterCount++] = (char)charCode;
                     boxes[i]->text[boxes[i]->letterCount]   = '\0';
 
-                    // Kiểm tra realtime: nếu ngày hợp lệ nhưng không phải tương lai → báo lỗi ngay
-                    if (KiemTraNgayHopLe_BD(boxes[i]->text) && !NgayLaTuongLai(boxes[i]->text))
-                        s_hanSDLoi = true;
-                    else
-                        s_hanSDLoi = false;
+                    // Chỉ báo lỗi khi đã gõ đủ 10 ký tự (dd/mm/yyyy)
+                    // Tránh báo lỗi khi đang gõ dở
+                    if (boxes[i]->letterCount == 10) {
+                        if (KiemTraNgayHopLe_BD(boxes[i]->text) && !NgayLaTuongLai(boxes[i]->text))
+                            s_hanSDLoi = true;
+                        else
+                            s_hanSDLoi = false;
+                    } else {
+                        s_hanSDLoi = false;  // Đang gõ dở, chưa báo lỗi
+                    }
                 }
 
             } else {
@@ -375,13 +388,18 @@ void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
     DrawTextEx(font, "HoanHoang_DUT library",
                (Vector2){card.x + 260*scale, card.y + 18*scale}, 28*scale, 1, clrText);
 
-    // ── ID căn giữa avatar box ───────────────────────────────
+    // ── ID: to hơn, căn giữa avatar box, ngang với ô Hạn sử dụng ──
     char idStr[32];
     snprintf(idStr, sizeof(idStr), "ID: %s", maThe);
-    Vector2 idSz = MeasureTextEx(font, idStr, 18*scale, 1);
-    float idX = avatarBox.x + (avatarBox.width - idSz.x) / 2.0f;  // căn giữa theo avatarBox
-    float idY = avatarBox.y + avatarBox.height + 8*scale;           // ngay dưới avatarBox
-    DrawTextEx(font, idStr, (Vector2){idX, idY}, 18*scale, 1, clrAccent);
+    float idFontSize = 26*scale;
+    Vector2 idSz = MeasureTextEx(font, idStr, idFontSize, 1);
+    float idX = avatarBox.x + (avatarBox.width - idSz.x) / 2.0f;
+    // Căn ngang với ô Hạn sử dụng (ô thứ 4, index 3)
+    float inputY  = card.y + 95*scale;
+    float spacing = 78*scale;
+    float boxH    = 42*scale;
+    float idY = inputY + (3 * spacing) + (boxH - idSz.y) / 2.0f;
+    DrawTextEx(font, idStr, (Vector2){idX, idY}, idFontSize, 1, clrAccent);
 
     // ── Các ô nhập ──────────────────────────────────────────
     const char*   labels[] = { "Họ và tên:", "Số điện thoại:", "Căn cước công dân:", "Hạn sử dụng:" };
@@ -598,13 +616,18 @@ void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_
     DrawTextEx(font, "HoanHoang_DUT library",
                (Vector2){card.x + 260*scale, card.y + 18*scale}, 28*scale, 1, clrText);
 
-    // ID căn giữa avatar box (đồng nhất với DrawLibraryCard)
+    // ── ID: to hơn, căn giữa avatar box, ngang với ô Hạn sử dụng ──
     char idStr[32];
     snprintf(idStr, sizeof(idStr), "ID: %s", the->maThe);
-    Vector2 idSz = MeasureTextEx(font, idStr, 18*scale, 1);
+    float idFontSize = 26*scale;
+    Vector2 idSz = MeasureTextEx(font, idStr, idFontSize, 1);
     float idX = avatarBox.x + (avatarBox.width - idSz.x) / 2.0f;
-    float idY = avatarBox.y + avatarBox.height + 8*scale;
-    DrawTextEx(font, idStr, (Vector2){idX, idY}, 18*scale, 1, clrAccent);
+    // Căn ngang với ô Hạn sử dụng (ô thứ 4, index 3)
+    float inputY  = card.y + 95*scale;
+    float spacing = 80.0f*scale;   // DrawTheBanDoc dùng spacing = 80
+    float boxH    = 42*scale;
+    float idY = inputY + (3 * spacing) + (boxH - idSz.y) / 2.0f;
+    DrawTextEx(font, idStr, (Vector2){idX, idY}, idFontSize, 1, clrAccent);
 
     // Các field
     const char* labels[] = { "Họ và tên:", "Số điện thoại:", "Căn cước công dân:", "Hạn sử dụng:" };
@@ -613,8 +636,6 @@ void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_
     float textX   = card.x + 270 * scale;
     float startY  = card.y + 95  * scale;
     float boxW    = 340 * scale;
-    float boxH    = 42  * scale;
-    float spacing = 80.0f * scale;
 
     for (int i = 0; i < 4; i++) {
         float currentY = startY + (i * spacing);

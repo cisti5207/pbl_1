@@ -253,7 +253,7 @@ static Color COL_BORDER    = {  90, 130, 210,  55 };
 
 static float colRatio[] = { 0.10f, 0.25f, 0.15f, 0.20f, 0.16f, 0.14f };
 #define NUM_COLS 6
-static const char *colHeaders[] = { "Mã thẻ", "Họ và tên", "Số ĐT", "CCCD", "Hạn sử dụng", "Chi tiết" };
+static const char *colHeaders[] = { "Mã thẻ", "Họ và tên", "Số điện thoại", "CCCD", "Hạn sử dụng", "Chi tiết" };
 
 static float ColX(float tableX, float tableW, int col) {
     float x = tableX;
