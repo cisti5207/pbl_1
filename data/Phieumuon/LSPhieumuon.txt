@@ -1,4 +1,4 @@
 Phiếu mượn   | Mã thẻ       | Mã truyện           | Tên truyện                                         | Ngày mượn           | Ngày trả DK         | TT
-PM000003     | 00000001     | T001C002            | Doraemon - Tập 2                                   | 04/06/2026          | 5                   | 1
-PM000002     | 00000001     | T001C006            | Doraemon - Tập 6                                   | 04/06/2026          | 5                   | 1
-PM000001     | 00000001     | T001C002            | Doraemon - Tập 2                                   | 04/06/2026          | 5                   | 1
+PM000003     | 00000001     | T001C002            | Doraemon - Tập 2                                   | 23/06/2026          | 5                   | 1
+PM000001     | 00000004     | T001C005            | Doraemon - Tập 5                                   | 06/06/2026          | 10                  | 1
+PM000002     | 00000001     | T002C002            | Thám tử lừng danh Conan - Tập 2                    | 06/06/2026          | 5                   | 1

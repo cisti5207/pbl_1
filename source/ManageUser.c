@@ -6,6 +6,55 @@
 #include <libmanage.h>
 #include <time.h>
 
+// ============================================================
+// Cờ lỗi hạn sử dụng (static nội bộ)
+// ============================================================
+static bool s_hanSDLoi    = false;  // true = ngày không hợp lệ hoặc là quá khứ
+
+// ============================================================
+// Tiện ích kiểm tra ngày
+// ============================================================
+
+// Kiểm tra định dạng dd/mm/yyyy và ngày tồn tại
+static bool KiemTraNgayHopLe_BD(const char *ngay) {
+    if (!ngay || ngay[0] == '\0') return false;
+    int d = 0, m = 0, y = 0;
+    if (sscanf(ngay, "%d/%d/%d", &d, &m, &y) != 3) return false;
+    if (y < 1000 || y > 9999) return false;
+    if (m < 1 || m > 12) return false;
+    int ngayToiDa[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+    if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) ngayToiDa[2] = 29;
+    if (d < 1 || d > ngayToiDa[m]) return false;
+    char ef[12], es1[12], es2[12], es3[12];
+    snprintf(ef,  sizeof(ef),  "%02d/%02d/%04d", d, m, y);
+    snprintf(es1, sizeof(es1), "%d/%02d/%04d",   d, m, y);
+    snprintf(es2, sizeof(es2), "%02d/%d/%04d",   d, m, y);
+    snprintf(es3, sizeof(es3), "%d/%d/%04d",     d, m, y);
+    return (strcmp(ngay, ef)  == 0 || strcmp(ngay, es1) == 0 ||
+            strcmp(ngay, es2) == 0 || strcmp(ngay, es3) == 0);
+}
+
+// Hạn sử dụng phải là tương lai (> hôm nay)
+// Trả về true nếu ngày > ngày hệ thống
+static bool NgayLaTuongLai(const char *ngay) {
+    if (!ngay || ngay[0] == '\0') return false;
+    int d = 0, m = 0, y = 0;
+    if (sscanf(ngay, "%d/%d/%d", &d, &m, &y) != 3) return false;
+
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    int todayY = t->tm_year + 1900;
+    int todayM = t->tm_mon + 1;
+    int todayD = t->tm_mday;
+
+    if (y > todayY) return true;
+    if (y < todayY) return false;
+    if (m > todayM) return true;
+    if (m < todayM) return false;
+    return d > todayD;   // phải SAU hôm nay (không bao gồm hôm nay)
+}
+
+// ============================================================
 void InitForm(Nhap *form) {
     memset(form->hoTen.text, 0, 256);
     memset(form->sdt.text,   0, 256);
@@ -31,8 +80,12 @@ void InitForm(Nhap *form) {
     form->successTimer = 0;
 
     // Reset thông báo lỗi
-    form->errorSdt[0]  = '\0';
-    form->errorCccd[0] = '\0';
+    form->errorHoTen[0] = '\0';
+    form->errorSdt[0]   = '\0';
+    form->errorCccd[0]  = '\0';
+
+    // Reset cờ lỗi hạn sử dụng
+    s_hanSDLoi = false;
 }
 
 void UpdateFormPosition(Nhap *form) {
@@ -61,15 +114,17 @@ void UpdateInputForm(Nhap *form, BanDoc **head, int *currentTotalUsers, char *ma
     if (maThe[0] == '\0') {
         LayMaTheTiepTheo(*head, maThe);
     }
-if (form->hanSD.letterCount == 0) {
-    time_t now = time(NULL);
-    struct tm *t = localtime(&now);
-    t->tm_year += 1;   // +1 năm
-    mktime(t);         // normalize (xử lý 29/02 leap year, v.v.)
-    snprintf(form->hanSD.text, 256, "%02d/%02d/%04d",
-             t->tm_mday, t->tm_mon + 1, t->tm_year + 1900);
-    form->hanSD.letterCount = (int)strlen(form->hanSD.text);
-}
+    if (form->hanSD.letterCount == 0) {
+        time_t now = time(NULL);
+        struct tm *t = localtime(&now);
+        t->tm_year += 1;   // +1 năm
+        mktime(t);
+        snprintf(form->hanSD.text, 256, "%02d/%02d/%04d",
+                 t->tm_mday, t->tm_mon + 1, t->tm_year + 1900);
+        form->hanSD.letterCount = (int)strlen(form->hanSD.text);
+        s_hanSDLoi = false;  // ngày mặc định luôn hợp lệ
+    }
+
     // 2. Logic nút Quay Lại
     Rectangle btnBack = { 20, 20, 130, 40 };
     bool isHoverBack = CheckCollisionPointRec(GetMousePosition(), btnBack);
@@ -80,7 +135,7 @@ if (form->hanSD.letterCount == 0) {
         return;
     }
 
-    // 3. Logic Success (đang hiện banner → đợi hết timer rồi reset)
+    // 3. Logic Success
     if (form->showSuccess) {
         form->successTimer -= GetFrameTime();
         if (form->successTimer <= 0) {
@@ -115,15 +170,16 @@ if (form->hanSD.letterCount == 0) {
         while (key > 0) {
             if (key == KEY_BACKSPACE) {
                 if (boxes[i]->letterCount > 0) {
-                    // Lùi 1 codepoint UTF-8
                     do { boxes[i]->letterCount--; }
                     while (boxes[i]->letterCount > 0 &&
                            (boxes[i]->text[boxes[i]->letterCount] & 0xC0) == 0x80);
                     boxes[i]->text[boxes[i]->letterCount] = '\0';
 
-                    // Xoá lỗi khi user chỉnh lại
-                    if (i == 1) form->errorSdt[0]  = '\0';
-                    if (i == 2) form->errorCccd[0] = '\0';
+                    if (i == 0) form->errorHoTen[0] = '\0';
+                    if (i == 1) form->errorSdt[0]   = '\0';
+                    if (i == 2) form->errorCccd[0]  = '\0';
+                    // Ô hạn SD (i==3): reset cờ lỗi khi xóa
+                    if (i == 3) s_hanSDLoi = false;
                 }
             }
             key = GetKeyPressed();
@@ -139,8 +195,10 @@ if (form->hanSD.letterCount == 0) {
                            (boxes[i]->text[boxes[i]->letterCount] & 0xC0) == 0x80);
                     boxes[i]->text[boxes[i]->letterCount] = '\0';
 
-                    if (i == 1) form->errorSdt[0]  = '\0';
-                    if (i == 2) form->errorCccd[0] = '\0';
+                    if (i == 0) form->errorHoTen[0] = '\0';
+                    if (i == 1) form->errorSdt[0]   = '\0';
+                    if (i == 2) form->errorCccd[0]  = '\0';
+                    if (i == 3) s_hanSDLoi = false;
                 }
             }
         } else {
@@ -152,27 +210,38 @@ if (form->hanSD.letterCount == 0) {
         while (charCode > 0) {
 
             if (i == 1 || i == 2) {
-                // ---- Ô SDT (i=1) và CCCD (i=2): chỉ nhận chữ số 0-9 ----
+                // SDT (i=1) và CCCD (i=2): chỉ nhận chữ số 0-9
                 int maxDigits = (i == 1) ? 10 : 12;
-
                 if (charCode >= '0' && charCode <= '9') {
-                    // Còn chỗ thì ghi, đủ rồi thì bỏ qua (hard-cap)
                     if (boxes[i]->letterCount < maxDigits) {
                         boxes[i]->text[boxes[i]->letterCount] = (char)charCode;
                         boxes[i]->letterCount++;
                         boxes[i]->text[boxes[i]->letterCount] = '\0';
-
-                        // Xoá lỗi khi user gõ lại
                         if (i == 1) form->errorSdt[0]  = '\0';
                         if (i == 2) form->errorCccd[0] = '\0';
                     }
-                    // Nếu đã đủ số → bỏ qua, không báo lỗi ngay lúc gõ
                 }
-                // Ký tự không phải số → bỏ qua hoàn toàn (chặn tại đây)
+
+            } else if (i == 3) {
+                // Ô hạn sử dụng: chỉ nhận số và '/', giới hạn 10 ký tự (dd/mm/yyyy)
+                if ((charCode >= '0' && charCode <= '9' || charCode == '/') &&
+                    boxes[i]->letterCount < 10) {
+                    boxes[i]->text[boxes[i]->letterCount++] = (char)charCode;
+                    boxes[i]->text[boxes[i]->letterCount]   = '\0';
+
+                    // Kiểm tra realtime: nếu ngày hợp lệ nhưng không phải tương lai → báo lỗi ngay
+                    if (KiemTraNgayHopLe_BD(boxes[i]->text) && !NgayLaTuongLai(boxes[i]->text))
+                        s_hanSDLoi = true;
+                    else
+                        s_hanSDLoi = false;
+                }
 
             } else {
-                // ---- Ô thường (Họ tên, Hạn SD): giữ nguyên logic cũ ----
-                if ((charCode >= 32) && (boxes[i]->letterCount < 250)) {
+                // Ô Họ tên (i=0)
+                bool isDigit = (charCode >= '0' && charCode <= '9');
+                if (i == 0 && isDigit) {
+                    strcpy(form->errorHoTen, "Họ và tên không được chứa số!");
+                } else if ((charCode >= 32) && (boxes[i]->letterCount < 250)) {
                     int byteSize = 0;
                     const char* utf8Char = CodepointToUTF8(charCode, &byteSize);
                     if (boxes[i]->letterCount + byteSize < 255) {
@@ -181,6 +250,7 @@ if (form->hanSD.letterCount == 0) {
                             boxes[i]->letterCount++;
                         }
                         boxes[i]->text[boxes[i]->letterCount] = '\0';
+                        if (i == 0) form->errorHoTen[0] = '\0';
                     }
                 }
             }
@@ -211,9 +281,9 @@ if (form->hanSD.letterCount == 0) {
                          CheckCollisionPointRec(GetMousePosition(), btnConfirm));
 
     if (clickConfirm) {
-        // Reset lỗi cũ trước
-        form->errorSdt[0]  = '\0';
-        form->errorCccd[0] = '\0';
+        form->errorHoTen[0] = '\0';
+        form->errorSdt[0]   = '\0';
+        form->errorCccd[0]  = '\0';
         bool valid = true;
 
         // Bắt buộc có Họ tên
@@ -221,19 +291,26 @@ if (form->hanSD.letterCount == 0) {
             valid = false;
         }
 
-        // Validate SDT: bắt buộc đúng 10 chữ số (nếu đã nhập)
-        if (form->sdt.letterCount >= 0 && form->sdt.letterCount != 10) {
+        // Validate SDT: đúng 10 chữ số
+        if (form->sdt.letterCount != 10) {
             strcpy(form->errorSdt, "Số điện thoại phải có đúng 10 số!");
             valid = false;
         }
 
-        // Validate CCCD: bắt buộc đúng 12 chữ số (nếu đã nhập)
-        if (form->cccd.letterCount >= 0 && form->cccd.letterCount != 12) {
+        // Validate CCCD: đúng 12 chữ số
+        if (form->cccd.letterCount != 12) {
             strcpy(form->errorCccd, "Căn cước công dân phải có đúng 12 số!");
             valid = false;
         }
 
-        // Chỉ lưu khi tất cả hợp lệ
+        // Validate hạn sử dụng: phải hợp lệ và là tương lai
+        bool hanSDHopLe = KiemTraNgayHopLe_BD(form->hanSD.text) &&
+                          NgayLaTuongLai(form->hanSD.text);
+        if (!hanSDHopLe) {
+            s_hanSDLoi = true;
+            valid = false;
+        }
+
         if (valid) {
             if (LuuThanhVienVaoFile(maThe, form)) {
                 ThemBanDocVaoList(head, maThe, form);
@@ -244,60 +321,48 @@ if (form->hanSD.letterCount == 0) {
     }
 }
 
+// ============================================================
+// DrawLibraryCard
+// ============================================================
 void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
     float screenW = (float)GetScreenWidth();
     float screenH = (float)GetScreenHeight();
     float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
     if (scale < 0.5f) scale = 0.5f;
 
-    // ── Màu chủ đạo (pastel sáng) ──────────────────────────────────────────
-    // Nền thẻ: xanh sky pastel hơi đậm
-    Color clrCard       = GetColor(0x003559ff);
-    Color clrCardBorder = GetColor(0x8ecae6ff);
-    Color clrAccent     = GetColor(0xb8e4f9ff); 
-    // Chữ pastel sáng
-    Color clrText       = GetColor(0xe8f7ffff); 
-    Color clrLabel      = GetColor(0xcceeffff); 
-    Color clrInput      = GetColor(0x1a3a4aff); 
-    Color clrCursor     = GetColor(0x2196f3ff); 
-    Color clrError      = GetColor(0xff6b8aff); 
-    Color clrBtnNormal  = GetColor(0x4fc3f7ff); 
-    Color clrBtnHover   = GetColor(0x0288d1ff); 
-    Color clrFocusBorder= GetColor(0x81d4faff); 
-    // ────────────────────────────────────────────────────────────────────────
+    Color clrCard        = GetColor(0x003559ff);
+    Color clrCardBorder  = GetColor(0x8ecae6ff);
+    Color clrAccent      = GetColor(0xb8e4f9ff);
+    Color clrText        = GetColor(0xe8f7ffff);
+    Color clrLabel       = GetColor(0xcceeffff);
+    Color clrError       = GetColor(0xff6b8aff);
+    Color clrBtnNormal   = GetColor(0x4fc3f7ff);
+    Color clrBtnHover    = GetColor(0x0288d1ff);
+    Color clrFocusBorder = GetColor(0x81d4faff);
 
-    // ── Nền động (particle) ─────────────────────────────────────────────────
     ClearBackground(AnimatedBackground());
     DrawBackgroundParticles();
-    // ────────────────────────────────────────────────────────────────────────
 
-    // ── Nút Quay Lại ────────────────────────────────────────────────────────
+    // ── Nút Quay Lại ────────────────────────────────────────
     Rectangle btnBack = { 20, 20, 130, 40 };
     bool isHoverBack = CheckCollisionPointRec(GetMousePosition(), btnBack);
-    Color btnBackColor  = isHoverBack ? clrBtnHover  : Fade(clrAccent, 0.25f);
-    Color btnBackText   = isHoverBack ? clrText      : clrText;
-    DrawRectangleRounded(btnBack, 0.3f, 10, btnBackColor);
+    DrawRectangleRounded(btnBack, 0.3f, 10, isHoverBack ? clrBtnHover : Fade(clrAccent, 0.25f));
     DrawRectangleRoundedLines(btnBack, 0.3f, 10, clrCardBorder);
-    DrawTextEx(font, "< Quay lại", (Vector2){btnBack.x + 15, btnBack.y + 10}, 20, 1, btnBackText);
-    // ────────────────────────────────────────────────────────────────────────
+    DrawTextEx(font, "< Quay lại", (Vector2){btnBack.x + 15, btnBack.y + 10}, 20, 1, clrText);
 
     Rectangle card = { (screenW - 650*scale)/2, (screenH - 420*scale)/2, 650*scale, 420*scale };
 
-    // ── Thẻ ─────────────────────────────────────────────────────────────────
-    // Bóng mềm
+    // ── Thẻ ─────────────────────────────────────────────────
     DrawRectangleRounded(
         (Rectangle){card.x + 6*scale, card.y + 8*scale, card.width, card.height},
         0.1f, 10, Fade(BLACK, 0.25f));
-    // Nền thẻ
     DrawRectangleRounded(card, 0.1f, 10, clrCard);
-    // Dải tiêu đề đậm hơn (top bar)
-    Rectangle topBar = { card.x, card.y, card.width, 70*scale };
-    DrawRectangleRounded(topBar, 0.1f, 10, Fade(BLACK, 0.01f));
-    // Viền thẻ
+    DrawRectangleRounded(
+        (Rectangle){card.x, card.y, card.width, 70*scale},
+        0.1f, 10, Fade(BLACK, 0.01f));
     DrawRectangleRoundedLines(card, 0.1f, 10, clrCardBorder);
-    // ────────────────────────────────────────────────────────────────────────
 
-    // ── Avatar ──────────────────────────────────────────────────────────────
+    // ── Avatar ──────────────────────────────────────────────
     Rectangle avatarBox = { card.x + 45*scale, card.y + 80*scale, 180*scale, 230*scale };
     DrawRectangleRounded(avatarBox, 0.05f, 5, Fade(WHITE, 0.15f));
     DrawRectangleRoundedLines(avatarBox, 0.05f, 5, clrAccent);
@@ -305,33 +370,36 @@ void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
                40*scale, Fade(clrAccent, 0.5f));
     DrawEllipse(avatarBox.x + avatarBox.width/2, avatarBox.y + 180*scale,
                 60*scale, 45*scale, Fade(clrAccent, 0.5f));
-    // ────────────────────────────────────────────────────────────────────────
 
-    // ── Tiêu đề & ID ────────────────────────────────────────────────────────
+    // ── Tiêu đề ─────────────────────────────────────────────
     DrawTextEx(font, "HoanHoang_DUT library",
                (Vector2){card.x + 260*scale, card.y + 18*scale}, 28*scale, 1, clrText);
-    // Đường kẻ ngang dưới tiêu đề
-    DrawTextEx(font, TextFormat("ID: %s", maThe),
-               (Vector2){card.x + 50*scale, card.y + 345*scale}, 22*scale, 1, clrAccent);
-    // ────────────────────────────────────────────────────────────────────────
 
-    // ── Các ô nhập ──────────────────────────────────────────────────────────
+    // ── ID căn giữa avatar box ───────────────────────────────
+    char idStr[32];
+    snprintf(idStr, sizeof(idStr), "ID: %s", maThe);
+    Vector2 idSz = MeasureTextEx(font, idStr, 18*scale, 1);
+    float idX = avatarBox.x + (avatarBox.width - idSz.x) / 2.0f;  // căn giữa theo avatarBox
+    float idY = avatarBox.y + avatarBox.height + 8*scale;           // ngay dưới avatarBox
+    DrawTextEx(font, idStr, (Vector2){idX, idY}, 18*scale, 1, clrAccent);
+
+    // ── Các ô nhập ──────────────────────────────────────────
     const char*   labels[] = { "Họ và tên:", "Số điện thoại:", "Căn cước công dân:", "Hạn sử dụng:" };
     InputBox_BD*  boxes[]  = { &form->hoTen, &form->sdt, &form->cccd, &form->hanSD };
 
     for (int i = 0; i < 4; i++) {
-        // Label
         DrawTextEx(font, labels[i],
                    (Vector2){boxes[i]->rec.x, boxes[i]->rec.y - 22*scale},
                    16*scale, 1, clrLabel);
 
-        // Viền ô: đỏ hồng nếu lỗi, xanh nếu focus, mờ nếu bình thường
-        bool hasError = (i == 1 && form->errorSdt[0]  != '\0') ||
-                        (i == 2 && form->errorCccd[0] != '\0');
-        Color borderColor = hasError          ? clrError      :
+        // Viền đỏ nếu lỗi (bao gồm cả hạn SD)
+        bool hasError = (i == 0 && form->errorHoTen[0] != '\0') ||
+                        (i == 1 && form->errorSdt[0]   != '\0') ||
+                        (i == 2 && form->errorCccd[0]  != '\0') ||
+                        (i == 3 && s_hanSDLoi);
+        Color borderColor = hasError            ? clrError       :
                             boxes[i]->isFocused ? clrFocusBorder : Fade(WHITE, 0.3f);
 
-        // Nền ô: trắng mờ
         DrawRectangleRounded(boxes[i]->rec, 0.2f, 10, Fade(WHITE, 0.18f));
         DrawRectangleRoundedLines(boxes[i]->rec, 0.2f, 10, borderColor);
 
@@ -349,38 +417,41 @@ void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
             };
             DrawTextEx(font, boxes[i]->text, textPos, fontSize, 1, clrText);
 
-            // Con trỏ nhấp nháy
             if (boxes[i]->isFocused && (((int)(GetTime() * 1.5f)) % 2 == 0)) {
                 DrawRectangleV(
                     (Vector2){ textPos.x + textSize.x + 2, textPos.y + 2 },
                     (Vector2){ 2, fontSize - 4 },
-                    clrCursor
+                    GetColor(0x2196f3ff)
                 );
             }
         EndScissorMode();
 
         // Thông báo lỗi dưới ô
-        if (i == 1 && form->errorSdt[0] != '\0') {
-            DrawTextEx(font, form->errorSdt,
-                       (Vector2){ boxes[i]->rec.x, boxes[i]->rec.y + boxes[i]->rec.height + 3*scale },
-                       13*scale, 1, clrError);
+        const char *errMsg = NULL;
+        if (i == 0 && form->errorHoTen[0] != '\0') errMsg = form->errorHoTen;
+        if (i == 1 && form->errorSdt[0]   != '\0') errMsg = form->errorSdt;
+        if (i == 2 && form->errorCccd[0]  != '\0') errMsg = form->errorCccd;
+        if (i == 3 && s_hanSDLoi) {
+            // Phân biệt: sai format vs ngày quá khứ
+            errMsg = KiemTraNgayHopLe_BD(form->hanSD.text)
+                     ? "! Chỉ được nhập ngày tương lai"
+                     : "! Hạn sử dụng không hợp lệ (dd/mm/yyyy)";
         }
-        if (i == 2 && form->errorCccd[0] != '\0') {
-            DrawTextEx(font, form->errorCccd,
+
+        if (errMsg) {
+            DrawTextEx(font, errMsg,
                        (Vector2){ boxes[i]->rec.x, boxes[i]->rec.y + boxes[i]->rec.height + 3*scale },
                        13*scale, 1, clrError);
         }
     }
-    // ────────────────────────────────────────────────────────────────────────
 
-    // ── Nút XÁC NHẬN ────────────────────────────────────────────────────────
+    // ── Nút XÁC NHẬN ────────────────────────────────────────
     Rectangle btnConfirm = {
         (screenW - 190*scale) / 2,
         card.y + card.height + 28 * scale,
         190*scale, 50*scale
     };
     bool isHover = CheckCollisionPointRec(GetMousePosition(), btnConfirm);
-    // Bóng nút
     DrawRectangleRounded(
         (Rectangle){btnConfirm.x + 3, btnConfirm.y + 4, btnConfirm.width, btnConfirm.height},
         0.4f, 10, Fade(BLACK, 0.2f));
@@ -391,7 +462,6 @@ void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
                    btnConfirm.y + (btnConfirm.height - 20*scale) / 2
                },
                20*scale, 1, WHITE);
-    // ────────────────────────────────────────────────────────────────────────
 
     // Banner thành công
     if (form->showSuccess) {
@@ -399,6 +469,9 @@ void DrawLibraryCard(Nhap *form, Texture2D icons[], char *maThe, Font font) {
     }
 }
 
+// ============================================================
+// DrawSuccessMessage
+// ============================================================
 void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer) {
     float screenW = (float)GetScreenWidth();
     float screenH = (float)GetScreenHeight();
@@ -411,24 +484,20 @@ void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer) {
     }
     DrawRectangle(0, 0, (int)screenW, (int)screenH, Fade(BLACK, 0.55f));
 
-    // Panel
     Rectangle panel = { screenW/2 - 250, screenH/2 - 150, 500, 300 };
-    DrawRectangleRounded(panel, 0.12f, 10, GetColor(0x1e3a4aff));        // nền xanh đậm
-    DrawRectangleRoundedLines(panel, 0.12f, 10, GetColor(0x8ecae6ff));   // viền sky pastel
+    DrawRectangleRounded(panel, 0.12f, 10, GetColor(0x1e3a4aff));
+    DrawRectangleRoundedLines(panel, 0.12f, 10, GetColor(0x8ecae6ff));
 
-    // Icon check
     DrawCircle((int)screenW/2, (int)screenH/2 - 60, 45, GetColor(0x4fc3f7ff));
     Vector2 vSz = MeasureTextEx(font, "V", 58, 1);
     DrawTextEx(font, "V", (Vector2){screenW/2 - vSz.x/2, screenH/2 - 60 - vSz.y/2}, 58, 1, WHITE);
 
-    // Thông báo
     const char* msg = "TẠO THẺ THÀNH CÔNG!";
     Vector2 msgSize = MeasureTextEx(font, msg, 30, 1);
     DrawTextEx(font, msg,
                (Vector2){(screenW - msgSize.x)/2, screenH/2 + 18},
-               30, 1, GetColor(0xe8f7ffff));   // trắng xanh pastel
+               30, 1, GetColor(0xe8f7ffff));
 
-    // Progress bar
     float progress = currentTimer / 3.0f;
     DrawRectangleRounded(
         (Rectangle){panel.x + 50, panel.y + panel.height - 46, 400, 10},
@@ -438,11 +507,13 @@ void DrawSuccessMessage(Font font, Texture2D background2, float currentTimer) {
         0.5f, 6, GetColor(0x4fc3f7ff));
 }
 
+// ============================================================
+// Lưu & Thêm node
+// ============================================================
 bool LuuThanhVienVaoFile(char *maThe, Nhap *form) {
     FILE *f = fopen("data/Phieumuon/User.txt", "a");
     if (f == NULL) return false;
 
-    // Trim trailing spaces
     for (int i = strlen(form->hoTen.text)-1; i >= 0 && form->hoTen.text[i] == ' '; i--) form->hoTen.text[i] = '\0';
     for (int i = strlen(form->sdt.text)-1;   i >= 0 && form->sdt.text[i]   == ' '; i--) form->sdt.text[i]   = '\0';
     for (int i = strlen(form->cccd.text)-1;  i >= 0 && form->cccd.text[i]  == ' '; i--) form->cccd.text[i]  = '\0';
@@ -468,7 +539,6 @@ void ThemBanDocVaoList(BanDoc **head, char *maThe, Nhap *form) {
         strcpy(newNode->cccd,  form->cccd.text);
         strcpy(newNode->hanSD, form->hanSD.text);
         newNode->next = NULL;
-        // Nối vào cuối list để giữ đúng thứ tự mã thẻ tăng dần
         if (*head == NULL) {
             *head = newNode;
         } else {
@@ -487,6 +557,9 @@ void FreeMemberList(BanDoc *head) {
     while (head) { BanDoc *t = head; head = head->next; free(t); }
 }
 
+// ============================================================
+// DrawTheBanDoc_TimKiem — hiển thị thẻ khi tìm kiếm
+// ============================================================
 void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_y) {
     if (the == NULL) return;
 
@@ -495,22 +568,18 @@ void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_
     float scale = (screenW / 1100.0f < screenH / 750.0f) ? screenW / 1100.0f : screenH / 750.0f;
     if (scale < 0.5f) scale = 0.5f;
 
-    // ── Bảng màu đồng bộ với DrawLibraryCard ───────────────────────────────
     Color clrCard       = GetColor(0x5ba8d0ff);
     Color clrCardBorder = GetColor(0x8ecae6ff);
     Color clrAccent     = GetColor(0xb8e4f9ff);
     Color clrText       = GetColor(0xe8f7ffff);
     Color clrLabel      = GetColor(0xcceeffff);
-    // ────────────────────────────────────────────────────────────────────────
 
     Rectangle card = { toa_do_x, toa_do_y, 650*scale, 420*scale };
 
-    // Bóng & nền thẻ
     DrawRectangleRounded(
         (Rectangle){card.x + 6*scale, card.y + 8*scale, card.width, card.height},
         0.1f, 10, Fade(BLACK, 0.25f));
     DrawRectangleRounded(card, 0.1f, 10, clrCard);
-    // Dải top bar
     DrawRectangleRounded(
         (Rectangle){card.x, card.y, card.width, 70*scale},
         0.1f, 10, Fade(BLACK, 0.01f));
@@ -525,12 +594,19 @@ void DrawTheBanDoc_TimKiem(BanDoc *the, Font font, float toa_do_x, float toa_do_
     DrawEllipse(avatarBox.x + avatarBox.width/2, avatarBox.y + 180*scale,
                 60*scale, 45*scale, Fade(clrAccent, 0.5f));
 
-    // Tiêu đề & ID
+    // Tiêu đề
     DrawTextEx(font, "HoanHoang_DUT library",
                (Vector2){card.x + 260*scale, card.y + 18*scale}, 28*scale, 1, clrText);
-    DrawTextEx(font, TextFormat("ID: %s", the->maThe),
-               (Vector2){card.x + 50*scale, card.y + 345*scale}, 22*scale, 1, clrAccent);
 
+    // ID căn giữa avatar box (đồng nhất với DrawLibraryCard)
+    char idStr[32];
+    snprintf(idStr, sizeof(idStr), "ID: %s", the->maThe);
+    Vector2 idSz = MeasureTextEx(font, idStr, 18*scale, 1);
+    float idX = avatarBox.x + (avatarBox.width - idSz.x) / 2.0f;
+    float idY = avatarBox.y + avatarBox.height + 8*scale;
+    DrawTextEx(font, idStr, (Vector2){idX, idY}, 18*scale, 1, clrAccent);
+
+    // Các field
     const char* labels[] = { "Họ và tên:", "Số điện thoại:", "Căn cước công dân:", "Hạn sử dụng:" };
     const char* values[] = { the->hoTen, the->sdt, the->cccd, the->hanSD };
 

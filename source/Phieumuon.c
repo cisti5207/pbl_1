@@ -47,11 +47,13 @@ static char s_selectedMaTruyen[16] = {0};
 static char s_selectedMaTap[16]    = {0};
 
 // Cờ báo lỗi số ngày mượn
-static bool s_ngaytraLoi = false;
+static bool s_ngaytraLoi  = false;
+// Cờ báo lỗi ngày mượn tương lai
+static bool s_ngaymuonLoi = false;
 // Cờ báo lỗi hết sách
-static bool s_hetSachLoi = false;
+static bool s_hetSachLoi  = false;
 // Cờ báo lỗi mã thẻ không hợp lệ hoặc không tồn tại
-static bool s_matheLoi = false;
+static bool s_matheLoi    = false;
 
 // ============================================================
 // Tiện ích
@@ -89,7 +91,6 @@ static bool KiemTraCoTap(const char *maTruyen) {
 static bool KiemTraTheTonTai(const char *mathe) {
     if (!mathe || mathe[0] == '\0') return false;
 
-    // Trim bản sao input để so sánh chính xác
     char input[64] = {0};
     strncpy(input, mathe, 63);
     TrimStr_PM(input);
@@ -101,15 +102,12 @@ static bool KiemTraTheTonTai(const char *mathe) {
     char line[512];
     bool first = true;
     while (fgets(line, sizeof(line), f)) {
-        // Bỏ qua dòng tiêu đề đầu tiên
         if (first) { first = false; continue; }
 
-        // Bỏ qua dòng trống
         char *p = line;
         while (*p == ' ' || *p == '\t') p++;
         if (*p == '\0' || *p == '\r' || *p == '\n') continue;
 
-        // Cột đầu tiên là mã thẻ, ngăn cách bởi '|'
         char mt[64] = {0};
         if (sscanf(p, " %63[^|]", mt) == 1) {
             TrimStr_PM(mt);
@@ -121,6 +119,26 @@ static bool KiemTraTheTonTai(const char *mathe) {
     }
     fclose(f);
     return false;
+}
+
+// --- Hàm kiểm tra ngày nhập vào không phải ngày tương lai ---
+// Trả về true nếu ngày <= ngày hệ thống hiện tại
+static bool NgayKhongTuongLai(const char *ngay) {
+    if (!ngay || ngay[0] == '\0') return false;
+    int d = 0, m = 0, y = 0;
+    if (sscanf(ngay, "%d/%d/%d", &d, &m, &y) != 3) return false;
+
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    int todayY = t->tm_year + 1900;
+    int todayM = t->tm_mon + 1;
+    int todayD = t->tm_mday;
+
+    if (y < todayY) return true;
+    if (y > todayY) return false;
+    if (m < todayM) return true;
+    if (m > todayM) return false;
+    return d <= todayD;
 }
 
 // ============================================================
@@ -371,9 +389,10 @@ void InitPhieumuon(FormPhieuMuon *Form) {
     Form->ngaytra.isfocused=Form->matruyen.isfocused=false;
     Form->showsuccess=false; Form->successtimer=0;
 
-    s_ngaytraLoi = false;
-    s_hetSachLoi = false;
-    s_matheLoi = false;
+    s_ngaytraLoi  = false;
+    s_ngaymuonLoi = false;  // <-- reset thêm cờ ngày mượn
+    s_hetSachLoi  = false;
+    s_matheLoi    = false;
 
     memset(s_filter,0,sizeof(s_filter));
     s_showDropdown=false; s_showTapDropdown=false;
@@ -413,7 +432,6 @@ void SinhMaPM(int currentcount, char *mathe) {
 void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState, char *mathe) {
     LoadDuLieuTruyen_PM();
     if (mathe[0]=='\0') {
-        // SinhMaPM đếm đúng số lượng từ linked list dữ liệu thực tế
         SinhMaPM(DemSoPhieuMuon(*head), mathe);
         if (Form->ngaymuon.lettercount == 0) {
             time_t now = time(NULL);
@@ -584,7 +602,7 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
                     s_filter[len]='\0';
                     Form->matruyen.text[0]='\0'; Form->matruyen.lettercount=0;
                     s_selectedMaTruyen[0] = '\0'; s_hetSachLoi = false;
-                    s_selectedMaTap[0] = '\0'; s_hetSachLoi = false;
+                    s_selectedMaTap[0] = '\0';
                     CapNhatMatch();
                     s_showDropdown = true;
                     s_showTapDropdown = false;
@@ -601,7 +619,7 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
                     s_filter[len]='\0';
                     Form->matruyen.text[0]='\0'; Form->matruyen.lettercount=0;
                     s_selectedMaTruyen[0] = '\0'; s_hetSachLoi = false;
-                    s_selectedMaTap[0] = '\0'; s_hetSachLoi = false;
+                    s_selectedMaTap[0] = '\0';
                     CapNhatMatch();
                     s_showDropdown = true;
                     s_showTapDropdown = false;
@@ -619,7 +637,7 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
                     s_filter[flen+bs]='\0';
                     Form->matruyen.text[0]='\0'; Form->matruyen.lettercount=0;
                     s_selectedMaTruyen[0] = '\0'; s_hetSachLoi = false;
-                    s_selectedMaTap[0] = '\0'; s_hetSachLoi = false;
+                    s_selectedMaTap[0] = '\0';
                     CapNhatMatch();
                     s_showDropdown = true;
                     s_showTapDropdown = false;
@@ -652,6 +670,12 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
                     boxes[i]->lettercount--;
                     boxes[i]->text[boxes[i]->lettercount] = '\0';
                     s_matheLoi = false;
+                } else if(i == 3) {
+                    // Ô ngày mượn: xóa ký tự cuối, reset cờ lỗi ngày mượn
+                    do{ boxes[i]->lettercount--; }
+                    while(boxes[i]->lettercount>0&&(boxes[i]->text[boxes[i]->lettercount]&0xC0)==0x80);
+                    boxes[i]->text[boxes[i]->lettercount]='\0';
+                    s_ngaymuonLoi = false;
                 } else {
                     do{ boxes[i]->lettercount--; }
                     while(boxes[i]->lettercount>0&&(boxes[i]->text[boxes[i]->lettercount]&0xC0)==0x80);
@@ -671,6 +695,12 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
                     boxes[i]->lettercount--;
                     boxes[i]->text[boxes[i]->lettercount] = '\0';
                     s_matheLoi = false;
+                } else if(i == 3) {
+                    // Ô ngày mượn: xóa ký tự cuối (giữ backspace), reset cờ lỗi
+                    do{ boxes[i]->lettercount--; }
+                    while(boxes[i]->lettercount>0&&(boxes[i]->text[boxes[i]->lettercount]&0xC0)==0x80);
+                    boxes[i]->text[boxes[i]->lettercount]='\0';
+                    s_ngaymuonLoi = false;
                 } else {
                     do{ boxes[i]->lettercount--; }
                     while(boxes[i]->lettercount>0&&(boxes[i]->text[boxes[i]->lettercount]&0xC0)==0x80);
@@ -692,6 +722,13 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
                     boxes[i]->text[boxes[i]->lettercount++] = (char)ch;
                     boxes[i]->text[boxes[i]->lettercount] = '\0';
                     s_ngaytraLoi = false;
+                }
+            } else if(i == 3) {
+                // Ô ngày mượn: cho phép nhập số và dấu '/' (định dạng dd/mm/yyyy)
+                if((ch >= '0' && ch <= '9' || ch == '/') && boxes[i]->lettercount < 10) {
+                    boxes[i]->text[boxes[i]->lettercount++] = (char)ch;
+                    boxes[i]->text[boxes[i]->lettercount] = '\0';
+                    s_ngaymuonLoi = false;
                 }
             } else {
                 if(ch>=32&&boxes[i]->lettercount<250) {
@@ -721,8 +758,8 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
     // ── Tọa độ nút XÁC NHẬN — phải khớp với DrawPM ──
     Rectangle cr={(sw-800*sc)/2+600*sc,(sh-620*sc)/2,200*sc,620*sc};
     Rectangle Confirm={
-        cr.x + (cr.width - 160*sc)/2,   // Căn giữa panel phải
-        cr.y + cr.height + 10*sc,        // Ngay bên dưới đáy card (ngoài card)
+        cr.x + (cr.width - 160*sc)/2,
+        cr.y + cr.height + 10*sc,
         160*sc, 48*sc
     };
 
@@ -733,7 +770,12 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
         bool matheHopLe = KiemTraTheTonTai(Form->mathe.text);
         s_matheLoi = !matheHopLe;
 
-        // 2. Kiểm tra số ngày mượn hợp lệ (> 0)
+        // 2. Kiểm tra ngày mượn hợp lệ và không phải ngày tương lai
+        bool ngaymuonHopLe = KiemTraNgayHopLe(Form->ngaymuon.text)
+                          && NgayKhongTuongLai(Form->ngaymuon.text);
+        s_ngaymuonLoi = !ngaymuonHopLe;
+
+        // 3. Kiểm tra số ngày mượn hợp lệ (> 0)
         int soNgay = atoi(Form->ngaytra.text);
         if(Form->ngaytra.lettercount == 0 || soNgay <= 0) {
             s_ngaytraLoi = true;
@@ -743,7 +785,7 @@ void UpdateInputPM(FormPhieuMuon *Form, PhieuMuonNode **head, int *currentState,
         }
 
         // Nếu tất cả hợp lệ thì mới thực hiện tạo phiếu mượn
-        if(matheHopLe && !s_ngaytraLoi && Form->matruyen.lettercount > 0) {
+        if(matheHopLe && ngaymuonHopLe && !s_ngaytraLoi && Form->matruyen.lettercount > 0) {
             if(GiamSoLuongTap(s_selectedMaTap, s_selectedMaTruyen)) {
                 s_hetSachLoi = false;
                 if(LuuPhieuMuonVaoFile(mathe,Form)) {
@@ -784,7 +826,7 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
 
     DrawTextEx(font,"Phiếu mượn sách",(Vector2){cl.x+136*sc,cr.y+36*sc},36*sc,1, GetColor(0xeff2f1ff));
 
-// IDPM — 1 dòng căn giữa panel phải cr
+    // IDPM — 1 dòng căn giữa panel phải cr
     char idLine[32];
     snprintf(idLine, sizeof(idLine), "IDPM: %s", mathe);
     Vector2 idLineSize = MeasureTextEx(font, idLine, 20*sc, 1);
@@ -800,12 +842,13 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
         DrawTextEx(font,labels[i],(Vector2){boxes[i]->rec.x,boxes[i]->rec.y-25*sc},18*sc,1,GetColor(0xeff2f1ff));
 
         bool rdonly=(i==2);
-        bool isNgaytraLoi = (i==4 && s_ngaytraLoi);
-        bool isMatheLoi   = (i==0 && s_matheLoi);
-        bool isLoi        = isNgaytraLoi || isMatheLoi;
+        bool isNgaytraLoi  = (i==4 && s_ngaytraLoi);
+        bool isMatheLoi    = (i==0 && s_matheLoi);
+        bool isNgaymuonLoi = (i==3 && s_ngaymuonLoi);  // <-- thêm cờ lỗi ngày mượn
+        bool isLoi         = isNgaytraLoi || isMatheLoi || isNgaymuonLoi;
 
         Color borderColor = rdonly ? LIGHTGRAY : (isLoi ? RED : (boxes[i]->isfocused ? WHITE : LIGHTGRAY));
-        Color bgColor = rdonly ? GetColor(0xF0F0F0FF) : (isLoi ? GetColor(0xFFF0F0FF) : WHITE);
+        Color bgColor     = rdonly ? GetColor(0xF0F0F0FF) : (isLoi ? GetColor(0xFFF0F0FF) : WHITE);
         DrawRectangleRounded(boxes[i]->rec,0.2f,10, bgColor);
         DrawRectangleRoundedLines(boxes[i]->rec,0.2f,10, borderColor);
 
@@ -816,6 +859,15 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
         }
         if(isMatheLoi) {
             DrawTextEx(font,"! Mã thẻ không hợp lệ hoặc không tồn tại",
+                (Vector2){boxes[i]->rec.x, boxes[i]->rec.y+boxes[i]->rec.height+6*sc},
+                14*sc,1,RED);
+        }
+        if(isNgaymuonLoi) {
+            // Phân biệt thông báo: ngày không hợp lệ vs ngày tương lai
+            const char *errMsg = KiemTraNgayHopLe(Form->ngaymuon.text)
+                ? "! Ngày mượn không được là ngày tương lai"
+                : "! Ngày mượn không hợp lệ (dd/mm/yyyy)";
+            DrawTextEx(font, errMsg,
                 (Vector2){boxes[i]->rec.x, boxes[i]->rec.y+boxes[i]->rec.height+6*sc},
                 14*sc,1,RED);
         }
@@ -932,10 +984,10 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
         }
     }
 
-    // ── Nút XÁC NHẬN — nằm BÊN NGOÀI card, phía dưới góc phải (căn theo cr) ──
+    // ── Nút XÁC NHẬN ──
     Rectangle Confirm={
-        cr.x + (cr.width - 160*sc)/2,   // Căn giữa theo panel phải
-        cr.y + cr.height + 10*sc,        // Ngay bên dưới đáy card (ngoài card)
+        cr.x + (cr.width - 160*sc)/2,
+        cr.y + cr.height + 10*sc,
         160*sc, 48*sc
     };
     bool isHover=CheckCollisionPointRec(GetMousePosition(),Confirm);
@@ -943,6 +995,7 @@ void DrawPM(FormPhieuMuon *Form, Texture2D icons[], char *mathe, Font font) {
     DrawTextEx(font,"XÁC NHẬN",
            (Vector2){Confirm.x+(Confirm.width-MeasureTextEx(font,"XÁC NHẬN",20*sc,1).x)/2,
                      Confirm.y+(Confirm.height-20*sc)/2},20*sc,1,WHITE);
+
     // Thông báo hết sách
     if(s_hetSachLoi) {
         const char *hetMsg = "! Sách đã hết, không thể mượn!";

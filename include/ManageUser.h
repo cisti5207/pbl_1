@@ -27,8 +27,9 @@ typedef struct {
     InputBox_BD hanSD;
     bool showSuccess;    
     float successTimer;
-    char errorSdt[64];   // Thông báo lỗi cho ô số điện thoại
-    char errorCccd[64];  // Thông báo lỗi cho ô căn cước công dân
+    char errorSdt[64];   
+    char errorCccd[64];
+    char errorHoTen[128];  
 } Nhap;
  
 void InitForm(Nhap *form);

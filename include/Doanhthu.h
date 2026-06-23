@@ -22,7 +22,7 @@ typedef struct {
 // 2. Trạng thái xem UI
 typedef enum {
     VIEW_NGAY = 0,
-    VIEW_TUAN,           // Đã thêm chế độ xem theo TUẦN
+    VIEW_TUAN,
     VIEW_THANG,
     VIEW_QUY,
     VIEW_NAM
@@ -32,13 +32,16 @@ typedef enum {
 typedef struct {
     ViewDoanhThuMode currentView;
     float scroll;
-    InputBox_BD nhapNam; // Ô nhập năm để lọc dữ liệu
+    InputBox_BD nhapNam;     // Ô nhập năm để lọc dữ liệu (giữ nguyên)
+    InputBox_BD nhapTuNgay;  // Ô nhập "Từ ngày" dd/mm/yyyy
+    InputBox_BD nhapDenNgay; // Ô nhập "Đến ngày" dd/mm/yyyy
+    bool dateRangeActive;    // true = đang lọc theo khoảng ngày
 } FormDoanhThu;
 
 // 3. Các hàm xử lý Logic Ngày & Toán học
 int KhoangCachNgay(const char *ngayBatDau, const char *ngayKetThuc);
 void CongThemNgay(const char *ngayGoc, int soNgayThem, char *ngayKetQua);
-double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *ngayDuKien, const char *ngayTraThucTe); 
+double TinhTienThue(int giaMotNgay, const char *ngayMuon, const char *ngayDuKien, const char *ngayTraThucTe);
 
 // 4. Các hàm xử lý Map Doanh Thu
 void InitDoanhThuMap(DoanhThuMap *map);
